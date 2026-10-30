@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>UNIV198 · Lecture 8 · Evaluating Answers</title>
+<style>
+:root{--navy:#1F3A6E;--orange:#E08A00;--orangedk:#CC7600;--green:#2E7D32;--red:#C62828;--ink:#1a1a1a;--muted:#666;--box:#F3F6FA;--line:#C9D3E3;--mono:"SFMono-Regular",Menlo,Consolas,"Liberation Mono",monospace}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;background:#fff;color:var(--ink);font:16px/1.45 "Helvetica Neue",Helvetica,Arial,sans-serif}
+body{display:flex;flex-direction:column}
+header{flex:none;display:flex;justify-content:space-between;align-items:center;padding:10px 22px;border-bottom:3px solid var(--navy);font-size:13px;color:var(--muted)}
+header b{color:var(--navy)}
+header .title{font-size:15px;color:var(--navy);font-weight:700}
+main{position:relative;flex:1;min-height:0;overflow:hidden}
+.slide{position:absolute;inset:0;padding:26px 48px 20px;display:none;overflow:auto}
+.slide.on{display:block}
+h1{font-size:28px;margin:0 0 6px;color:var(--navy)}
+h2{font-size:17px;margin:14px 0 8px;color:var(--orange)}
+h3{font-size:15px;margin:0 0 4px;color:var(--navy)}
+p{margin:6px 0}
+.lead{font-size:17px}
+.muted{color:var(--muted)}
+.small{font-size:13px}
+.grid{display:grid;gap:14px;margin-top:10px}
+.g2{grid-template-columns:1fr 1fr}.g3{grid-template-columns:repeat(3,1fr)}.g4{grid-template-columns:repeat(4,1fr)}
+.card{background:var(--box);border:1px solid var(--line);border-radius:8px;padding:12px 14px}
+.card.orange{background:#FFF6E8;border-color:#F0C98A}
+.card.green{background:#F1F8F1;border-color:#A5C8A7}
+.card.red{background:#FDF1F1;border-color:#E6A3A3}
+.card h3{margin-bottom:6px}
+.num{display:inline-block;width:22px;height:22px;border-radius:50%;background:var(--orange);color:#fff;font-weight:700;font-size:13px;text-align:center;line-height:22px;margin-right:6px}
+pre,code,.mono{font-family:var(--mono)}
+pre{background:#fff;border:1px solid var(--line);border-radius:6px;padding:10px 12px;font-size:13.5px;white-space:pre-wrap;margin:6px 0}
+.prompt{background:#fff;border-left:4px solid var(--orange);padding:8px 12px;font-family:var(--mono);font-size:13.5px;white-space:pre-wrap;border-radius:4px}
+.model{background:#fff;border-left:4px solid var(--navy);padding:8px 12px;font-size:14px;white-space:pre-wrap;border-radius:4px}
+button{font:inherit;font-size:14px;padding:7px 14px;border-radius:6px;border:1px solid var(--navy);background:#fff;color:var(--navy);cursor:pointer}
+button.primary{background:var(--navy);color:#fff}
+button.orange{background:var(--orange);border-color:var(--orange);color:#fff}
+button:disabled{opacity:.45;cursor:default}
+button.sel{background:var(--navy);color:#fff}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin:8px 0}
+.take{background:#fff;border:2px solid var(--navy);border-radius:8px;padding:12px 16px;margin-top:12px}
+.ok{color:var(--green);font-weight:700}.bad{color:var(--red);font-weight:700}
+.tag{display:inline-block;padding:1px 8px;border-radius:10px;font-size:12px;font-weight:700;background:var(--navy);color:#fff;margin-right:6px}
+.tag.o{background:var(--orange)}.tag.g{background:var(--green)}.tag.r{background:var(--red)}.tag.grey{background:#888}
+table{border-collapse:collapse;width:100%;font-size:13.5px}
+th,td{padding:6px 8px;border-bottom:1px solid var(--line);vertical-align:top;text-align:left}
+th{color:var(--navy);border-bottom:2px solid var(--navy)}
+footer{flex:none;display:flex;justify-content:space-between;align-items:center;padding:8px 22px;border-top:1px solid var(--line);font-size:13px;color:var(--muted)}
+footer .nav button{min-width:40px}
+footer .dots span{display:inline-block;width:8px;height:8px;border-radius:50%;background:#ccd;margin:0 3px}
+footer .dots span.on{background:var(--orange)}
+.hide{display:none}
+input[type=text],textarea,select{font:inherit;font-size:14px;padding:6px 8px;border:1px solid var(--line);border-radius:6px;width:100%}
+textarea{font-family:var(--mono);font-size:13px}
+.step{opacity:.25;transition:opacity .25s}
+.step.on{opacity:1}
+.token{display:inline-block;padding:2px 6px;margin:2px;border-radius:4px;background:#E8EEF7;border:1px solid var(--line);font-family:var(--mono);font-size:13px}
+.token.new{background:#FFE7C2;border-color:var(--orange)}
+.pill{display:inline-block;padding:6px 10px;border:1px solid var(--line);border-radius:6px;background:#fff;cursor:pointer;font-size:13.5px;margin:3px}
+.pill.sel{background:var(--navy);color:#fff;border-color:var(--navy)}
+.pill.right{background:#E6F2E6;border-color:var(--green)}
+.pill.wrong{background:#FBE6E6;border-color:var(--red)}
+.blank{background:#FFE7C2;border-bottom:2px solid var(--orange);padding:0 3px;border-radius:3px}
+.kv{display:grid;grid-template-columns:150px 1fr;gap:6px 10px;font-size:14px}
+.null{color:var(--red);font-weight:700}
+.chk{font-size:14px;margin:4px 0}
+@media (max-width:900px){.g2,.g3,.g4{grid-template-columns:1fr}.slide{padding:18px 16px}h1{font-size:22px}}
+
+.turn{display:flex;gap:10px;margin:6px 0;align-items:flex-start}
+.turn .who{flex:none;width:64px;font-size:12px;font-weight:700;color:var(--navy);padding-top:9px}
+.turn .msg{flex:1;border-radius:6px;padding:8px 12px;font-size:13.5px;white-space:pre-wrap}
+.turn.u .msg{background:#fff;border-left:4px solid var(--orange);font-family:var(--mono);font-size:13px}
+.turn.m .msg{background:#fff;border-left:4px solid var(--navy)}
+.turn .note{flex:none;width:200px;font-size:12px;color:var(--muted);padding-top:6px}
+.bar{display:flex;align-items:center;gap:8px;margin:3px 0;font-size:13px}
+.bar .lab{flex:none;width:200px;font-family:var(--mono);font-size:12px}
+.bar .fill{height:16px;border-radius:3px;background:var(--navy);transition:opacity .3s,width .3s}
+.bar.rule .fill{background:var(--orange)}
+.sn{font-size:10px;color:var(--orange);font-weight:700;vertical-align:super;margin-right:2px}
+.score{display:grid;grid-template-columns:150px repeat(3,46px);gap:4px 8px;align-items:center;font-size:13px}
+.score .sq{display:inline-block;width:40px;height:28px;line-height:28px;text-align:center;border:1px solid var(--line);border-radius:5px;cursor:pointer;background:#fff}
+.score .sq.sel{background:var(--navy);color:#fff;border-color:var(--navy)}
+.ans{background:#fff;border:1px solid var(--line);border-radius:8px;padding:10px 12px;font-size:13.5px;white-space:pre-wrap;min-height:120px}
+.ans.a{border-top:4px solid var(--orange)}.ans.b{border-top:4px solid var(--navy)}
+@media (max-width:900px){.turn .note{display:none}.bar .lab{width:120px}}
+</style></head>
+<body>
+<header><div><span class="title">UNIV198 · AI Literacy · Lecture 8</span><br>Prompting in practice: evaluating answers, and beyond prompting</div>
+<div class="small">Companion page · <b>Evaluating Answers</b><br>Use ← → or the buttons below</div></header>
+<main>
+<section class="slide">
+<h1>Four Questions for Any Answer</h1>
+<p class="lead">The model writes; you judge. Four questions, in this order, every time. They are also how Assignment 1 is being marked, and what the midterm (Week 11) asks.</p>
+<div class="grid g2">
+ <div class="card"><h3><span class="num">1</span>Correct?</h3><p class="small">Check the facts you can check: every number, date, name, quote and citation you will reuse. Two minutes per reused fact (Lecture 3). If you cannot check it, you cannot use it.</p></div>
+ <div class="card"><h3><span class="num">2</span>Complete?</h3><p class="small">What did the task need that the answer left out? Smooth answers skip the hard part. Compare against the task, not against the answer's own outline.</p></div>
+ <div class="card"><h3><span class="num">3</span>Appropriate?</h3><p class="small">Right reader, right length, right register, right format. An accurate answer for the wrong reader is still the wrong answer.</p></div>
+ <div class="card orange"><h3><span class="num">4</span>Checkable?</h3><p class="small">Does it show its sources, steps or structure so that question 1 was possible? An answer that cannot be checked scores zero here, however good it sounds.</p></div>
+</div>
+<div class="take"><b>The habit:</b> before you reuse a fact, you can say in one sentence where you checked it. If you cannot, it is not yet a fact; it is a token sequence.</div>
+</section>
+<section class="slide">
+<h1>The Two-Minute Check, by Kind of Claim</h1>
+<table>
+<tr><th style="width:22%">The answer contains</th><th style="width:42%">How to check it</th><th>What a failure looks like</th></tr>
+<tr><td>A number or a date</td><td>Find it in a primary source: the paper, the statistics office, the official page. Not another chatbot.</td><td>Precise figure, no source, slightly different each run.</td></tr>
+<tr><td>A quotation</td><td>Search the exact phrase in quotation marks.</td><td>The sentence exists nowhere, or exists with a different meaning.</td></tr>
+<tr><td>A citation</td><td>Open it. Does the paper exist, and does it say that?</td><td>Real authors, real journal, invented title or year (Lecture 3).</td></tr>
+<tr><td>A procedure or rule</td><td>Compare with the official instructions: the syllabus, the regulation, the manual.</td><td>Plausible steps with one missing, or an outdated version.</td></tr>
+<tr><td>Code</td><td>Run it, with one input designed to break it.</td><td>Runs on the example, fails on the edge case.</td></tr>
+<tr><td>An opinion or a judgement</td><td>Ask for the strongest objection, then judge both.</td><td>Agreement with the premise you supplied.</td></tr>
+</table>
+<h2>Eight failure patterns worth recognising on sight</h2>
+<div class="grid g4">
+ <div class="card"><b>Confident hedge</b><p class="small">“is generally considered”, “experts agree”: a claim with no owner.</p></div>
+ <div class="card"><b>Invented specifics</b><p class="small">A precise number, year or name that makes the answer feel checked. It is not.</p></div>
+ <div class="card"><b>Scope creep</b><p class="small">Answers a neighbouring, easier question, fluently.</p></div>
+ <div class="card"><b>Sycophancy</b><p class="small">Agrees with the premise in your question, including the wrong ones.</p></div>
+ <div class="card"><b>Format drift</b><p class="small">The table you asked for turns into prose by the second answer.</p></div>
+ <div class="card"><b>Smoothing</b><p class="small">The hard part of the task is summarised away in one tidy sentence.</p></div>
+ <div class="card"><b>Apology loop</b><p class="small">“You are right, I apologise” followed by a new guess, not a check.</p></div>
+ <div class="card"><b>Stale knowledge</b><p class="small">True at the cut-off, not now. Ask for the date it relies on.</p></div>
+</div>
+<p class="small muted">None of these is a bug. Each is the likeliest text for the context you gave (Lecture 3). Recognising them is faster than preventing them.</p>
+</section>
+<section class="slide">
+<h1>Activity 1: Spot the Pattern</h1>
+<p class="lead">Six short extracts from answers (invented). For each, pick the failure pattern, then press Check. Submit your real answers, with the three words on what you would check or ask, on the Google Form.</p>
+<div id="act1" class="grid g2"></div>
+<div class="row"><button class="primary" id="checkA1">Check</button><button id="resetA1">Reset</button><span id="scoreA1" class="small muted"></span></div>
+<div class="take hide" id="patternA1"><b>The pattern:</b> every one of these is a prompt for the next follow-up (Lecture 7): ask for the owner of the claim, open the page, re-ask the exact question, ask for the steps rather than for agreement, ask for the check rather than the new guess, ask for every exception with its clause.</div>
+</section>
+<section class="slide">
+<h1>Activity 2: Grade Two Answers</h1>
+<p class="lead">Pick your school. One prompt, two answers to it, A and B (all invented). Score each on the four questions, 0 to 2, then press <b>Compare</b>. Agree the scores with your partner before you type them on the Google Form; this page shows the defensible scores afterwards.</p>
+<div class="row"><label class="small" for="school"><b>School:</b></label><select id="school" style="width:auto"></select></div>
+<div class="card"><h3>The prompt</h3><div class="prompt" id="gprompt"></div></div>
+<div class="grid g2" style="margin-top:10px">
+ <div><h3>Answer A</h3><div class="ans a" id="gA"></div></div>
+ <div><h3>Answer B</h3><div class="ans b" id="gB"></div></div>
+</div>
+<div class="grid g2" style="margin-top:10px">
+ <div class="card"><h3>Score A</h3><div class="score" id="scA"></div><p class="small" id="totA"></p></div>
+ <div class="card"><h3>Score B</h3><div class="score" id="scB"></div><p class="small" id="totB"></p></div>
+</div>
+<div class="row"><button class="primary" id="gcmp">Compare</button><button id="greset">Reset scores</button></div>
+<div class="take hide" id="gout"></div>
+</section>
+<section class="slide">
+<h1>What the Room Usually Finds, and Comparing Two Tools Fairly</h1>
+<div class="grid g3">
+ <div class="card"><h3>The fluent one loses</h3><p class="small">Answer A is longer and more confident in every pair. It scores lower on checkable every time, and usually on complete.</p></div>
+ <div class="card"><h3>Complete is the split</h3><p class="small">Pairs agree on correct and appropriate within a point. Complete is where they argue, because it needs the task, not the answer.</p></div>
+ <div class="card orange"><h3>Nobody checked the number</h3><p class="small">Both answers contain one figure. Almost no pair looks it up. That is the two minutes Assignment 1 asked for.</p></div>
+</div>
+<h2>Comparing two tools fairly (Assignment 1, in hindsight)</h2>
+<div class="grid g2">
+ <div class="card"><h3>Same everything</h3><ul class="small" style="margin:4px 0 0 18px;line-height:1.6"><li>Same prompt, word for word, pasted; same input text</li><li>Run each tool twice: one run is a sample (Lecture 3)</li><li>Same settings you know of: search on or off in both, thinking mode on or off in both</li><li>Record the date, the tool name, and the prompt</li></ul></div>
+ <div class="card"><h3>Compare on the four questions, not on tone</h3>
+  <table class="small"><tr><th>Question</th><th>Copilot</th><th>Gemini</th><th>What I checked</th></tr>
+  <tr><td>Correct?</td><td>2</td><td>1</td><td>the 2023 figure, source</td></tr><tr><td>Complete?</td><td>1</td><td>2</td><td>the exception clause</td></tr><tr><td>Appropriate?</td><td>2</td><td>2</td><td>first-year reader</td></tr><tr><td>Checkable?</td><td>0</td><td>2</td><td>B quoted lines</td></tr></table>
+  <p class="small muted">0 = no, 1 = partly, 2 = yes. The table is the evidence; the paragraph you write is the argument.</p></div>
+</div>
+<div class="take"><b>When they disagree:</b> disagreement is information, not a verdict. Name the likely cause from Lecture 3 (the model, the sampling, the cut-off, the system prompt or the search), then ask Lecture 5's question: what did my prompt leave open?</div>
+</section>
+<section class="slide">
+<h1>Takeaways</h1>
+<div class="grid g2">
+ <div class="card"><h3>Four questions, in order</h3><p class="small">Correct, complete, appropriate, checkable. The fourth decides whether the first was even possible.</p></div>
+ <div class="card"><h3>Two minutes per reused fact</h3><p class="small">A primary source, not another chatbot. If you cannot say where you checked it, it is not yet a fact.</p></div>
+ <div class="card"><h3>Patterns, not bugs</h3><p class="small">Confident hedge, invented specifics, scope creep, sycophancy, format drift, smoothing, apology loop, stale knowledge. Each is a prompt for the next follow-up.</p></div>
+ <div class="card"><h3>The marker reads your checks</h3><p class="small">Not the tools' prose. An answer you could not check gets the follow-up, not the grade. The midterm gives you a task, a prompt and an answer, and asks exactly these four questions.</p></div>
+</div>
+<p class="small muted" style="margin-top:14px">The second half of Lecture 8 (where prompting stops: documents in Week 7, fine-tuning for specialists) has no companion page; the slides and the readings cover it.</p>
+</section>
+</main>
+<footer><div class="dots" id="dots"></div><div class="nav"><button id="prev">←</button> <span id="counter"></span> <button id="next">→</button></div></footer>
+<script>
+(function(){
+  const slides=[...document.querySelectorAll('.slide')];
+  let i=0;
+  const counter=document.getElementById('counter'), dots=document.getElementById('dots');
+  slides.forEach((s,k)=>{const d=document.createElement('span'); d.onclick=()=>go(k); dots.appendChild(d);});
+  function go(n){ i=Math.max(0,Math.min(slides.length-1,n));
+    slides.forEach((s,k)=>s.classList.toggle('on',k===i));
+    [...dots.children].forEach((d,k)=>d.classList.toggle('on',k===i));
+    counter.textContent=(i+1)+' / '+slides.length;
+    document.getElementById('prev').disabled=i===0; document.getElementById('next').disabled=i===slides.length-1;
+    try{location.hash='s'+(i+1);}catch(e){}
+  }
+  document.getElementById('prev').onclick=()=>go(i-1);
+  document.getElementById('next').onclick=()=>go(i+1);
+  document.addEventListener('keydown',e=>{ if(e.target.tagName==='TEXTAREA'||e.target.tagName==='INPUT')return;
+    if(e.key==='ArrowRight'||e.key==='PageDown'||e.key===' '){e.preventDefault();go(i+1);}
+    if(e.key==='ArrowLeft'||e.key==='PageUp'){e.preventDefault();go(i-1);}
+    if(e.key==='Home')go(0); if(e.key==='End')go(slides.length-1);});
+  const m=(location.hash||'').match(/s(\d+)/); go(m?parseInt(m[1])-1:0);
+  window.goSlide=go;
+})();
+
+const SCH={"Medicine": {"prompt": "Write five plain sentences for a patient on what to do in the first day after a tooth extraction, for a reader with no medical training. Use only the leaflet pasted below; do not add drug names. Mark anything not in the leaflet as NOT STATED.\n\n[leaflet, 14 lines]", "A": "After your extraction, it is essential to follow proper aftercare to ensure optimal healing. Bite firmly on the gauze for 30 to 45 minutes, and avoid rinsing, spitting or drinking through a straw for 24 hours, as this can dislodge the clot and cause dry socket, which affects about 3 to 5 percent of patients. Take ibuprofen 400 mg every six hours, or paracetamol if you cannot take ibuprofen. Avoid hot drinks, alcohol and smoking. Eat soft foods such as yoghurt and soup. Keep your head raised when you lie down. If bleeding continues for more than two hours, or you develop a fever, contact your dentist. Most patients feel much better within three days.", "B": "1. Keep biting on the gauze for the time the dentist told you (leaflet, line 2).\n2. For the first day, do not rinse, spit or use a straw, so that the clot stays in place (line 3).\n3. Eat soft, cool food, and keep hot drinks for tomorrow (line 6).\n4. Rest with your head a little raised (line 8).\n5. If the bleeding does not stop or you feel unwell with a fever, call the practice (line 11).\nPain relief: the leaflet says to take what the dentist recommended; it names no medicine. NOT STATED: how long healing takes.", "scores": {"A": [1, 1, 0, 0], "B": [2, 2, 2, 2]}, "why": "A is fluent, adds two drug names and a dosing instruction the leaflet never gives, and a percentage with no source. B uses only the leaflet, points to the line for each sentence, and says what the leaflet does not cover."}, "Nursing": {"prompt": "Turn the handover note pasted below into an SBAR note: four labelled lines, one each for Situation, Background, Assessment, Recommendation. Use only the note. If a line cannot be filled from the note, write NOT STATED.\n\n[handover note, 9 lines; the patient is invented]", "A": "The patient is a 64-year-old woman admitted yesterday with community-acquired pneumonia who has remained stable overnight, although she became more breathless this morning with a heart rate of 112 and oxygen saturation of 91 percent on room air. She has a history of COPD and hypertension and is on her second day of intravenous antibiotics. On assessment she appears tired but is alert and orientated, and her chest sounds have not changed. I would recommend increasing her oxygen, repeating observations in thirty minutes and informing the doctor if she does not improve.", "B": "S: Woman, 64, admitted with pneumonia; more breathless since 07:00; HR 102, SpO2 91% on air (note, lines 1 and 4).\nB: COPD and hypertension; IV antibiotics started yesterday (lines 2 and 3).\nA: Alert, tired; chest unchanged on the day nurse's listen (line 6). Temperature: NOT STATED.\nR: NOT STATED in the note. The note ends with the observations; no plan is written.", "scores": {"A": [1, 2, 1, 0], "B": [2, 2, 2, 2]}, "why": "A reads like a good handover, but the heart rate is wrong (the note says 102) and the recommendation is invented. B keeps the four lines, cites the note, and admits what is missing: the missing recommendation is the thing the nurse now has to write."}, "Law": {"prompt": "Summarise the case summary pasted below in IRAC form (Issue, Rule, Application, Conclusion), under 120 words, for a first-year law student. Use only the text. Where the summary does not state something, write NOT STATED.\n\n[case summary, invented, 20 lines]", "A": "Issue: whether a tenant who withheld rent because of disrepair was lawfully evicted. Rule: under the well-established principle confirmed by the Court of Appeal in 2019, a landlord must follow the statutory notice procedure before possession, and the tenant's right to withhold rent is limited. Application: the landlord served no valid notice and relied on an informal letter, which the court found insufficient. Conclusion: the eviction was unlawful and the tenant was entitled to damages of 4,000, a sum the court described as modest given the circumstances.", "B": "Issue: was the eviction lawful when no formal notice had been served? (summary, lines 3 and 4)\nRule: the summary states that notice in the prescribed form is required before possession (line 7). Which court decided this: NOT STATED.\nApplication: the letter of 12 March was found not to be notice in the prescribed form (lines 9 to 11).\nConclusion: eviction unlawful; damages awarded (line 14). The amount: NOT STATED.", "scores": {"A": [1, 2, 2, 0], "B": [2, 2, 2, 2]}, "why": "A cites a court and a year that the summary never mentions and gives a figure the summary does not contain. B has the same structure, quotes line numbers, and flags the two gaps instead of filling them."}, "Engineering": {"prompt": "Below is a short Python function. Name one input that would make it fail or return a wrong result, and say which line is responsible. If you find none, say so and explain why.\n\n[function, 8 lines: average of a list of sizes]", "A": "The function is well structured and follows good practices: it has a clear name, a docstring and a single responsibility. It correctly sums the values and divides by the count to compute the average. One suggestion would be to add type hints and input validation to make it more robust and readable, and perhaps to handle edge cases gracefully. Overall, the implementation looks correct.", "B": "Input: an empty list, [] .\nWhat happens: line 4 divides by len(sizes), which is 0, so the function raises ZeroDivisionError.\nA second case: sizes containing a string, e.g. [3, \"4\"], fails at line 3 in the sum.\nNot an error, but worth knowing: negative sizes are accepted and lower the average (line 3 does not check them).", "scores": {"A": [0, 0, 1, 0], "B": [2, 2, 2, 2]}, "why": "A answers a neighbouring question (is the code tidy?) and never names an input. B gives the input, the line and the error, which you can confirm by running it."}, "Sciences": {"prompt": "The abstract pasted below is followed by six claims from a student's summary of it. For each claim, say whether the abstract supports it, and quote the sentence that does. If no sentence supports it, write NOT STATED.\n\n[abstract, invented, 8 sentences; six claims]", "A": "Yes, all six claims are well supported by the abstract. The study clearly demonstrates that the treatment improved growth rates, that the effect was significant across all conditions, and that the mechanism involves the signalling pathway described. The sample size of 120 plants gives the results good statistical power, and the conclusions follow directly from the data presented. The summary is accurate and complete.", "B": "1. Supported: \"growth rate increased by 18% in treated plants\" (sentence 4).\n2. Supported: \"the effect was present at both temperatures tested\" (sentence 5). Note: two conditions, not \"all conditions\".\n3. NOT STATED: the abstract names no mechanism.\n4. Supported: \"n = 120\" (sentence 3).\n5. NOT STATED: no control for light is mentioned.\n6. Supported in part: sentence 7 says \"may\", the claim says \"shows\".", "scores": {"A": [0, 1, 1, 0], "B": [2, 2, 2, 2]}, "why": "A agrees with every claim, including two the abstract never makes, and quotes nothing. B goes claim by claim with the sentence number and catches the two unsupported ones and the softened verb."}, "Administrative Sciences and Economics": {"prompt": "The forecast pasted below predicts next year's revenue for a small company. List the assumptions the forecast depends on, one line each, each tied to the sentence in the text that makes it. Do not restate the forecast. If an assumption is implied but not written, say so.\n\n[forecast memo, invented, 12 sentences]", "A": "The forecast expects revenue to grow from 2.4 million to 3.1 million next year, a rise of about 29 percent, driven mainly by the launch of the new product line in the second quarter and continued growth in the existing customer base. Costs are expected to rise more slowly, so margins improve. The forecast appears reasonable given the company's recent performance and the general market outlook, although some risks remain, as with any projection.", "B": "1. The new line launches in Q2 and sells from the first month (sentence 5). Implied, not written: no launch delay.\n2. Existing customers renew at last year's rate (sentence 7).\n3. Prices stay fixed; no discounting is mentioned (sentence 8, implied).\n4. The two largest customers remain (sentence 9 mentions them; their renewal is assumed, not stated).\n5. Exchange rate: the memo gives figures in one currency and never mentions it. Implied.", "scores": {"A": [1, 0, 1, 0], "B": [2, 2, 2, 2]}, "why": "A restates the forecast, politely, and calls it reasonable. B lists assumptions, ties each to a sentence, and separates the written ones from the implied ones, which is what the task asked."}, "Social Sciences and Humanities": {"prompt": "Summarise the argument of the passage pasted below in under 100 words for a first-year reader. Use only the passage; name no authors the passage does not name. Quote two phrases from it.\n\n[passage, invented, about 350 words]", "A": "The passage argues, in line with the view widely accepted among scholars since Foucault (1975), that institutions shape individual behaviour through routine rather than through explicit rules. Drawing on examples from schools and hospitals, the author shows that discipline operates through timetables, architecture and observation, and that individuals internalise these structures over time. The argument is persuasive and well supported, and connects to broader debates in sociology about power and agency, although some critics have questioned whether it leaves room for resistance. In conclusion, the passage offers a nuanced account of how everyday routines carry authority.", "B": "The passage argues that institutions shape people less through rules than through routine: \"the timetable governs more firmly than the regulation\". Using a school and a hospital as examples, it claims that people come to treat these routines as their own, \"so that the watching is no longer needed\". The author gives no evidence beyond the two examples and names no other scholars. Under 100 words; two phrases quoted.", "scores": {"A": [1, 1, 0, 0], "B": [2, 2, 2, 2]}, "why": "A is 110 words, names an author the passage does not, invents critics, and quotes nothing. B is under the limit, quotes two phrases you can find in the passage, and says plainly what the passage does not contain."}};
+
+(function(){
+ const pats=['Confident hedge','Invented specifics','Scope creep','Sycophancy','Format drift','Smoothing','Apology loop','Stale knowledge'];
+ const cases=[
+  ['“It is widely accepted”','“It is widely accepted that the policy reduced inflation by about 4 points within a year.”','Confident hedge','Who accepts it? Ask for the source.'],
+  ['The precise figure','“Koç University’s library holds 1,284,310 volumes, of which 61.7% are in English.”','Invented specifics','Open the library page.'],
+  ['The neighbouring question','Asked which input breaks the function. Answer: a paragraph on why the function is well structured.','Scope creep','Re-ask the exact question.'],
+  ['The confirmation','You: “So the total is 35, right?” Model: “Yes, exactly, 35 cups. Well done.” (It was 42.)','Sycophancy','Ask for the steps, not for agreement.'],
+  ['The apology','“You are right, I apologise for the confusion. The correct year is 2021.” (It was 2023.)','Apology loop','Ask for the check, not the new guess.'],
+  ['The tidy sentence','Asked to list the exceptions in a regulation. Answer: “...with a small number of exceptions for special cases.”','Smoothing','“List every exception, quote the clause.”']];
+ const box=document.getElementById('act1'); const picks={};
+ cases.forEach((t,i)=>{const c=document.createElement('div'); c.className='card'; c.innerHTML='<span class="num">'+(i+1)+'</span><b>'+t[0]+'</b><p class="small" style="margin:4px 0">'+t[1]+'</p>';
+  const s=document.createElement('select'); s.innerHTML='<option value="">choose a pattern</option>'+pats.map(p=>'<option>'+p+'</option>').join(''); s.onchange=()=>{picks[i]=s.value;}; s.id='s'+i; c.appendChild(s);
+  const x=document.createElement('div'); x.className='small muted hide'; x.id='x'+i; c.appendChild(x); box.appendChild(c);});
+ document.getElementById('checkA1').onclick=()=>{let ok=0; cases.forEach((t,i)=>{const s=document.getElementById('s'+i); const good=picks[i]===t[2]; if(good)ok++; s.style.borderColor=good?'var(--green)':'var(--red)'; s.style.borderWidth='2px';
+   const x=document.getElementById('x'+i); x.classList.remove('hide'); x.innerHTML='<b>Defensible:</b> '+t[2]+'. <i>'+t[3]+'</i>';});
+  document.getElementById('scoreA1').textContent=ok+' of 6 match the defensible answers.'; document.getElementById('patternA1').classList.remove('hide');};
+ document.getElementById('resetA1').onclick=()=>{for(const k in picks)delete picks[k]; cases.forEach((t,i)=>{const s=document.getElementById('s'+i); s.value=''; s.style.borderColor=''; s.style.borderWidth=''; document.getElementById('x'+i).classList.add('hide');}); document.getElementById('scoreA1').textContent=''; document.getElementById('patternA1').classList.add('hide');};
+})();
+(function(){
+ const qs=['Correct?','Complete?','Appropriate?','Checkable?']; const sel=document.getElementById('school'); Object.keys(SCH).forEach(k=>{const o=document.createElement('option'); o.textContent=k; sel.appendChild(o);});
+ const sc={A:[null,null,null,null],B:[null,null,null,null]};
+ function grid(id,key){ const g=document.getElementById(id); g.innerHTML=''; qs.forEach((q,i)=>{ const l=document.createElement('span'); l.textContent=q; g.appendChild(l);
+   [0,1,2].forEach(v=>{const b=document.createElement('span'); b.className='sq'+(sc[key][i]===v?' sel':''); b.textContent=v; b.onclick=()=>{sc[key][i]=v; grid(id,key); tot();}; g.appendChild(b);});});}
+ function tot(){ ['A','B'].forEach(k=>{const s=sc[k]; const n=s.filter(v=>v!==null).length; document.getElementById('tot'+k).textContent = n===4?('Total: '+s.reduce((a,b)=>a+b,0)+' of 8'):(4-n)+' question'+(4-n>1?'s':'')+' left';}); }
+ function load(){ const d=SCH[sel.value]; document.getElementById('gprompt').textContent=d.prompt; document.getElementById('gA').textContent=d.A; document.getElementById('gB').textContent=d.B; sc.A=[null,null,null,null]; sc.B=[null,null,null,null]; grid('scA','A'); grid('scB','B'); tot(); document.getElementById('gout').classList.add('hide'); }
+ sel.onchange=load; load();
+ document.getElementById('gcmp').onclick=()=>{ const d=SCH[sel.value]; const o=document.getElementById('gout'); o.classList.remove('hide');
+  const row=(k)=>qs.map((q,i)=>q.replace('?','')+' '+d.scores[k][i]).join(' · ')+' (total '+d.scores[k].reduce((a,b)=>a+b,0)+')';
+  const yours=(k)=>sc[k].every(v=>v!==null)?' Yours: '+sc[k].reduce((a,b)=>a+b,0)+'.':'';
+  o.innerHTML='<b>Defensible scores.</b> A: '+row('A')+'.'+yours('A')+'<br>B: '+row('B')+'.'+yours('B')+'<p class="small" style="margin:6px 0 0">'+d.why+' A point either way on correct or appropriate is a fair argument; checkable is not: an answer with no sources, lines or steps scores 0 there however good it sounds.</p>'; };
+ document.getElementById('greset').onclick=()=>{sc.A=[null,null,null,null]; sc.B=[null,null,null,null]; grid('scA','A'); grid('scB','B'); tot(); document.getElementById('gout').classList.add('hide');};
+})();
+
+</script>
+</body></html>

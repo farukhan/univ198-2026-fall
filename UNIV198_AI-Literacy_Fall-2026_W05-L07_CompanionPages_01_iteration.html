@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>UNIV198 · Lecture 7 · Iteration</title>
+<style>
+:root{--navy:#1F3A6E;--orange:#E08A00;--orangedk:#CC7600;--green:#2E7D32;--red:#C62828;--ink:#1a1a1a;--muted:#666;--box:#F3F6FA;--line:#C9D3E3;--mono:"SFMono-Regular",Menlo,Consolas,"Liberation Mono",monospace}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;background:#fff;color:var(--ink);font:16px/1.45 "Helvetica Neue",Helvetica,Arial,sans-serif}
+body{display:flex;flex-direction:column}
+header{flex:none;display:flex;justify-content:space-between;align-items:center;padding:10px 22px;border-bottom:3px solid var(--navy);font-size:13px;color:var(--muted)}
+header b{color:var(--navy)}
+header .title{font-size:15px;color:var(--navy);font-weight:700}
+main{position:relative;flex:1;min-height:0;overflow:hidden}
+.slide{position:absolute;inset:0;padding:26px 48px 20px;display:none;overflow:auto}
+.slide.on{display:block}
+h1{font-size:28px;margin:0 0 6px;color:var(--navy)}
+h2{font-size:17px;margin:14px 0 8px;color:var(--orange)}
+h3{font-size:15px;margin:0 0 4px;color:var(--navy)}
+p{margin:6px 0}
+.lead{font-size:17px}
+.muted{color:var(--muted)}
+.small{font-size:13px}
+.grid{display:grid;gap:14px;margin-top:10px}
+.g2{grid-template-columns:1fr 1fr}.g3{grid-template-columns:repeat(3,1fr)}.g4{grid-template-columns:repeat(4,1fr)}
+.card{background:var(--box);border:1px solid var(--line);border-radius:8px;padding:12px 14px}
+.card.orange{background:#FFF6E8;border-color:#F0C98A}
+.card.green{background:#F1F8F1;border-color:#A5C8A7}
+.card.red{background:#FDF1F1;border-color:#E6A3A3}
+.card h3{margin-bottom:6px}
+.num{display:inline-block;width:22px;height:22px;border-radius:50%;background:var(--orange);color:#fff;font-weight:700;font-size:13px;text-align:center;line-height:22px;margin-right:6px}
+pre,code,.mono{font-family:var(--mono)}
+pre{background:#fff;border:1px solid var(--line);border-radius:6px;padding:10px 12px;font-size:13.5px;white-space:pre-wrap;margin:6px 0}
+.prompt{background:#fff;border-left:4px solid var(--orange);padding:8px 12px;font-family:var(--mono);font-size:13.5px;white-space:pre-wrap;border-radius:4px}
+.model{background:#fff;border-left:4px solid var(--navy);padding:8px 12px;font-size:14px;white-space:pre-wrap;border-radius:4px}
+button{font:inherit;font-size:14px;padding:7px 14px;border-radius:6px;border:1px solid var(--navy);background:#fff;color:var(--navy);cursor:pointer}
+button.primary{background:var(--navy);color:#fff}
+button.orange{background:var(--orange);border-color:var(--orange);color:#fff}
+button:disabled{opacity:.45;cursor:default}
+button.sel{background:var(--navy);color:#fff}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin:8px 0}
+.take{background:#fff;border:2px solid var(--navy);border-radius:8px;padding:12px 16px;margin-top:12px}
+.ok{color:var(--green);font-weight:700}.bad{color:var(--red);font-weight:700}
+.tag{display:inline-block;padding:1px 8px;border-radius:10px;font-size:12px;font-weight:700;background:var(--navy);color:#fff;margin-right:6px}
+.tag.o{background:var(--orange)}.tag.g{background:var(--green)}.tag.r{background:var(--red)}.tag.grey{background:#888}
+table{border-collapse:collapse;width:100%;font-size:13.5px}
+th,td{padding:6px 8px;border-bottom:1px solid var(--line);vertical-align:top;text-align:left}
+th{color:var(--navy);border-bottom:2px solid var(--navy)}
+footer{flex:none;display:flex;justify-content:space-between;align-items:center;padding:8px 22px;border-top:1px solid var(--line);font-size:13px;color:var(--muted)}
+footer .nav button{min-width:40px}
+footer .dots span{display:inline-block;width:8px;height:8px;border-radius:50%;background:#ccd;margin:0 3px}
+footer .dots span.on{background:var(--orange)}
+.hide{display:none}
+input[type=text],textarea,select{font:inherit;font-size:14px;padding:6px 8px;border:1px solid var(--line);border-radius:6px;width:100%}
+textarea{font-family:var(--mono);font-size:13px}
+.step{opacity:.25;transition:opacity .25s}
+.step.on{opacity:1}
+.token{display:inline-block;padding:2px 6px;margin:2px;border-radius:4px;background:#E8EEF7;border:1px solid var(--line);font-family:var(--mono);font-size:13px}
+.token.new{background:#FFE7C2;border-color:var(--orange)}
+.pill{display:inline-block;padding:6px 10px;border:1px solid var(--line);border-radius:6px;background:#fff;cursor:pointer;font-size:13.5px;margin:3px}
+.pill.sel{background:var(--navy);color:#fff;border-color:var(--navy)}
+.pill.right{background:#E6F2E6;border-color:var(--green)}
+.pill.wrong{background:#FBE6E6;border-color:var(--red)}
+.blank{background:#FFE7C2;border-bottom:2px solid var(--orange);padding:0 3px;border-radius:3px}
+.kv{display:grid;grid-template-columns:150px 1fr;gap:6px 10px;font-size:14px}
+.null{color:var(--red);font-weight:700}
+.chk{font-size:14px;margin:4px 0}
+@media (max-width:900px){.g2,.g3,.g4{grid-template-columns:1fr}.slide{padding:18px 16px}h1{font-size:22px}}
+
+.turn{display:flex;gap:10px;margin:6px 0;align-items:flex-start}
+.turn .who{flex:none;width:64px;font-size:12px;font-weight:700;color:var(--navy);padding-top:9px}
+.turn .msg{flex:1;border-radius:6px;padding:8px 12px;font-size:13.5px;white-space:pre-wrap}
+.turn.u .msg{background:#fff;border-left:4px solid var(--orange);font-family:var(--mono);font-size:13px}
+.turn.m .msg{background:#fff;border-left:4px solid var(--navy)}
+.turn .note{flex:none;width:200px;font-size:12px;color:var(--muted);padding-top:6px}
+.bar{display:flex;align-items:center;gap:8px;margin:3px 0;font-size:13px}
+.bar .lab{flex:none;width:200px;font-family:var(--mono);font-size:12px}
+.bar .fill{height:16px;border-radius:3px;background:var(--navy);transition:opacity .3s,width .3s}
+.bar.rule .fill{background:var(--orange)}
+.sn{font-size:10px;color:var(--orange);font-weight:700;vertical-align:super;margin-right:2px}
+.score{display:grid;grid-template-columns:150px repeat(3,46px);gap:4px 8px;align-items:center;font-size:13px}
+.score .sq{display:inline-block;width:40px;height:28px;line-height:28px;text-align:center;border:1px solid var(--line);border-radius:5px;cursor:pointer;background:#fff}
+.score .sq.sel{background:var(--navy);color:#fff;border-color:var(--navy)}
+.ans{background:#fff;border:1px solid var(--line);border-radius:8px;padding:10px 12px;font-size:13.5px;white-space:pre-wrap;min-height:120px}
+.ans.a{border-top:4px solid var(--orange)}.ans.b{border-top:4px solid var(--navy)}
+@media (max-width:900px){.turn .note{display:none}.bar .lab{width:120px}}
+</style></head>
+<body>
+<header><div><span class="title">UNIV198 · AI Literacy · Lecture 7</span><br>Prompting in practice: iteration and context</div>
+<div class="small">Companion page · <b>Iteration</b><br>Use ← → or the buttons below</div></header>
+<main>
+<section class="slide">
+<h1>The Loop: Ask, Read, Name What Is Wrong, Ask Again</h1>
+<p class="lead">Lectures 5 and 6 were about one prompt. Today the unit is the <b>conversation</b>. The first answer is a probe: it shows what the model assumed where your prompt left something open. Read it for assumptions before you read it for quality.</p>
+<div class="grid g3">
+ <div class="card"><h3>The assumed audience</h3><p class="small">Too technical, or too simple? The register tells you which reader it pictured. You did not say.</p></div>
+ <div class="card"><h3>The assumed format</h3><p class="small">Bullets when you wanted prose; a wall of text when you wanted a table. Shape words are strong tokens (Lecture 6).</p></div>
+ <div class="card"><h3>The assumed scope</h3><p class="small">It answered a neighbouring question, or three questions instead of one. Your task verb was wide.</p></div>
+</div>
+<div class="take"><b>The rule:</b> read before you re-prompt. Each thing the first answer got wrong is one missing part of the prompt (Lecture 5), and the follow-up supplies exactly that part.</div>
+<p class="small muted" style="margin-top:10px">In Lecture 3's words: a follow-up is more text in the window. “Try again” re-samples the same distribution; “bullet 6 is not in the text” moves it.</p>
+</section>
+<section class="slide">
+<h1>Four Kinds of Follow-Up</h1>
+<p class="lead">Most useful conversations use two of these and then stop. If you need all four twice, the first prompt was missing more than one part: write it again.</p>
+<div class="grid g2">
+ <div class="card"><h3><span class="tag">Narrow</span> Cut scope, fix the reader</h3><div class="prompt">Only the second point, in three sentences, for a first-year reader.</div><p class="small muted">Cuts scope and fixes the audience in one line. The commonest second turn.</p></div>
+ <div class="card"><h3><span class="tag r">Correct</span> Name the error and its source</h3><div class="prompt">The date is wrong: the text says 2023. Redo that paragraph using only the text.</div><p class="small muted">Names the error and where the right value comes from. Not “you are wrong”.</p></div>
+ <div class="card"><h3><span class="tag g">Expand</span> More, but bounded</h3><div class="prompt">Add one example per point, taken from the text, and mark each with the sentence it comes from.</div><p class="small muted">Asks for more and says where the more must come from.</p></div>
+ <div class="card orange"><h3><span class="tag o">Verify</span> Make it checkable</h3><div class="prompt">For each claim, quote the line it comes from, or write NOT STATED.</div><p class="small muted">Turns an answer you have to trust into one you can check. Lecture 6 put this inside every template.</p></div>
+</div>
+</section>
+<section class="slide">
+<h1>Worked Example: Three Turns on One Summary</h1>
+<p class="lead">An invented course announcement (sentence numbers added). Task: a summary for students who missed the session. Press <b>Next turn</b> to follow the conversation.</p>
+<details class="small" style="margin:6px 0"><summary class="muted" style="cursor:pointer">Show the announcement (15 sentences)</summary><div class="card" style="margin-top:6px;line-height:1.6"><span class="sn">1</span>Dear students, this message replaces the announcement posted last week. <span class="sn">2</span>The Week 6 session will be held in the Auditorium instead of our usual room, because the usual room is being used for an exam. <span class="sn">3</span>Please arrive ten minutes early, since the Auditorium has a single entrance and seating takes longer than usual. <span class="sn">4</span>The session will be recorded, and the recording will be posted on the course page within two days. <span class="sn">5</span>The group project brief is now available on the course page under Assessment. <span class="sn">6</span>Groups of three or four are formed through the sign-up sheet, which closes at the end of Week 6. <span class="sn">7</span>Each group submits one report and one five-minute presentation. <span class="sn">8</span>The report must be written in the template provided on the course page; reports in other formats will be returned without marks. <span class="sn">9</span>The presentation slots are in Weeks 12 and 13, and a timetable will be published once groups are formed. <span class="sn">10</span>Students who cannot attend the Week 6 session should watch the recording and complete the short reflection form linked at the end of it. <span class="sn">11</span>The reflection form counts as attendance for that week. <span class="sn">12</span>Office hours continue as usual, but the Tuesday slot moves from 14:00 to 15:00 for the rest of the term. <span class="sn">13</span>As before, questions about marks go to the teaching assistants first, through the course inbox, not by direct e-mail to the instructors. <span class="sn">14</span>Finally, two students have asked whether the midterm will cover the Week 6 material: it will. <span class="sn">15</span>Thank you, and see you in the Auditorium.</div></details>
+<div id="turns"></div>
+<div class="row"><button class="primary" id="turnBtn">Next turn</button><button id="turnReset">Reset</button><span class="small muted" id="turnNote"></span></div>
+<div class="take hide" id="turnTake"><b>What changed:</b> turn 1 showed what the model assumed (the length, and the licence to add). Turn 2 fixed the two missing parts: format and rules. Turn 3 added the verification step. Three turns, one checkable answer, and a record of how you got it.</div>
+</section>
+<section class="slide">
+<h1>Rules of Refinement, and One Trap</h1>
+<div class="grid g3">
+ <div class="card"><h3>One change per turn</h3><p class="small">If you change three things and the answer improves, you do not know which one did it. Next time you will repeat all three.</p></div>
+ <div class="card"><h3>Say what is wrong</h3><p class="small">“Try again” re-samples the same distribution (Lecture 3). “Bullet 6 is not in the text” moves it.</p></div>
+ <div class="card"><h3>Specify, do not argue</h3><p class="small">“You are wrong” invites an apology and a new guess. “The text says 2023; use it” gives the model the token it needs.</p></div>
+</div>
+<h2>The trap: agreement is cheap</h2>
+<p class="small">Chat models are tuned to please (Lecture 6). Click each prompt to see the typical answer.</p>
+<div class="grid g2">
+ <div class="card red" style="cursor:pointer" id="trapA"><div class="prompt">I think the answer is 35, right?</div><div class="model hide" style="margin-top:8px" id="trapAo"><b>Model:</b> Yes, exactly: 35 cups. Well done. <span class="bad">(It was 42.)</span></div></div>
+ <div class="card green" style="cursor:pointer" id="trapB"><div class="prompt">Recompute the total and show the steps. Final answer on its own line.</div><div class="model hide" style="margin-top:8px" id="trapBo"><b>Model:</b> 08:00 to 11:00: 3 h × 6 = 18. 11:00 to 13:00: 2 h × 12 = 24. Total: 42. <span class="ok">(Now compare with your own number.)</span></div></div>
+</div>
+<div class="take"><b>Stop when it is checkable</b>, not when it reads well. A fluent answer that you cannot check has not finished; a plain one with sentence numbers has.</div>
+</section>
+<section class="slide">
+<h1>Activity 1: Name the Fix</h1>
+<p class="lead">For each first answer, which follow-up does it need: <b>narrow</b>, <b>correct</b>, <b>expand</b> or <b>verify</b>? Pick, then press Check. Submit your real answers (and your one-sentence follow-ups) on the Google Form; this page only shows the defensible ones.</p>
+<div id="act1" class="grid g2"></div>
+<div class="row"><button class="primary" id="checkA1">Check</button><button id="resetA1">Reset</button><span id="scoreA1" class="small muted"></span></div>
+<div class="take hide" id="patternA1"><b>The pattern:</b> the follow-up supplies the part the first prompt left open. Two of the six need verify, because the model made claims it could not back; none of them needs “try again”.</div>
+</section>
+<section class="slide">
+<h1>When to Stop Iterating and Start Again</h1>
+<p class="lead">Three signs that another follow-up will not help:</p>
+<div class="grid g3">
+ <div class="card"><span class="num">1</span><b>Three turns, no movement</b><p class="small">The same flaw survives three specific corrections. The prompt is fighting the first turn; the first turn is still in the window.</p></div>
+ <div class="card"><span class="num">2</span><b>The removed thing comes back</b><p class="small">You deleted a claim in turn 2; it returns in turn 5. Earlier text keeps feeding it. The chat is anchored.</p></div>
+ <div class="card"><span class="num">3</span><b>The rules have faded</b><p class="small">Turn 1 said “Turkish, two sentences”. Turn 9 is English and a page long. The next companion page explains why.</p></div>
+</div>
+<div class="take"><b>The fix is not a cleverer follow-up but a new chat with a three-line brief:</b> what you learned from this chat, written once at the top of the next one.</div>
+<h2>Takeaways</h2>
+<div class="grid g2">
+ <div class="card"><h3>Read the first answer for assumptions</h3><p class="small">Audience, format, scope. Each one is a missing part of the prompt.</p></div>
+ <div class="card"><h3>One follow-up, one kind, one change</h3><p class="small">Narrow, correct, expand or verify. Say what is wrong and what to do instead.</p></div>
+ <div class="card"><h3>Ask neutrally</h3><p class="small">“Recompute and show the steps” beats “35, right?”. Compare with your own number afterwards.</p></div>
+ <div class="card"><h3>Stop when it is checkable</h3><p class="small">Sentence numbers, quoted lines, NOT STATED. That is what a finished answer looks like.</p></div>
+</div>
+<p class="small muted" style="margin-top:10px">Next companion page: UNIV198_AI-Literacy_Fall-2026_W05-L07_CompanionPages_02_context-and-memory.html (the window in a long chat, the drifting chat demo, the brief, memory).</p>
+</section>
+</main>
+<footer><div class="dots" id="dots"></div><div class="nav"><button id="prev">←</button> <span id="counter"></span> <button id="next">→</button></div></footer>
+<script>
+(function(){
+  const slides=[...document.querySelectorAll('.slide')];
+  let i=0;
+  const counter=document.getElementById('counter'), dots=document.getElementById('dots');
+  slides.forEach((s,k)=>{const d=document.createElement('span'); d.onclick=()=>go(k); dots.appendChild(d);});
+  function go(n){ i=Math.max(0,Math.min(slides.length-1,n));
+    slides.forEach((s,k)=>s.classList.toggle('on',k===i));
+    [...dots.children].forEach((d,k)=>d.classList.toggle('on',k===i));
+    counter.textContent=(i+1)+' / '+slides.length;
+    document.getElementById('prev').disabled=i===0; document.getElementById('next').disabled=i===slides.length-1;
+    try{location.hash='s'+(i+1);}catch(e){}
+  }
+  document.getElementById('prev').onclick=()=>go(i-1);
+  document.getElementById('next').onclick=()=>go(i+1);
+  document.addEventListener('keydown',e=>{ if(e.target.tagName==='TEXTAREA'||e.target.tagName==='INPUT')return;
+    if(e.key==='ArrowRight'||e.key==='PageDown'||e.key===' '){e.preventDefault();go(i+1);}
+    if(e.key==='ArrowLeft'||e.key==='PageUp'){e.preventDefault();go(i-1);}
+    if(e.key==='Home')go(0); if(e.key==='End')go(slides.length-1);});
+  const m=(location.hash||'').match(/s(\d+)/); go(m?parseInt(m[1])-1:0);
+  window.goSlide=go;
+})();
+
+
+(function(){
+ const turns=[
+  ['Turn 1, first prompt','Summarise the announcement below in five bullets for students who missed class. Use only the text.\n\n[announcement]',
+   '• The Week 6 session moves to the Auditorium; arrive ten minutes early.\n• The session will be recorded and posted within two days.\n• The group project brief is online; groups of three or four sign up by the end of Week 6.\n• Each group submits a report and a five-minute presentation.\n• The report is typically about 10 pages and must use the template.\n• Presentations take place in Weeks 12 and 13.\n• Students who miss the session watch the recording and complete a reflection form, which counts as attendance.\n• Tuesday office hours move to 15:00; questions about marks go to the TAs.',
+   'Eight bullets, about 160 words. Bullet 5 says “typically about 10 pages”: the text never gives a length. What it assumed: the length, and the licence to add.'],
+  ['Turn 2, correct and narrow','Too long, and bullet 5 is not in the text. Five bullets, under 80 words, use only the text.',
+   '• Week 6 session in the Auditorium; arrive ten minutes early; it will be recorded.\n• Group project brief is on the course page; groups of three or four, sign up by end of Week 6.\n• One report (in the template) and one five-minute presentation per group, presentations in Weeks 12 and 13.\n• If you miss the session: watch the recording and complete the reflection form; it counts as attendance.\n• Tuesday office hours now at 15:00; questions about marks go to the TAs via the course inbox.',
+   'Five bullets, 74 words, right facts. Still nothing a reader can check without the original.'],
+  ['Turn 3, verify','After each bullet add, in brackets, the sentence number it comes from. If no sentence supports it, write NOT STATED.',
+   '• Week 6 session in the Auditorium; arrive ten minutes early; it will be recorded. [2, 3, 4]\n• Group project brief on the course page; groups of three or four, sign up by end of Week 6. [5, 6]\n• One report (in the template) and one five-minute presentation per group; presentations in Weeks 12 and 13. [7, 8, 9]\n• Missed the session: watch the recording and complete the reflection form; it counts as attendance. [10, 11]\n• Tuesday office hours now at 15:00; questions about marks go to the TAs via the inbox. [12, 13]\nSign-up deadline date: NOT STATED (the text says “end of Week 6” but gives no date).',
+   'Each bullet now carries sentence numbers. One NOT STATED: the deadline was implied, not written. This answer can be checked in two minutes.']];
+ let k=0; const box=document.getElementById('turns'), note=document.getElementById('turnNote');
+ function draw(){ box.innerHTML=''; turns.slice(0,k).forEach(t=>{ const d=document.createElement('div'); d.className='card'; d.style.marginTop='8px';
+   d.innerHTML='<h3>'+t[0]+'</h3><div class="prompt">'+t[1].replace(/</g,'&lt;')+'</div><div class="model" style="margin-top:6px"><b>Model:</b>\n'+t[2].replace(/</g,'&lt;')+'</div><p class="small muted" style="margin:6px 0 0">'+t[3]+'</p>'; box.appendChild(d);});
+   note.textContent = k===0?'':k<3?('Turn '+k+' of 3 shown.'):'All three turns shown.';
+   document.getElementById('turnBtn').disabled=k>=3; document.getElementById('turnTake').classList.toggle('hide',k<3); if(k>0) box.lastChild.scrollIntoView({block:'nearest'}); }
+ document.getElementById('turnBtn').onclick=()=>{k=Math.min(3,k+1);draw();}; document.getElementById('turnReset').onclick=()=>{k=0;draw();}; draw();
+})();
+(function(){
+ document.getElementById('trapA').onclick=()=>document.getElementById('trapAo').classList.remove('hide');
+ document.getElementById('trapB').onclick=()=>document.getElementById('trapBo').classList.remove('hide');
+})();
+(function(){
+ const cases=[
+  ['Patient leaflet','Asked for five plain sentences for a patient. Got twelve, two drug names and a dosing table.','narrow','Five sentences, no drug names, plain words.'],
+  ['Case summary','Asked for Issue, Rule, Application, Holding. The holding cites a court the summary never mentions.','verify','Quote the line that names the court, or write NOT STATED.'],
+  ['Code review','Asked what could break the function. Got “The function looks correct and well structured.”','expand','Give one input that breaks it, and the line responsible.'],
+  ['Three causes of inflation','Asked for a first-year reader. Got “monetary base”, “velocity of money” and no example.','correct','The reader is a first-year with no economics: define each term and give one everyday example.'],
+  ['Lab abstract check','Asked whether each claim is supported. Got a confident “yes” for all six, no quotes.','verify','For each claim, quote the supporting sentence or write NOT STATED.'],
+  ['Forecast critique','Asked for the assumptions behind a forecast. Got the forecast restated, politely.','expand','List the assumptions, not the forecast, one per line, each tied to a sentence.']];
+ const opts=[['narrow','Narrow'],['correct','Correct'],['expand','Expand'],['verify','Verify']]; const box=document.getElementById('act1'); const picks={};
+ cases.forEach((t,i)=>{const c=document.createElement('div'); c.className='card'; c.innerHTML='<span class="num">'+(i+1)+'</span><b>'+t[0]+'</b><p class="small" style="margin:4px 0">'+t[1]+'</p><div class="row" id="o'+i+'"></div><div class="small muted hide" id="x'+i+'"></div>';
+  box.appendChild(c); const r=c.querySelector('#o'+i);
+  opts.forEach(o=>{const b=document.createElement('span'); b.className='pill'; b.textContent=o[1]; b.onclick=()=>{picks[i]=o[0]; [...r.children].forEach(ch=>ch.classList.remove('sel')); b.classList.add('sel');}; r.appendChild(b);});});
+ document.getElementById('checkA1').onclick=()=>{let ok=0; cases.forEach((t,i)=>{const r=document.getElementById('o'+i);
+   [...r.children].forEach((ch,j)=>{ch.classList.remove('right','wrong'); const v=opts[j][0]; if(v===t[2]) ch.classList.add('right'); if(picks[i]===v&&v!==t[2]) ch.classList.add('wrong');});
+   if(picks[i]===t[2]) ok++; const x=document.getElementById('x'+i); x.classList.remove('hide'); x.innerHTML='<b>Defensible:</b> '+t[2]+'. <i>'+t[3]+'</i>';});
+  document.getElementById('scoreA1').textContent=ok+' of 6 match the defensible answers. Case 4 is arguable: correct (the audience) or narrow (define the terms); both name the missing part.'; document.getElementById('patternA1').classList.remove('hide');};
+ document.getElementById('resetA1').onclick=()=>{for(const k in picks)delete picks[k]; document.querySelectorAll('#act1 .pill').forEach(p=>p.className='pill'); document.querySelectorAll('#act1 .muted').forEach(x=>x.classList.add('hide')); document.getElementById('scoreA1').textContent=''; document.getElementById('patternA1').classList.add('hide');};
+})();
+
+</script>
+</body></html>
