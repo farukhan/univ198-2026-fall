@@ -133,10 +133,10 @@ textarea{font-family:var(--mono);font-size:13px}
 </section>
 <section class="slide">
 <h1>Activity 1: Name the Fix</h1>
-<p class="lead">For each first answer, which follow-up does it need: <b>narrow</b>, <b>correct</b>, <b>expand</b> or <b>verify</b>? Pick, then press Check. Submit your real answers (and your one-sentence follow-ups) on the Google Form; this page only shows the defensible ones.</p>
+<p class="lead">For each first answer, which follow-up does it need: <b>narrow</b>, <b>correct</b>, <b>expand</b> or <b>verify</b>? Pick, then press that case's <b>Check</b>. Some cases take more than one defensible follow-up: choose the most likely one. Submit your real answers (and your one-sentence follow-ups) on the Google Form; this page only shows the defensible ones.</p>
 <div id="act1" class="grid g2"></div>
-<div class="row"><button class="primary" id="checkA1">Check</button><button id="resetA1">Reset</button><span id="scoreA1" class="small muted"></span></div>
-<div class="take hide" id="patternA1"><b>The pattern:</b> the follow-up supplies the part the first prompt left open. Two of the six need verify, because the model made claims it could not back; none of them needs “try again”.</div>
+<div class="row"><button id="resetA1">Reset all</button><span id="scoreA1" class="small muted"></span></div>
+<div class="take hide" id="patternA1"><b>The pattern:</b> the follow-up supplies the part the first prompt left open. Two of the six need verify, because the model made claims it could not back; none of them needs “try again”. Where two kinds fit, your sentence decides: a good follow-up names the missing part.</div>
 </section>
 <section class="slide">
 <h1>When to Stop Iterating and Start Again</h1>
@@ -206,21 +206,25 @@ textarea{font-family:var(--mono);font-size:13px}
 })();
 (function(){
  const cases=[
-  ['Patient leaflet','Asked for five plain sentences for a patient. Got twelve, two drug names and a dosing table.','narrow','Five sentences, no drug names, plain words.'],
-  ['Case summary','Asked for Issue, Rule, Application, Holding. The holding cites a court the summary never mentions.','verify','Quote the line that names the court, or write NOT STATED.'],
-  ['Code review','Asked what could break the function. Got “The function looks correct and well structured.”','expand','Give one input that breaks it, and the line responsible.'],
-  ['Three causes of inflation','Asked for a first-year reader. Got “monetary base”, “velocity of money” and no example.','correct','The reader is a first-year with no economics: define each term and give one everyday example.'],
-  ['Lab abstract check','Asked whether each claim is supported. Got a confident “yes” for all six, no quotes.','verify','For each claim, quote the supporting sentence or write NOT STATED.'],
-  ['Forecast critique','Asked for the assumptions behind a forecast. Got the forecast restated, politely.','expand','List the assumptions, not the forecast, one per line, each tied to a sentence.']];
- const opts=[['narrow','Narrow'],['correct','Correct'],['expand','Expand'],['verify','Verify']]; const box=document.getElementById('act1'); const picks={};
+  ['Patient leaflet','Asked for five plain sentences for a patient. Got twelve, two drug names and a dosing table.','narrow',[],'Five sentences, no drug names, plain words.'],
+  ['Case summary','Asked for Issue, Rule, Application, Holding. The holding cites a court the summary never mentions.','verify',[],'Quote the line that names the court, or write NOT STATED.'],
+  ['Code review','Asked what could break the function. Got “The function looks correct and well structured.”','expand',[],'Give one input that breaks it, and the line responsible.'],
+  ['Three causes of inflation','Asked for a first-year reader. Got “monetary base”, “velocity of money” and no example.','correct',['narrow'],'The reader is a first-year with no economics: define each term and give one everyday example. Case 4 is arguable: correct (the audience) or narrow (define the terms); both name the missing part.'],
+  ['Lab abstract check','Asked whether each claim is supported. Got a confident “yes” for all six, no quotes.','verify',[],'For each claim, quote the supporting sentence or write NOT STATED.'],
+  ['Forecast critique','Asked for the assumptions behind a forecast. Got the forecast restated, politely.','expand',[],'List the assumptions, not the forecast, one per line, each tied to a sentence.']];
+ const opts=[['narrow','Narrow'],['correct','Correct'],['expand','Expand'],['verify','Verify']]; const box=document.getElementById('act1'); const picks={}; const done={};
+ function score(){ const n=Object.keys(done).length; if(!n){document.getElementById('scoreA1').textContent=''; document.getElementById('patternA1').classList.add('hide'); return;}
+  const ok=Object.values(done).filter(Boolean).length; document.getElementById('scoreA1').textContent=ok+' of '+n+' checked match the defensible answers.'; document.getElementById('patternA1').classList.toggle('hide',n<6); }
  cases.forEach((t,i)=>{const c=document.createElement('div'); c.className='card'; c.innerHTML='<span class="num">'+(i+1)+'</span><b>'+t[0]+'</b><p class="small" style="margin:4px 0">'+t[1]+'</p><div class="row" id="o'+i+'"></div><div class="small muted hide" id="x'+i+'"></div>';
   box.appendChild(c); const r=c.querySelector('#o'+i);
-  opts.forEach(o=>{const b=document.createElement('span'); b.className='pill'; b.textContent=o[1]; b.onclick=()=>{picks[i]=o[0]; [...r.children].forEach(ch=>ch.classList.remove('sel')); b.classList.add('sel');}; r.appendChild(b);});});
- document.getElementById('checkA1').onclick=()=>{let ok=0; cases.forEach((t,i)=>{const r=document.getElementById('o'+i);
-   [...r.children].forEach((ch,j)=>{ch.classList.remove('right','wrong'); const v=opts[j][0]; if(v===t[2]) ch.classList.add('right'); if(picks[i]===v&&v!==t[2]) ch.classList.add('wrong');});
-   if(picks[i]===t[2]) ok++; const x=document.getElementById('x'+i); x.classList.remove('hide'); x.innerHTML='<b>Defensible:</b> '+t[2]+'. <i>'+t[3]+'</i>';});
-  document.getElementById('scoreA1').textContent=ok+' of 6 match the defensible answers. Case 4 is arguable: correct (the audience) or narrow (define the terms); both name the missing part.'; document.getElementById('patternA1').classList.remove('hide');};
- document.getElementById('resetA1').onclick=()=>{for(const k in picks)delete picks[k]; document.querySelectorAll('#act1 .pill').forEach(p=>p.className='pill'); document.querySelectorAll('#act1 .muted').forEach(x=>x.classList.add('hide')); document.getElementById('scoreA1').textContent=''; document.getElementById('patternA1').classList.add('hide');};
+  opts.forEach(o=>{const b=document.createElement('span'); b.className='pill'; b.textContent=o[1]; b.onclick=()=>{picks[i]=o[0]; [...r.children].forEach(ch=>{if(ch.classList.contains('pill'))ch.className='pill';}); b.classList.add('sel'); document.getElementById('x'+i).classList.add('hide'); delete done[i]; score();}; r.appendChild(b);});
+  const chk=document.createElement('button'); chk.className='primary'; chk.textContent='Check'; chk.style.marginLeft='auto';
+  chk.onclick=()=>{ if(picks[i]===undefined){document.getElementById('x'+i).classList.remove('hide'); document.getElementById('x'+i).innerHTML='Pick one first.'; return;}
+   const good=picks[i]===t[2]||t[3].includes(picks[i]); done[i]=good;
+   [...r.children].forEach((ch,j)=>{ if(!ch.classList.contains('pill'))return; ch.classList.remove('right','wrong'); const v=opts[j][0]; if(v===t[2]) ch.classList.add('right'); if(picks[i]===v&&!good) ch.classList.add('wrong');});
+   const x=document.getElementById('x'+i); x.classList.remove('hide'); x.innerHTML='<b>Defensible:</b> '+t[2]+'. <i>'+t[4]+'</i>'; score(); };
+  r.appendChild(chk);});
+ document.getElementById('resetA1').onclick=()=>{for(const k in picks)delete picks[k]; for(const k in done)delete done[k]; document.querySelectorAll('#act1 .pill').forEach(p=>p.className='pill'); document.querySelectorAll('#act1 .muted').forEach(x=>x.classList.add('hide')); score();};
 })();
 
 </script>
