@@ -119,8 +119,8 @@ textarea{font-family:var(--mono);font-size:13px}
 <h1>Demo: The Drifting Chat</h1>
 <div class="row" style="margin-top:0"><button class="primary" id="tabLive">Live: paste lines</button><button id="tabTr">Fallback: transcript</button><span class="small muted">One chat, nine turns, in Google Gemini. Everything here is invented; say so once when you paste the article.</span></div>
 <div id="livePanel">
- <p class="small muted" style="margin:4px 0 6px">Open a <b>new chat</b> with personalisation off. Press <b>Copy</b> on each turn, paste it into Gemini, send. The grey line under each turn is the one sentence to say to the room. Turns 3 and 4 copy the instruction together with the text to rewrite or summarise.</p>
- <div id="live" style="max-height:60vh;overflow:auto;border:1px solid var(--line);border-radius:8px;padding:6px 10px;background:var(--box)"></div>
+ <p class="small muted" style="margin:4px 0 6px">Open a <b>new chat</b> with personalisation off. Press <b>Copy</b> on each turn, paste it into Gemini, send. The grey line under each turn is the one sentence to say to the room. Turns 3 and 4 copy the instruction together with the text to rewrite or summarise. Scroll down for turn 9, repair (b) and what to do if the drift does not happen.</p>
+ <div id="live" style="border:1px solid var(--line);border-radius:8px;padding:6px 10px;background:var(--box)"></div>
 </div>
 <div id="trPanel" class="hide">
  <p class="small muted" style="margin:4px 0 6px">The transcript as recorded (figures invented). Press <b>Next</b> to add a turn and watch which rules survive; the notes on the right say what to look at.</p>
@@ -214,7 +214,7 @@ const DEMO=[["Turn 1: set the rules", "Bu sohbette kurallar: Türkçe cevap ver,
  DEMO.forEach((d,i)=>{ const full=d[2]?d[1]+'\n\n'+d[2]:d[1]; const c=document.createElement('div'); c.className='card'; c.style.margin='6px 0'; c.style.padding='8px 12px';
   c.innerHTML='<div class="row" style="margin:0;justify-content:space-between"><b>'+(i<9?'<span class="num">'+(i+1)+'</span>':i===9?'<span class="num">b</span>':'')+d[0]+'</b><button class="primary cpy">Copy</button></div>'
    +'<div class="prompt" style="margin-top:6px">'+d[1].replace(/</g,'&lt;')+'</div>'
-   +(d[2]?'<details class="small" style="margin-top:4px"><summary class="muted" style="cursor:pointer">plus the text to paste ('+d[2].split(/\s+/).length+' words; Copy includes it)</summary><div class="prompt" style="margin-top:4px;max-height:160px;overflow:auto">'+d[2].replace(/</g,'&lt;')+'</div></details>':'')
+   +(d[2]?'<p class="small muted" style="margin:4px 0 2px">plus the text to paste ('+d[2].split(/\s+/).length+' words; the Copy button includes it):</p><div class="prompt" style="max-height:'+(d[2].length>600?'180px':'none')+';overflow:auto;font-size:12.5px">'+d[2].replace(/</g,'&lt;')+'</div>':'')
    +'<p class="small muted" style="margin:4px 0 0">Say: '+d[3]+'</p>';
   c.querySelector('.cpy').onclick=(e)=>copyText(full,e.target); live.appendChild(c);});
  const lp=document.getElementById('livePanel'), tp=document.getElementById('trPanel'), bl=document.getElementById('tabLive'), bt=document.getElementById('tabTr');
