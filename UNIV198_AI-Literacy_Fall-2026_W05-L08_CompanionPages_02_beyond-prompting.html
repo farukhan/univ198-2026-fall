@@ -112,9 +112,10 @@ textarea{font-family:var(--mono);font-size:13px}
 <h1>Fine-Tuning in One Slide</h1>
 <div class="grid g2">
  <div class="card"><h3>What it is</h3><ul class="small" style="margin:4px 0 0 18px;line-height:1.6"><li>Training an existing model further on thousands of example pairs (input, wanted output) from one domain or task</li><li>It changes the weights: the behaviour is in the model, not in the prompt</li><li>Most of it is done with <b>adapters</b> (LoRA): a small add-on, about one percent of the parameters, trained in hours on one GPU, while the original weights stay frozen</li></ul></div>
- <div class="card"><h3>What it needs, and what it cannot do</h3><ul class="small" style="margin:4px 0 0 18px;line-height:1.6"><li>Data you have the right to use: licensed, consented, de-identified (Lecture 4 does not pause for engineers)</li><li>A held-out test set, or you cannot tell whether it worked</li><li>It teaches style, format and vocabulary. It does not keep knowledge current, and it does not remove the need to check: a fine-tuned model hallucinates in better jargon</li></ul></div>
+ <div class="card"><h3>What it needs, and what it cannot do</h3><ul class="small" style="margin:4px 0 0 18px;line-height:1.6"><li>Data you have the right to use: licensed, consented, de-identified (Lecture 4 does not pause for engineers)</li><li>A held-out test set<sup>*</sup>, or you cannot tell whether it worked</li><li>It teaches style, format and vocabulary. It does not keep knowledge current, and it does not remove the need to check: a fine-tuned model hallucinates in better jargon</li></ul></div>
 </div>
 <div class="take"><b>For this course:</b> you will not fine-tune anything in UNIV198. You should be able to say, in a meeting, whether a problem is a prompt problem, a documents problem or a training problem, and to be suspicious when someone proposes training before trying the first two.</div>
+<p class="small muted"><sup>*</sup>Held-out test set: a slice of the example pairs (often 10 to 20 percent) kept apart and never used for training. The model is scored on it afterwards; testing on the training examples only shows what it memorised, and judging a few outputs by eye is the “sounds right” trap.</p>
 </section>
 <section class="slide">
 <h1>The Decision in Three Questions</h1>
