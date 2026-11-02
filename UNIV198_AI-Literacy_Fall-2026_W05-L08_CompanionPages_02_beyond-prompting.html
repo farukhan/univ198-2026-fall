@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>UNIV198 · Lecture 8 · Beyond Prompting</title>
+<style>
+:root{--navy:#1F3A6E;--orange:#E08A00;--orangedk:#CC7600;--green:#2E7D32;--red:#C62828;--ink:#1a1a1a;--muted:#666;--box:#F3F6FA;--line:#C9D3E3;--mono:"SFMono-Regular",Menlo,Consolas,"Liberation Mono",monospace}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;background:#fff;color:var(--ink);font:16px/1.45 "Helvetica Neue",Helvetica,Arial,sans-serif}
+body{display:flex;flex-direction:column}
+header{flex:none;display:flex;justify-content:space-between;align-items:center;padding:10px 22px;border-bottom:3px solid var(--navy);font-size:13px;color:var(--muted)}
+header b{color:var(--navy)}
+header .title{font-size:15px;color:var(--navy);font-weight:700}
+main{position:relative;flex:1;min-height:0;overflow:hidden}
+.slide{position:absolute;inset:0;padding:26px 48px 20px;display:none;overflow:auto}
+.slide.on{display:block}
+h1{font-size:28px;margin:0 0 6px;color:var(--navy)}
+h2{font-size:17px;margin:14px 0 8px;color:var(--orange)}
+h3{font-size:15px;margin:0 0 4px;color:var(--navy)}
+p{margin:6px 0}
+.lead{font-size:17px}
+.muted{color:var(--muted)}
+.small{font-size:13px}
+.grid{display:grid;gap:14px;margin-top:10px}
+.g2{grid-template-columns:1fr 1fr}.g3{grid-template-columns:repeat(3,1fr)}.g4{grid-template-columns:repeat(4,1fr)}
+.card{background:var(--box);border:1px solid var(--line);border-radius:8px;padding:12px 14px}
+.card.orange{background:#FFF6E8;border-color:#F0C98A}
+.card.green{background:#F1F8F1;border-color:#A5C8A7}
+.card.red{background:#FDF1F1;border-color:#E6A3A3}
+.card h3{margin-bottom:6px}
+.num{display:inline-block;width:22px;height:22px;border-radius:50%;background:var(--orange);color:#fff;font-weight:700;font-size:13px;text-align:center;line-height:22px;margin-right:6px}
+pre,code,.mono{font-family:var(--mono)}
+pre{background:#fff;border:1px solid var(--line);border-radius:6px;padding:10px 12px;font-size:13.5px;white-space:pre-wrap;margin:6px 0}
+.prompt{background:#fff;border-left:4px solid var(--orange);padding:8px 12px;font-family:var(--mono);font-size:13.5px;white-space:pre-wrap;border-radius:4px}
+.model{background:#fff;border-left:4px solid var(--navy);padding:8px 12px;font-size:14px;white-space:pre-wrap;border-radius:4px}
+button{font:inherit;font-size:14px;padding:7px 14px;border-radius:6px;border:1px solid var(--navy);background:#fff;color:var(--navy);cursor:pointer}
+button.primary{background:var(--navy);color:#fff}
+button.orange{background:var(--orange);border-color:var(--orange);color:#fff}
+button:disabled{opacity:.45;cursor:default}
+button.sel{background:var(--navy);color:#fff}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin:8px 0}
+.take{background:#fff;border:2px solid var(--navy);border-radius:8px;padding:12px 16px;margin-top:12px}
+.ok{color:var(--green);font-weight:700}.bad{color:var(--red);font-weight:700}
+.tag{display:inline-block;padding:1px 8px;border-radius:10px;font-size:12px;font-weight:700;background:var(--navy);color:#fff;margin-right:6px}
+.tag.o{background:var(--orange)}.tag.g{background:var(--green)}.tag.r{background:var(--red)}.tag.grey{background:#888}
+table{border-collapse:collapse;width:100%;font-size:13.5px}
+th,td{padding:6px 8px;border-bottom:1px solid var(--line);vertical-align:top;text-align:left}
+th{color:var(--navy);border-bottom:2px solid var(--navy)}
+footer{flex:none;display:flex;justify-content:space-between;align-items:center;padding:8px 22px;border-top:1px solid var(--line);font-size:13px;color:var(--muted)}
+footer .nav button{min-width:40px}
+footer .dots span{display:inline-block;width:8px;height:8px;border-radius:50%;background:#ccd;margin:0 3px}
+footer .dots span.on{background:var(--orange)}
+.hide{display:none}
+input[type=text],textarea,select{font:inherit;font-size:14px;padding:6px 8px;border:1px solid var(--line);border-radius:6px;width:100%}
+textarea{font-family:var(--mono);font-size:13px}
+.step{opacity:.25;transition:opacity .25s}
+.step.on{opacity:1}
+.token{display:inline-block;padding:2px 6px;margin:2px;border-radius:4px;background:#E8EEF7;border:1px solid var(--line);font-family:var(--mono);font-size:13px}
+.token.new{background:#FFE7C2;border-color:var(--orange)}
+.pill{display:inline-block;padding:6px 10px;border:1px solid var(--line);border-radius:6px;background:#fff;cursor:pointer;font-size:13.5px;margin:3px}
+.pill.sel{background:var(--navy);color:#fff;border-color:var(--navy)}
+.pill.right{background:#E6F2E6;border-color:var(--green)}
+.pill.wrong{background:#FBE6E6;border-color:var(--red)}
+.blank{background:#FFE7C2;border-bottom:2px solid var(--orange);padding:0 3px;border-radius:3px}
+.kv{display:grid;grid-template-columns:150px 1fr;gap:6px 10px;font-size:14px}
+.null{color:var(--red);font-weight:700}
+.chk{font-size:14px;margin:4px 0}
+@media (max-width:900px){.g2,.g3,.g4{grid-template-columns:1fr}.slide{padding:18px 16px}h1{font-size:22px}}
+
+.turn{display:flex;gap:10px;margin:6px 0;align-items:flex-start}
+.turn .who{flex:none;width:64px;font-size:12px;font-weight:700;color:var(--navy);padding-top:9px}
+.turn .msg{flex:1;border-radius:6px;padding:8px 12px;font-size:13.5px;white-space:pre-wrap}
+.turn.u .msg{background:#fff;border-left:4px solid var(--orange);font-family:var(--mono);font-size:13px}
+.turn.m .msg{background:#fff;border-left:4px solid var(--navy)}
+.turn .note{flex:none;width:200px;font-size:12px;color:var(--muted);padding-top:6px}
+.bar{display:flex;align-items:center;gap:8px;margin:3px 0;font-size:13px}
+.bar .lab{flex:none;width:200px;font-family:var(--mono);font-size:12px}
+.bar .fill{height:16px;border-radius:3px;background:var(--navy);transition:opacity .3s,width .3s}
+.bar.rule .fill{background:var(--orange)}
+.sn{font-size:10px;color:var(--orange);font-weight:700;vertical-align:super;margin-right:2px}
+.score{display:grid;grid-template-columns:150px repeat(3,46px);gap:4px 8px;align-items:center;font-size:13px}
+.score .sq{display:inline-block;width:40px;height:28px;line-height:28px;text-align:center;border:1px solid var(--line);border-radius:5px;cursor:pointer;background:#fff}
+.score .sq.sel{background:var(--navy);color:#fff;border-color:var(--navy)}
+.ans{background:#fff;border:1px solid var(--line);border-radius:8px;padding:10px 12px;font-size:13.5px;white-space:pre-wrap;min-height:120px}
+.ans.a{border-top:4px solid var(--orange)}.ans.b{border-top:4px solid var(--navy)}
+@media (max-width:900px){.turn .note{display:none}.bar .lab{width:120px}}
+</style></head>
+<body>
+<header><div><span class="title">UNIV198 · AI Literacy · Lecture 8</span><br>Prompting in practice: evaluating answers, and beyond prompting</div>
+<div class="small">Companion page · <b>Beyond Prompting</b><br>Use ← → or the buttons below</div></header>
+<main>
+<section class="slide">
+<h1>The Customisation Spectrum</h1>
+<p class="lead">Six ways to make a model do what you need, from cheapest to dearest. Click a box. The first four change the <b>window</b> (what the model reads); the last two change the <b>model</b> (what it has learned).</p>
+<div class="row" id="spec" style="gap:6px"></div>
+<div class="card" id="specOut" style="min-height:90px"><p class="small muted">Click a box above.</p></div>
+<div class="grid g3" style="margin-top:10px">
+ <div class="card"><h3>Lectures 5 to 8</h3><p class="small">Everything you did this month lives in the first three boxes. It changed only the text the model reads.</p></div>
+ <div class="card"><h3>Week 7</h3><p class="small">Documents: the app searches your files or the web and pastes what it finds into the window. Still the window.</p></div>
+ <div class="card orange"><h3>Specialists</h3><p class="small">Fine-tuning and pre-training change the weights. You should know when it is the answer and when it is not; you will not do it in this course.</p></div>
+</div>
+</section>
+<section class="slide">
+<h1>When Prompting Is Not Enough: Four Signals</h1>
+<div class="grid g2">
+ <div class="card"><h3>The knowledge is private or newer than the cut-off</h3><p class="small">Your lab's protocols, this year's regulation, your own notes. No prompt can supply what the model never saw. The fix is documents in the window (Week 7), not a new model.</p></div>
+ <div class="card"><h3>Exact format, thousands of times</h3><p class="small">A hospital discharge template, a legal clause structure, across ten thousand outputs. Few-shot drifts at that scale; fine-tuning on real examples holds the shape.</p></div>
+ <div class="card"><h3>Domain language the model keeps getting wrong</h3><p class="small">Specialist vocabulary and conventions a general model has rarely seen. More examples in the prompt help up to a point; past it, continued training on domain text does.</p></div>
+ <div class="card orange"><h3>The same long instruction block, every call</h3><p class="small">Two pages of rules and five examples sent a million times. At that volume the prompt is the cost. Teaching the behaviour once can be cheaper than repeating it.</p></div>
+</div>
+<div class="take">Notice which signal is first: the commonest reason a prompt “is not enough” is missing knowledge, and the answer to that is retrieval, not fine-tuning.</div>
+</section>
+<section class="slide">
+<h1>Fine-Tuning in One Slide</h1>
+<div class="grid g2">
+ <div class="card"><h3>What it is</h3><ul class="small" style="margin:4px 0 0 18px;line-height:1.6"><li>Training an existing model further on thousands of example pairs (input, wanted output) from one domain or task</li><li>It changes the weights: the behaviour is in the model, not in the prompt</li><li>Most of it is done with <b>adapters</b> (LoRA): a small add-on, about one percent of the parameters, trained in hours on one GPU, while the original weights stay frozen</li></ul></div>
+ <div class="card"><h3>What it needs, and what it cannot do</h3><ul class="small" style="margin:4px 0 0 18px;line-height:1.6"><li>Data you have the right to use: licensed, consented, de-identified (Lecture 4 does not pause for engineers)</li><li>A held-out test set, or you cannot tell whether it worked</li><li>It teaches style, format and vocabulary. It does not keep knowledge current, and it does not remove the need to check: a fine-tuned model hallucinates in better jargon</li></ul></div>
+</div>
+<div class="take"><b>For this course:</b> you will not fine-tune anything in UNIV198. You should be able to say, in a meeting, whether a problem is a prompt problem, a documents problem or a training problem, and to be suspicious when someone proposes training before trying the first two.</div>
+</section>
+<section class="slide">
+<h1>The Decision in Three Questions</h1>
+<p class="lead">Describe a problem in one line, then answer the three questions in order. The page says where the problem lands. The golden rule: start simple, and increase complexity only when the simple thing has demonstrably failed and you can say how.</p>
+<input type="text" id="dprob" placeholder="One line: what should the model do, for whom, how often?">
+<div class="grid g3" style="margin-top:10px">
+ <div class="card"><h3><span class="num">1</span>Can a better prompt fix it?</h3><p class="small">Five parts, examples, steps, a brief. Has that been tried, properly?</p><div class="row" id="d1"></div></div>
+ <div class="card"><h3><span class="num">2</span>Is the missing thing knowledge?</h3><p class="small">Private, recent, or long: something the model never saw.</p><div class="row" id="d2"></div></div>
+ <div class="card"><h3><span class="num">3</span>Is it behaviour, at scale?</h3><p class="small">Format, vocabulary, a million calls, real examples available.</p><div class="row" id="d3"></div></div>
+</div>
+<div class="take hide" id="dout"></div>
+</section>
+<section class="slide">
+<h1>Take-Home Activity: Prompt, Documents or Training?</h1>
+<p class="lead">Six situations (invented). For each, what is the <b>first</b> thing to try: a better prompt, giving it documents, or training? And one you would refuse to build at all. Pick, then press that case's <b>Check</b>. Submit your real answers, with one word on why, on the Google Form.</p>
+<div id="act3" class="grid g2"></div>
+<div class="row"><button id="resetA3">Reset all</button><span id="scoreA3" class="small muted"></span></div>
+<div class="take hide" id="patternA3"><b>Only two of six are training.</b> Missing or changing knowledge wants documents; a first attempt wants a better prompt; and one of the six was never a technique question.</div>
+</section>
+<section class="slide">
+<h1>Takeaways</h1>
+<div class="grid g2">
+ <div class="card"><h3>Two kinds of change</h3><p class="small">Prompts, templates and documents change what the model reads. Fine-tuning and pre-training change what it has learned. Most tasks never leave the first group.</p></div>
+ <div class="card"><h3>Three questions, in order</h3><p class="small">Can a better prompt fix it? Is the missing thing knowledge? Is it behaviour, at scale? Each yes stops the search.</p></div>
+ <div class="card"><h3>Documents before training</h3><p class="small">Private, recent or long knowledge goes in the window (Week 7). Training freezes a version and does not keep it current.</p></div>
+ <div class="card"><h3>Training does not remove checking</h3><p class="small">A fine-tuned model hallucinates in better jargon. The four questions still apply, and so does Lecture 4.</p></div>
+</div>
+<p class="small muted" style="margin-top:14px">Companion page for the first half of Lecture 8: UNIV198_AI-Literacy_Fall-2026_W05-L08_CompanionPages_01_evaluating-answers.html. Week 6 is multimodal generative AI; Week 7 adds documents to the window.</p>
+</section>
+</main>
+<footer><div class="dots" id="dots"></div><div class="nav"><button id="prev">←</button> <span id="counter"></span> <button id="next">→</button></div></footer>
+<script>
+(function(){
+  const slides=[...document.querySelectorAll('.slide')];
+  let i=0;
+  const counter=document.getElementById('counter'), dots=document.getElementById('dots');
+  slides.forEach((s,k)=>{const d=document.createElement('span'); d.onclick=()=>go(k); dots.appendChild(d);});
+  function go(n){ i=Math.max(0,Math.min(slides.length-1,n));
+    slides.forEach((s,k)=>s.classList.toggle('on',k===i));
+    [...dots.children].forEach((d,k)=>d.classList.toggle('on',k===i));
+    counter.textContent=(i+1)+' / '+slides.length;
+    document.getElementById('prev').disabled=i===0; document.getElementById('next').disabled=i===slides.length-1;
+    try{location.hash='s'+(i+1);}catch(e){}
+  }
+  document.getElementById('prev').onclick=()=>go(i-1);
+  document.getElementById('next').onclick=()=>go(i+1);
+  document.addEventListener('keydown',e=>{ if(e.target.tagName==='TEXTAREA'||e.target.tagName==='INPUT')return;
+    if(e.key==='ArrowRight'||e.key==='PageDown'||e.key===' '){e.preventDefault();go(i+1);}
+    if(e.key==='ArrowLeft'||e.key==='PageUp'){e.preventDefault();go(i-1);}
+    if(e.key==='Home')go(0); if(e.key==='End')go(slides.length-1);});
+  const m=(location.hash||'').match(/s(\d+)/); go(m?parseInt(m[1])-1:0);
+  window.goSlide=go;
+})();
+
+const SPEC=[["Zero-shot", "five parts", "window", "One prompt with task, context, input, format and rules (Lecture 5). Changes only the text the model reads. Cost: minutes."], ["Few-shot", "examples", "window", "Two or three worked examples in the prompt (Lecture 5). The model copies the pattern. Still only text in the window. Cost: minutes."], ["Template", "written once", "window", "A reusable prompt with named blanks and a verification step inside (Lecture 6). Written once, filled many times. Cost: an hour."], ["Documents", "retrieval, RAG", "window", "The app searches your files or the web and pastes what it finds into the window before answering (Week 7). The model is unchanged; its reading changed. Cost: hours to days, and the documents must be yours to use."], ["Fine-tuning", "new weights", "model", "Further training on thousands of (input, wanted output) pairs, usually through a small adapter (LoRA). The behaviour is now in the weights, not in the prompt. Cost: data, a test set, a specialist, weeks."], ["Pre-training", "a new model", "model", "Training a model from scratch on a very large corpus. Companies and national labs; months and very large budgets. Not a student or small-business option."]];
+const SIT=[["The hospital template", "Discharge letters in an exact house format, 400 a day; few-shot drifts after the 50th.", "training", "Format at scale, after prompting has demonstrably failed. Thousands of real examples exist; a test set is easy to build."], ["The new regulation", "A law firm needs answers that reflect a regulation published last month.", "documents", "Newer than the cut-off. No amount of training on old text supplies it; put the regulation in the window."], ["The vague summary", "A student's summaries come back too long and general. One prompt, no examples.", "prompt", "The five parts, then a follow-up. Nothing has been tried yet."], ["The lab protocol", "Questions about 300 pages of internal protocols, which change twice a year.", "documents", "Private, changing and long: retrieval over the current protocols. Fine-tuning would freeze a version that is wrong by spring."], ["The dialect", "Replies in a regional register the model gets wrong even with ten examples; a million a year.", "training", "Behaviour at scale, after examples failed; data permitting, and with a held-out test set."], ["The grade predictor", "Predict which first-years will fail, from their chat logs with the course tools.", "refuse", "A data-protection and fairness problem before it is a model problem (Lecture 4). The question is not which technique; it is whether to build it."]];
+
+(function(){
+ const row=document.getElementById('spec'), out=document.getElementById('specOut');
+ SPEC.forEach((b,i)=>{const d=document.createElement('div'); d.className='pill'; d.style.cssText='flex:1;text-align:center;padding:10px 6px;'+(b[2]==='model'?'background:#FFF6E8;border-color:#F0C98A':'');
+  d.innerHTML='<b>'+b[0]+'</b><br><span class="small muted">'+b[1]+'</span>'; d.onclick=()=>{[...row.children].forEach(c=>c.style.outline=''); d.style.outline='2px solid var(--navy)';
+   out.innerHTML='<h3>'+b[0]+' <span class="tag '+(b[2]==='model'?'o':'')+'">changes the '+b[2]+'</span></h3><p class="small">'+b[3]+'</p>';}; row.appendChild(d);});
+})();
+(function(){
+ const ans={}; const ids=['d1','d2','d3'];
+ const msgs={1:['<b>Yes: iterate.</b> A better prompt, examples, steps, or a brief (Lectures 5 to 7). You are done for almost every task in this course. Only move on when this has demonstrably failed and you can say how.','green'],
+             2:['<b>Yes: give it the documents.</b> Retrieval, Week 7. The model is fine; its reading is missing. Fine-tuning would freeze a version that goes stale.','green'],
+             3:['<b>Yes: a specialist fine-tunes.</b> Budget: licensed and de-identified data, a held-out test set, weeks. And the four questions still apply afterwards.','orange'],
+             0:['<b>No to all three:</b> the task may not be a language-model task at all. Ask what the real problem is before choosing a tool, and check Lecture 4 first.','grey']};
+ function render(){ const out=document.getElementById('dout'); const p=document.getElementById('dprob').value.trim();
+  if(ans.d1===undefined){out.classList.add('hide');return;}
+  let k=0; if(ans.d1==='yes')k=1; else if(ans.d2==='yes')k=2; else if(ans.d2==='no'&&ans.d3==='yes')k=3; else if(ans.d2==='no'&&ans.d3==='no')k=0; else {out.classList.add('hide');return;}
+  out.classList.remove('hide'); out.innerHTML=(p?'<p class="small muted" style="margin:0 0 6px">'+p.replace(/</g,'&lt;')+'</p>':'')+msgs[k][0]; }
+ ids.forEach((id,i)=>{const r=document.getElementById(id); [['yes','Yes'],['no','No']].forEach(o=>{const b=document.createElement('span'); b.className='pill'; b.textContent=o[1];
+  b.onclick=()=>{ans[id]=o[0]; [...r.children].forEach(c=>c.classList.remove('sel')); b.classList.add('sel'); if(id==='d1'&&o[0]==='yes'){delete ans.d2; delete ans.d3; ['d2','d3'].forEach(x=>[...document.getElementById(x).children].forEach(c=>c.classList.remove('sel')));} render();}; r.appendChild(b);});});
+ document.getElementById('dprob').oninput=render;
+})();
+(function(){
+ const opts=[['prompt','Prompt'],['documents','Documents'],['training','Training'],['refuse','Refuse to build']]; const box=document.getElementById('act3'); const picks={}; const done={};
+ function score(){ const n=Object.keys(done).length; if(!n){document.getElementById('scoreA3').textContent=''; document.getElementById('patternA3').classList.add('hide'); return;}
+  const ok=Object.values(done).filter(Boolean).length; document.getElementById('scoreA3').textContent=ok+' of '+n+' checked match the defensible answers.'; document.getElementById('patternA3').classList.toggle('hide',n<6); }
+ SIT.forEach((t,i)=>{const c=document.createElement('div'); c.className='card'; c.innerHTML='<span class="num">'+(i+1)+'</span><b>'+t[0]+'</b><p class="small" style="margin:4px 0">'+t[1]+'</p><div class="row" id="o'+i+'"></div><div class="small muted hide" id="x'+i+'"></div>';
+  box.appendChild(c); const r=c.querySelector('#o'+i);
+  opts.forEach(o=>{const b=document.createElement('span'); b.className='pill'; b.textContent=o[1]; b.onclick=()=>{picks[i]=o[0]; [...r.children].forEach(ch=>{if(ch.classList.contains('pill'))ch.className='pill';}); b.classList.add('sel'); document.getElementById('x'+i).classList.add('hide'); delete done[i]; score();}; r.appendChild(b);});
+  const chk=document.createElement('button'); chk.className='primary'; chk.textContent='Check'; chk.style.marginLeft='auto';
+  chk.onclick=()=>{ const x=document.getElementById('x'+i); if(picks[i]===undefined){x.classList.remove('hide'); x.textContent='Pick one first.'; return;} const good=picks[i]===t[2]; done[i]=good;
+   [...r.children].forEach((ch,j)=>{ if(!ch.classList.contains('pill'))return; ch.classList.remove('right','wrong'); if(opts[j][0]===t[2]) ch.classList.add('right'); if(picks[i]===opts[j][0]&&!good) ch.classList.add('wrong');});
+   x.classList.remove('hide'); x.innerHTML='<b>Defensible:</b> '+t[2]+'. <i>'+t[3]+'</i>'; score(); };
+  r.appendChild(chk);});
+ document.getElementById('resetA3').onclick=()=>{for(const k in picks)delete picks[k]; for(const k in done)delete done[k]; document.querySelectorAll('#act3 .pill').forEach(p=>p.className='pill'); document.querySelectorAll('#act3 .muted').forEach(x=>x.classList.add('hide')); score();};
+})();
+
+</script>
+</body></html>
