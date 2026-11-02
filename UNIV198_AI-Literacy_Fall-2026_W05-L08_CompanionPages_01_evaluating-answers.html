@@ -124,9 +124,9 @@ textarea{font-family:var(--mono);font-size:13px}
 </section>
 <section class="slide">
 <h1>Activity 1: Spot the Pattern</h1>
-<p class="lead">Six short extracts from answers (invented). For each, pick the failure pattern, then press Check. Submit your real answers, with the three words on what you would check or ask, on the Google Form.</p>
+<p class="lead">Six short extracts from answers (invented). For each, pick the failure pattern, then press that case's <b>Check</b>. Submit your real answers, with the three words on what you would check or ask, on the Google Form.</p>
 <div id="act1" class="grid g2"></div>
-<div class="row"><button class="primary" id="checkA1">Check</button><button id="resetA1">Reset</button><span id="scoreA1" class="small muted"></span></div>
+<div class="row"><button id="resetA1">Reset all</button><span id="scoreA1" class="small muted"></span></div>
 <div class="take hide" id="patternA1"><b>The pattern:</b> every one of these is a prompt for the next follow-up (Lecture 7): ask for the owner of the claim, open the page, re-ask the exact question, ask for the steps rather than for agreement, ask for the check rather than the new guess, ask for every exception with its clause.</div>
 </section>
 <section class="slide">
@@ -208,14 +208,17 @@ const SCH={"Medicine": {"prompt": "Write five plain sentences for a patient on w
   ['The confirmation','You: “So the total is 35, right?” Model: “Yes, exactly, 35 cups. Well done.” (It was 42.)','Sycophancy','Ask for the steps, not for agreement.'],
   ['The apology','“You are right, I apologise for the confusion. The correct year is 2021.” (It was 2023.)','Apology loop','Ask for the check, not the new guess.'],
   ['The tidy sentence','Asked to list the exceptions in a regulation. Answer: “...with a small number of exceptions for special cases.”','Smoothing','“List every exception, quote the clause.”']];
- const box=document.getElementById('act1'); const picks={};
+ const box=document.getElementById('act1'); const picks={}; const done={};
+ function score(){ const n=Object.keys(done).length; if(!n){document.getElementById('scoreA1').textContent=''; document.getElementById('patternA1').classList.add('hide'); return;}
+  const ok=Object.values(done).filter(Boolean).length; document.getElementById('scoreA1').textContent=ok+' of '+n+' checked match the defensible answers.'; document.getElementById('patternA1').classList.toggle('hide',n<6); }
  cases.forEach((t,i)=>{const c=document.createElement('div'); c.className='card'; c.innerHTML='<span class="num">'+(i+1)+'</span><b>'+t[0]+'</b><p class="small" style="margin:4px 0">'+t[1]+'</p>';
-  const s=document.createElement('select'); s.innerHTML='<option value="">choose a pattern</option>'+pats.map(p=>'<option>'+p+'</option>').join(''); s.onchange=()=>{picks[i]=s.value;}; s.id='s'+i; c.appendChild(s);
-  const x=document.createElement('div'); x.className='small muted hide'; x.id='x'+i; c.appendChild(x); box.appendChild(c);});
- document.getElementById('checkA1').onclick=()=>{let ok=0; cases.forEach((t,i)=>{const s=document.getElementById('s'+i); const good=picks[i]===t[2]; if(good)ok++; s.style.borderColor=good?'var(--green)':'var(--red)'; s.style.borderWidth='2px';
-   const x=document.getElementById('x'+i); x.classList.remove('hide'); x.innerHTML='<b>Defensible:</b> '+t[2]+'. <i>'+t[3]+'</i>';});
-  document.getElementById('scoreA1').textContent=ok+' of 6 match the defensible answers.'; document.getElementById('patternA1').classList.remove('hide');};
- document.getElementById('resetA1').onclick=()=>{for(const k in picks)delete picks[k]; cases.forEach((t,i)=>{const s=document.getElementById('s'+i); s.value=''; s.style.borderColor=''; s.style.borderWidth=''; document.getElementById('x'+i).classList.add('hide');}); document.getElementById('scoreA1').textContent=''; document.getElementById('patternA1').classList.add('hide');};
+  const row=document.createElement('div'); row.className='row'; row.style.margin='4px 0';
+  const s=document.createElement('select'); s.style.width='auto'; s.style.flex='1'; s.innerHTML='<option value="">choose a pattern</option>'+pats.map(p=>'<option>'+p+'</option>').join(''); s.onchange=()=>{picks[i]=s.value; s.style.borderColor=''; s.style.borderWidth=''; document.getElementById('x'+i).classList.add('hide'); delete done[i]; score();}; s.id='s'+i; row.appendChild(s);
+  const chk=document.createElement('button'); chk.className='primary'; chk.textContent='Check'; row.appendChild(chk); c.appendChild(row);
+  const x=document.createElement('div'); x.className='small muted hide'; x.id='x'+i; c.appendChild(x); box.appendChild(c);
+  chk.onclick=()=>{ if(!picks[i]){x.classList.remove('hide'); x.textContent='Pick a pattern first.'; return;} const good=picks[i]===t[2]; done[i]=good; s.style.borderColor=good?'var(--green)':'var(--red)'; s.style.borderWidth='2px';
+   x.classList.remove('hide'); x.innerHTML='<b>Defensible:</b> '+t[2]+'. <i>'+t[3]+'</i>'; score(); };});
+ document.getElementById('resetA1').onclick=()=>{for(const k in picks)delete picks[k]; for(const k in done)delete done[k]; cases.forEach((t,i)=>{const s=document.getElementById('s'+i); s.value=''; s.style.borderColor=''; s.style.borderWidth=''; document.getElementById('x'+i).classList.add('hide');}); score();};
 })();
 (function(){
  const qs=['Correct?','Complete?','Appropriate?','Checkable?']; const sel=document.getElementById('school'); Object.keys(SCH).forEach(k=>{const o=document.createElement('option'); o.textContent=k; sel.appendChild(o);});
