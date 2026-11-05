@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>UNIV198 · Lecture 10 · Documents and Recordings</title>
+<style>
+:root{--navy:#1F3A6E;--orange:#E08A00;--orangedk:#CC7600;--green:#2E7D32;--red:#C62828;--ink:#1a1a1a;--muted:#666;--box:#F3F6FA;--line:#C9D3E3;--mono:"SFMono-Regular",Menlo,Consolas,"Liberation Mono",monospace}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;background:#fff;color:var(--ink);font:16px/1.45 "Helvetica Neue",Helvetica,Arial,sans-serif}
+body{display:flex;flex-direction:column}
+header{flex:none;display:flex;justify-content:space-between;align-items:center;padding:10px 22px;border-bottom:3px solid var(--navy);font-size:13px;color:var(--muted)}
+header b{color:var(--navy)}
+header .title{font-size:15px;color:var(--navy);font-weight:700}
+main{position:relative;flex:1;min-height:0;overflow:hidden}
+.slide{position:absolute;inset:0;padding:26px 48px 20px;display:none;overflow:auto}
+.slide.on{display:block}
+h1{font-size:28px;margin:0 0 6px;color:var(--navy)}
+h2{font-size:17px;margin:14px 0 8px;color:var(--orange)}
+h3{font-size:15px;margin:0 0 4px;color:var(--navy)}
+p{margin:6px 0}
+.lead{font-size:17px}
+.muted{color:var(--muted)}
+.small{font-size:13px}
+.grid{display:grid;gap:14px;margin-top:10px}
+.g2{grid-template-columns:1fr 1fr}.g3{grid-template-columns:repeat(3,1fr)}.g4{grid-template-columns:repeat(4,1fr)}
+.card{background:var(--box);border:1px solid var(--line);border-radius:8px;padding:12px 14px}
+.card.orange{background:#FFF6E8;border-color:#F0C98A}
+.card.green{background:#F1F8F1;border-color:#A5C8A7}
+.card.red{background:#FDF1F1;border-color:#E6A3A3}
+.card h3{margin-bottom:6px}
+.num{display:inline-block;width:22px;height:22px;border-radius:50%;background:var(--orange);color:#fff;font-weight:700;font-size:13px;text-align:center;line-height:22px;margin-right:6px}
+pre,code,.mono{font-family:var(--mono)}
+pre{background:#fff;border:1px solid var(--line);border-radius:6px;padding:10px 12px;font-size:13.5px;white-space:pre-wrap;margin:6px 0}
+.prompt{background:#fff;border-left:4px solid var(--orange);padding:8px 12px;font-family:var(--mono);font-size:13.5px;white-space:pre-wrap;border-radius:4px}
+.model{background:#fff;border-left:4px solid var(--navy);padding:8px 12px;font-size:14px;white-space:pre-wrap;border-radius:4px}
+button{font:inherit;font-size:14px;padding:7px 14px;border-radius:6px;border:1px solid var(--navy);background:#fff;color:var(--navy);cursor:pointer}
+button.primary{background:var(--navy);color:#fff}
+button.orange{background:var(--orange);border-color:var(--orange);color:#fff}
+button:disabled{opacity:.45;cursor:default}
+button.sel{background:var(--navy);color:#fff}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin:8px 0}
+.take{background:#fff;border:2px solid var(--navy);border-radius:8px;padding:12px 16px;margin-top:12px}
+.ok{color:var(--green);font-weight:700}.bad{color:var(--red);font-weight:700}
+.tag{display:inline-block;padding:1px 8px;border-radius:10px;font-size:12px;font-weight:700;background:var(--navy);color:#fff;margin-right:6px}
+.tag.o{background:var(--orange)}.tag.g{background:var(--green)}.tag.r{background:var(--red)}.tag.grey{background:#888}
+table{border-collapse:collapse;width:100%;font-size:13.5px}
+th,td{padding:6px 8px;border-bottom:1px solid var(--line);vertical-align:top;text-align:left}
+th{color:var(--navy);border-bottom:2px solid var(--navy)}
+footer{flex:none;display:flex;justify-content:space-between;align-items:center;padding:8px 22px;border-top:1px solid var(--line);font-size:13px;color:var(--muted)}
+footer .nav button{min-width:40px}
+footer .dots span{display:inline-block;width:8px;height:8px;border-radius:50%;background:#ccd;margin:0 3px}
+footer .dots span.on{background:var(--orange)}
+.hide{display:none}
+input[type=text],textarea,select{font:inherit;font-size:14px;padding:6px 8px;border:1px solid var(--line);border-radius:6px;width:100%}
+textarea{font-family:var(--mono);font-size:13px}
+.step{opacity:.25;transition:opacity .25s}
+.step.on{opacity:1}
+.token{display:inline-block;padding:2px 6px;margin:2px;border-radius:4px;background:#E8EEF7;border:1px solid var(--line);font-family:var(--mono);font-size:13px}
+.token.new{background:#FFE7C2;border-color:var(--orange)}
+.pill{display:inline-block;padding:6px 10px;border:1px solid var(--line);border-radius:6px;background:#fff;cursor:pointer;font-size:13.5px;margin:3px}
+.pill.sel{background:var(--navy);color:#fff;border-color:var(--navy)}
+.pill.right{background:#E6F2E6;border-color:var(--green)}
+.pill.wrong{background:#FBE6E6;border-color:var(--red)}
+.blank{background:#FFE7C2;border-bottom:2px solid var(--orange);padding:0 3px;border-radius:3px}
+.kv{display:grid;grid-template-columns:150px 1fr;gap:6px 10px;font-size:14px}
+.null{color:var(--red);font-weight:700}
+.chk{font-size:14px;margin:4px 0}
+@media (max-width:900px){.g2,.g3,.g4{grid-template-columns:1fr}.slide{padding:18px 16px}h1{font-size:22px}}
+
+.turn{display:flex;gap:10px;margin:6px 0;align-items:flex-start}
+.turn .who{flex:none;width:64px;font-size:12px;font-weight:700;color:var(--navy);padding-top:9px}
+.turn .msg{flex:1;border-radius:6px;padding:8px 12px;font-size:13.5px;white-space:pre-wrap}
+.turn.u .msg{background:#fff;border-left:4px solid var(--orange);font-family:var(--mono);font-size:13px}
+.turn.m .msg{background:#fff;border-left:4px solid var(--navy)}
+.turn .note{flex:none;width:200px;font-size:12px;color:var(--muted);padding-top:6px}
+.bar{display:flex;align-items:center;gap:8px;margin:3px 0;font-size:13px}
+.bar .lab{flex:none;width:200px;font-family:var(--mono);font-size:12px}
+.bar .fill{height:16px;border-radius:3px;background:var(--navy);transition:opacity .3s,width .3s}
+.bar.rule .fill{background:var(--orange)}
+.sn{font-size:10px;color:var(--orange);font-weight:700;vertical-align:super;margin-right:2px}
+.score{display:grid;grid-template-columns:150px repeat(3,46px);gap:4px 8px;align-items:center;font-size:13px}
+.score .sq{display:inline-block;width:40px;height:28px;line-height:28px;text-align:center;border:1px solid var(--line);border-radius:5px;cursor:pointer;background:#fff}
+.score .sq.sel{background:var(--navy);color:#fff;border-color:var(--navy)}
+.ans{background:#fff;border:1px solid var(--line);border-radius:8px;padding:10px 12px;font-size:13.5px;white-space:pre-wrap;min-height:120px}
+.ans.a{border-top:4px solid var(--orange)}.ans.b{border-top:4px solid var(--navy)}
+@media (max-width:900px){.turn .note{display:none}.bar .lab{width:120px}}
+
+.still{background:#fff;border:1px solid var(--line);border-radius:8px;padding:8px;text-align:center}
+.still img{max-width:100%;max-height:220px;border-radius:4px}
+.still .ph{height:140px;display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:13px;background:var(--box);border-radius:4px}
+canvas.diff{border:1px solid var(--line);border-radius:6px;background:#fff}
+.chip{display:inline-block;padding:3px 9px;border-radius:12px;font-size:12px;font-weight:700;margin:2px 4px 2px 0;background:#E8EEF7;color:var(--navy)}
+.chip.o{background:#FFE7C2;color:var(--orangedk)}
+.chip.r{background:#FBE6E6;color:var(--red)}
+.numin{width:110px !important;display:inline-block;margin-right:6px}
+td.hl{background:#FFE7C2;font-weight:700}
+</style></head>
+<body>
+<header><div><span class="title">UNIV198 · AI Literacy · Lecture 10</span><br>Multimodal generative AI: documents, recordings and multimodal prompting in practice</div>
+<div class="small">Companion page · <b>Documents and Recordings</b><br>Use ← → or the buttons below</div></header>
+<main>
+<section class="slide">
+<h1>From Pixels to Text: What “Reading” a Page Means</h1>
+<p class="lead">A photographed page is cut into patches; the model predicts the likeliest characters given the patches and the words around them. Not recognition: prediction. Click a stage.</p>
+<div class="row" id="ocr" style="gap:6px"></div>
+<div class="card" id="ocrOut" style="min-height:90px"><p class="small muted">Click a stage above.</p></div>
+<div class="grid g2" style="margin-top:10px">
+ <div class="card red"><h3>Substitutions</h3><p class="small">1 for l, 0 for O, 5 for S, a wrong digit in a long number, a negated sentence un-negated. Found by reading numbers and names against the original.</p></div>
+ <div class="card orange"><h3>Silent repairs</h3><p class="small">A fluent sentence where the page had a crossed-out one; a complete row where the page had a gap. Found by asking: “mark every place where you were unsure or filled something in”.</p></div>
+</div>
+</section>
+<section class="slide">
+<h1>Tables, Charts and Screenshots: Where It Goes Wrong</h1>
+<table>
+<tr><th style="width:20%">You give it</th><th style="width:42%">What usually goes wrong</th><th>The two-minute check</th></tr>
+<tr><td>A photographed table</td><td>A column shifted by one row; a merged header split; units dropped; a total recomputed instead of copied</td><td>Pick three cells, including the last row and a long number, and compare with the page</td></tr>
+<tr><td>A chart with no labels</td><td>Precise values that were estimated; the wrong axis for a second series; months in the wrong order</td><td>Ask for READ or ESTIMATED per value (Lecture 9); check one against the source data</td></tr>
+<tr><td>A screenshot of a timetable</td><td>Days and columns transposed; a cancelled entry included; a note under the table ignored</td><td>Ask it to quote the note; check one day end to end</td></tr>
+<tr><td>A scanned form</td><td>Boxes read as text; ticks missed; handwriting in the margin dropped</td><td>Ask it to list every tick box and its state</td></tr>
+<tr><td>A PDF of a paper</td><td>The abstract summarised, the method skipped; references invented when the page is cut</td><td>Ask for the page number of each claim; check two</td></tr>
+</table>
+<div class="take">The pattern is Lecture 8's: smoothing and invented specifics, in a new medium. The check is the same too: against the source, never against a second look at the answer.</div>
+</section>
+<section class="slide">
+<h1>Recordings: Find the Three Ns</h1>
+<p class="lead">Five lines from an invented meeting. On the left, what was said; on the right, what a transcription tool produced. Click each right-hand line where you think it is wrong, then press Check. The three Ns: names, numbers, negations.</p>
+<div id="tr"></div>
+<div class="row"><button class="primary" id="trCheck">Check</button><button id="trReset">Reset</button><span class="small muted" id="trOut"></span></div>
+<div class="take hide" id="trTake"><b>All five are wrong, and all five read fluently.</b> A summary made from this transcript would inherit every error and hide them. Before you rely on a transcript: names, numbers, negations, against the recording. And before you record: everyone in the room knows and agrees (Lecture 4).</div>
+<h2>The demo, if the live one is slow</h2>
+<div class="grid g3">
+ <div class="card"><h3><span class="num">1</span>Extract</h3><div class="prompt">Turn this page into text. Keep the layout: headings, lists, table. Mark anything you were unsure of with [?].</div><p class="small muted">Read the result against the page: numbers, names, the crossed-out line.</p></div>
+ <div class="card"><h3><span class="num">2</span>Verify</h3><div class="prompt">List every place where you filled something in, corrected a spelling, or could not read a word.</div><p class="small muted">Typical: two silent repairs it did not mark in turn 1 appear now.</p></div>
+ <div class="card"><h3><span class="num">3</span>Structure</h3><div class="prompt">Give the table as a table with the units in the header, and say which cells you read with certainty.</div><p class="small muted">A merged cell or a shifted column shows up here, if there is one.</p></div>
+</div>
+</section>
+<section class="slide">
+<h1>Activity 1: Photo to Table</h1>
+<p class="lead">Photograph the table below (or the slide) with your phone, upload it to either app, and ask for it as a typed table with a column marking each cell READ or UNSURE. Type what it gave you for the two shaded cells and press Check; then submit on the Google Form.</p>
+<div class="grid g2">
+ <div class="card"><table class="small"><tr><th>Section (invented)</th><th>Enrolled</th><th>Submitted</th><th>Late</th><th>Mean (%)</th></tr><tr><td>Section 1</td><td>103</td><td>97</td><td class="">4</td><td class="">71.8</td></tr><tr><td>Section 2</td><td>98</td><td>91</td><td class="hl">11</td><td class="">68.5</td></tr><tr><td>Section 3</td><td>101</td><td>95</td><td class="">6</td><td class="">73.1</td></tr><tr><td>Section 4</td><td>99</td><td>88</td><td class="">9</td><td class="hl">70.0</td></tr><tr><td>Section 5</td><td>104</td><td>100</td><td class="">3</td><td class="">74.6</td></tr><tr><td>All</td><td>505</td><td>471</td><td class="">33</td><td class="">71.6</td></tr></table>
+  <p class="small muted" style="margin:6px 0 0">Shaded: the two cells to report. The “All” row is a trap: a model that recomputes the mean gives 71.7; the page says 71.6.</p></div>
+ <div class="card">
+  <p class="small" style="margin:0 0 4px"><b>Section 2, Late</b></p><div class="row" style="margin:0 0 8px"><input type="text" class="numin" id="t1" placeholder="value"><select id="m1" style="width:auto"><option value="">marked?</option><option>READ</option><option>UNSURE</option><option>not marked</option></select></div>
+  <p class="small" style="margin:0 0 4px"><b>Section 4, Mean (%)</b></p><div class="row" style="margin:0 0 8px"><input type="text" class="numin" id="t2" placeholder="value"><select id="m2" style="width:auto"><option value="">marked?</option><option>READ</option><option>UNSURE</option><option>not marked</option></select></div>
+  <p class="small" style="margin:0 0 4px"><b>All, Mean (%)</b> (the trap)</p><div class="row" style="margin:0 0 8px"><input type="text" class="numin" id="t3" placeholder="value"></div>
+  <div class="row"><button class="primary" id="tabCheck">Check</button></div><div class="small" id="tabOut"></div>
+ </div>
+</div>
+</section>
+<section class="slide">
+<h1>Long Files: The Window, Again</h1>
+<div class="grid g3">
+ <div class="card"><h3>A file is tokens in the window</h3><p class="small">A 40-page PDF is a few tens of thousands of tokens; an hour of audio, about the same as its transcript. It fits. It is also now most of the context.</p></div>
+ <div class="card"><h3>The middle fades</h3><p class="small">Lecture 7's “lost in the middle” holds for files: claims from page 20 are used less reliably than page 1 or page 40. Ask for page numbers; check the middle.</p></div>
+ <div class="card orange"><h3>Week 7 starts here</h3><p class="small">When the files are too many to paste, the app <b>retrieves</b> the relevant parts and puts only those in the window. That is retrieval, next week's topic.</p></div>
+</div>
+<div class="take"><b>A habit for files:</b> a new chat per file or per task; the brief from Lecture 7 at the top; page or line references in every answer; keep the file you uploaded with the answer, so that the check is possible later.</div>
+<h2>What the room usually finds (Activity 1)</h2>
+<div class="grid g3">
+ <div class="card"><h3>The cells are right</h3><p class="small">A clean photo of a printed table is read correctly almost every time. The value is not the problem.</p></div>
+ <div class="card"><h3>The marking is not</h3><p class="small">Asked to mark READ or UNSURE, most answers mark everything READ, including a cell that was out of focus. The admission has to be asked for twice.</p></div>
+ <div class="card orange"><h3>The total is recomputed</h3><p class="small">Some answers give 71.7, the average of the five means, not the 71.6 on the page. Neither is wrong; only one is what the page says.</p></div>
+</div>
+</section>
+<section class="slide">
+<h1>Takeaways</h1>
+<div class="grid g2">
+ <div class="card"><h3>Reading is prediction</h3><p class="small">Substitutions and silent repairs. Ask it to mark what it filled in; check numbers and names against the page.</p></div>
+ <div class="card"><h3>Three cells, three Ns, two page numbers</h3><p class="small">The two-minute check for a table, a transcript and a PDF. Against the original, never against the answer.</p></div>
+ <div class="card"><h3>Copied or computed?</h3><p class="small">A total that is recomputed is not what the page says. Ask which it did.</p></div>
+ <div class="card"><h3>Files are the window</h3><p class="small">The middle fades; ask for references; keep the file with the answer. Retrieval is next week.</p></div>
+</div>
+<p class="small muted" style="margin-top:14px">Next companion page: UNIV198_AI-Literacy_Fall-2026_W06-L10_CompanionPages_02_prompting-and-responsibility.html (the five parts with a file, the four patterns, alt text, uploads and disclosure, the group take-home).</p>
+</section>
+</main>
+<footer><div class="dots" id="dots"></div><div class="nav"><button id="prev">←</button> <span id="counter"></span> <button id="next">→</button></div></footer>
+<script>
+(function(){
+  const slides=[...document.querySelectorAll('.slide')];
+  let i=0;
+  const counter=document.getElementById('counter'), dots=document.getElementById('dots');
+  slides.forEach((s,k)=>{const d=document.createElement('span'); d.onclick=()=>go(k); dots.appendChild(d);});
+  function go(n){ i=Math.max(0,Math.min(slides.length-1,n));
+    slides.forEach((s,k)=>s.classList.toggle('on',k===i));
+    [...dots.children].forEach((d,k)=>d.classList.toggle('on',k===i));
+    counter.textContent=(i+1)+' / '+slides.length;
+    document.getElementById('prev').disabled=i===0; document.getElementById('next').disabled=i===slides.length-1;
+    try{location.hash='s'+(i+1);}catch(e){}
+  }
+  document.getElementById('prev').onclick=()=>go(i-1);
+  document.getElementById('next').onclick=()=>go(i+1);
+  document.addEventListener('keydown',e=>{ if(e.target.tagName==='TEXTAREA'||e.target.tagName==='INPUT')return;
+    if(e.key==='ArrowRight'||e.key==='PageDown'||e.key===' '){e.preventDefault();go(i+1);}
+    if(e.key==='ArrowLeft'||e.key==='PageUp'){e.preventDefault();go(i-1);}
+    if(e.key==='Home')go(0); if(e.key==='End')go(slides.length-1);});
+  const m=(location.hash||'').match(/s(\d+)/); go(m?parseInt(m[1])-1:0);
+  window.goSlide=go;
+})();
+
+const TRL=[["Speaker 1 (course coordinator)", "The deadline is not before Friday the fourteenth; the form closes at midnight.", "The deadline is before Friday the 14th; the form closes at midnight.", "a dropped negation: “not before” became “before”"], ["Speaker 2 (TA)", "Section 3 has 101 enrolled, and we expect about 95 submissions.", "Section 3 has 110 enrolled, and we expect about 95 submissions.", "a number: 101 became 110"], ["Speaker 1", "Please send questions to univ198instructors-group, not to Dr Gökmen directly.", "Please send questions to the instructors group, not to Dr Gokmen directly.", "a name and an address flattened"], ["Speaker 2", "UNIV198 Lecture 10 is on Thursday; the KUHub upload is Wednesday.", "UNIV198 Lecture 10 is on Thursday; the Q hub upload is Wednesday.", "an acronym the model has never seen: KUHub"], ["Speaker 1", "We will not change the marking scheme this term.", "We will change the marking scheme this term.", "a dropped negation, again"]];
+const TROWS=[["Section 1", 103, 97, 4, "71.8"], ["Section 2", 98, 91, 11, "68.5"], ["Section 3", 101, 95, 6, "73.1"], ["Section 4", 99, 88, 9, "70.0"], ["Section 5", 104, 100, 3, "74.6"], ["All", 505, 471, 33, "71.6"]];
+
+(function(){
+ const ST=[['1. Patches','The photo is cut into small squares, each a token (Lecture 9). Resolution matters: a blurry photo is a page of blurry tokens. Light, flat, straight, is half the result.'],['2. Prediction','The model predicts the likeliest characters given the patches and the words around them. Which is why it fixes your spelling without being asked, and why it “reads” a number that was never there.'],['3. Structure, guessed','Columns, rows, headings, footnotes are inferred from position and style. A two-column page becomes one interleaved column; a merged cell becomes two values. Ask for the layout it assumed.']];
+ const row=document.getElementById('ocr'), out=document.getElementById('ocrOut');
+ ST.forEach(t=>{const d=document.createElement('div'); d.className='pill'; d.style.cssText='flex:1;text-align:center;padding:10px 6px'; d.innerHTML='<b>'+t[0]+'</b>'; d.onclick=()=>{[...row.children].forEach(c=>c.style.outline=''); d.style.outline='2px solid var(--navy)'; out.innerHTML='<h3>'+t[0]+'</h3><p class="small">'+t[1]+'</p>';}; row.appendChild(d);});
+})();
+(function(){
+ const box=document.getElementById('tr'); const picked=new Set();
+ TRL.forEach((l,i)=>{const d=document.createElement('div'); d.className='grid g2'; d.style.marginBottom='6px';
+  d.innerHTML='<div class="card" style="padding:8px 12px"><span class="small muted">'+l[0]+', said:</span><br>'+l[1]+'</div><div class="card" style="padding:8px 12px;cursor:pointer" id="tl'+i+'"><span class="small muted">transcript:</span><br>'+l[2]+'<div class="small muted hide" id="tx'+i+'"></div></div>';
+  box.appendChild(d); const c=d.querySelector('#tl'+i); c.onclick=()=>{ if(picked.has(i)){picked.delete(i); c.style.outline='';} else {picked.add(i); c.style.outline='2px solid var(--orange)';} };});
+ document.getElementById('trCheck').onclick=()=>{ let n=0; TRL.forEach((l,i)=>{const c=document.getElementById('tl'+i), x=document.getElementById('tx'+i); x.classList.remove('hide'); x.innerHTML='<b>Wrong:</b> '+l[3]+'.'; c.style.background=picked.has(i)?'#F1F8F1':'#FDF1F1'; if(picked.has(i))n++;});
+  document.getElementById('trOut').textContent='You found '+n+' of 5.'; document.getElementById('trTake').classList.remove('hide'); };
+ document.getElementById('trReset').onclick=()=>{picked.clear(); TRL.forEach((l,i)=>{const c=document.getElementById('tl'+i); c.style.outline=''; c.style.background=''; document.getElementById('tx'+i).classList.add('hide');}); document.getElementById('trOut').textContent=''; document.getElementById('trTake').classList.add('hide');};
+})();
+(function(){
+ document.getElementById('tabCheck').onclick=()=>{ const r=[]; const v1=document.getElementById('t1').value.trim(), v2=document.getElementById('t2').value.trim(), v3=document.getElementById('t3').value.trim();
+  r.push(v1===''?'<span class="muted">Section 2, Late: nothing entered.</span>':(v1==='11'?'<span class="ok">Section 2, Late: 11, correct.</span>':'<span class="bad">Section 2, Late: '+v1+'; the page says 11.</span>'));
+  r.push(v2===''?'<span class="muted">Section 4, Mean: nothing entered.</span>':(parseFloat(v2)===70?'<span class="ok">Section 4, Mean: 70.0, correct.</span>':'<span class="bad">Section 4, Mean: '+v2+'; the page says 70.0.</span>'));
+  const m1=document.getElementById('m1').value, m2=document.getElementById('m2').value;
+  if(m1||m2) r.push((m1==='READ'||m2==='READ')?'<span class="ok">Marked READ: fine for a sharp photo. Was it sharp?</span>':(m1==='not marked'||m2==='not marked')?'<span class="bad">Not marked: the instruction was ignored; ask for the marking again in turn 2.</span>':'<span class="ok">Marked UNSURE: honest, if the cell was hard to read.</span>');
+  if(v3){ const x=parseFloat(v3); r.push(Math.abs(x-71.6)<0.01?'<span class="ok">All, Mean: 71.6, copied from the page.</span>':Math.abs(x-71.7)<0.01?'<span class="bad">All, Mean: 71.7 is the average of the five means, recomputed, not the 71.6 on the page. Ask: “did you copy or compute this?”</span>':'<span class="bad">All, Mean: '+v3+'; the page says 71.6 (a recomputation gives 71.7).</span>'); }
+  document.getElementById('tabOut').innerHTML='<ul style="margin:6px 0 0 18px;line-height:1.6"><li>'+r.join('</li><li>')+'</li></ul>'; };
+})();
+
+</script>
+</body></html>
