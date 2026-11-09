@@ -91,6 +91,7 @@ canvas.diff{border:1px solid var(--line);border-radius:6px;background:#fff}
 .chip.o{background:#FFE7C2;color:var(--orangedk)}
 .chip.r{background:#FBE6E6;color:var(--red)}
 .numin{width:110px !important;display:inline-block;margin-right:6px}
+td.hl{background:#FFE7C2;font-weight:700}
 </style></head>
 <body>
 <header><div><span class="title">UNIV198 · AI Literacy · Lecture 9</span><br>Multimodal generative AI: seeing, hearing, making</div>
@@ -100,7 +101,7 @@ canvas.diff{border:1px solid var(--line);border-radius:6px;background:#fff}
 <h1>Demo: One Prompt, Two Pictures, Then the Loop</h1>
 <p class="lead">The film-club poster, live in Gemini or Copilot. Press <b>Copy</b> on each turn and paste it; the grey line says what to look at. The stills below are the fallback if the app is slow.</p>
 <div id="demo"></div>
-<div class="grid g3" style="margin-top:10px"><div class="still"><img src="assets/L9_demo_1.png" alt="Still 1: the first picture" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"><div class="ph" style="display:none">still to be added: assets/L9_demo_1.png</div><p class="small muted" style="margin:6px 0 0">Still 1: the first picture</p></div><div class="still"><img src="assets/L9_demo_2.png" alt="Still 2: after Correct" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"><div class="ph" style="display:none">still to be added: assets/L9_demo_2.png</div><p class="small muted" style="margin:6px 0 0">Still 2: after Correct</p></div><div class="still"><img src="assets/L9_demo_3.png" alt="Still 3: after Narrow" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"><div class="ph" style="display:none">still to be added: assets/L9_demo_3.png</div><p class="small muted" style="margin:6px 0 0">Still 3: after Narrow</p></div></div>
+<div class="grid g3" style="margin-top:10px"><div class="still"><img src="assets/L9_demo_1.jpg" alt="Still 1: the first picture" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"><div class="ph" style="display:none">still to be added: assets/L9_demo_1.jpg</div><p class="small muted" style="margin:6px 0 0">Still 1: the first picture</p></div><div class="still"><img src="assets/L9_demo_2.jpg" alt="Still 2: after Correct" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"><div class="ph" style="display:none">still to be added: assets/L9_demo_2.jpg</div><p class="small muted" style="margin:6px 0 0">Still 2: after Correct</p></div><div class="still"><img src="assets/L9_demo_3.jpg" alt="Still 3: after Narrow" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"><div class="ph" style="display:none">still to be added: assets/L9_demo_3.jpg</div><p class="small muted" style="margin:6px 0 0">Still 3: after Narrow</p></div></div>
 <div class="take"><b>What to look for:</b> the second and third pictures are edits of the first, not new rolls: the loop works on pixels as it did on text. And every version has to be checked by eye; nothing in the app tells you a letter is wrong.</div>
 </section>
 <section class="slide">
@@ -200,7 +201,7 @@ canvas.diff{border:1px solid var(--line);border-radius:6px;background:#fff}
   window.goSlide=go;
 })();
 
-const DEMO=[["First prompt", "A poster for a student film club, A3 portrait, flat illustration, two colours, a projector beam as the only object, large empty space at the top. No text in the image.", "Typical: a good beam, a third colour, something that looks like a title, and square."], ["Correct", "Keep the composition. Remove the lettering. Two colours only: navy and orange.", "The app edits the picture you have. Compare with the first: what moved that you did not ask to move?"], ["Narrow", "Portrait, 3 to 4 ratio. More empty space at the top, the beam lower.", "One change per turn. If three turns do not move it, start a new chat with a better first prompt (Lecture 7)."]];
+const DEMO=[["First prompt", "A poster for a student film club, A3 portrait, flat illustration, two colours, a projector beam as the only object, large empty space at the top. No text in the image.", "Typical: a good beam, a third colour, something that looks like a title, and square."], ["Correct", "Keep the composition. If any lettering or a third colour appeared, remove it. Two colours only: navy and orange.", "The app edits the picture you have. Compare with the first: what moved that you did not ask to move?"], ["Narrow", "Portrait, 3 to 4 ratio. More empty space at the top, the beam lower.", "One change per turn. If three turns do not move it, start a new chat with a better first prompt (Lecture 7)."]];
 const TRUTH={"jul": 9780, "oct": 24870, "aug_online": 24900};
 
 (function(){
