@@ -83,6 +83,8 @@ textarea{font-family:var(--mono);font-size:13px}
 .ans.a{border-top:4px solid var(--orange)}.ans.b{border-top:4px solid var(--navy)}
 @media (max-width:900px){.turn .note{display:none}.bar .lab{width:120px}}
 
+a.btn{display:inline-block;font-size:14px;padding:7px 14px;border-radius:6px;border:1px solid var(--navy);background:#fff;color:var(--navy);text-decoration:none}
+
 .still{background:#fff;border:1px solid var(--line);border-radius:8px;padding:8px;text-align:center}
 .still img{max-width:100%;max-height:220px;border-radius:4px}
 .still .ph{height:140px;display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:13px;background:var(--box);border-radius:4px}
@@ -146,7 +148,8 @@ td.hl{background:#FFE7C2;font-weight:700}
   <div class="row"><button class="primary" id="acopy">Copy</button><button id="acheck">Check</button><button id="aexample">Load the example</button><span class="small muted" id="amsg"></span></div>
   <div class="small" id="achk"></div>
   <h3 style="margin-top:12px">The alt text it gave you</h3><textarea id="alt" rows="3" placeholder="Paste the model's alt text here"></textarea>
-  <div class="row"><button id="altcheck">Check the alt text</button></div><div class="small" id="altchk"></div>
+  <div class="row"><button id="altcheck">Check the alt text</button><button id="altbad">Paste a typical first answer</button><button id="altgood">Paste a good answer</button></div><div class="small" id="altchk"></div>
+  <p class="small muted" style="margin:6px 0 0">The two sample answers are written for this page as typical results (for the chart on slide 2), not copied from an app; use them if the live run is slow.</p>
  </div>
 </div>
 </section>
@@ -158,8 +161,8 @@ td.hl{background:#FFE7C2;font-weight:700}
 <div class="take hide" id="upTake"><b>The line most students cross by accident:</b> a whiteboard with a classmate's name, a screenshot of a group chat, a recording of a seminar. Each is other people's data the moment it leaves your phone. Crop, blur, or ask first. And blacking out a name does not turn clinical data into yours.</div>
 </section>
 <section class="slide">
-<h1>Take-Home, in Groups: One Page, Three Media</h1>
-<p class="lead">Groups of three or four, this week: one page for a course of one member's (a short explainer, a poster, a handout) with one generated image, one AI-read source and alt text, each with its disclosure line. One submission per group. Build the three lines here and copy them.</p>
+<h1>Take-Home: One Page, Three Media</h1>
+<p class="lead">This week: one page for one of your courses (a short explainer, a poster, a handout) with one generated image, one AI-read source and alt text, each with its disclosure line. One submission each. Build the three lines here and copy them.</p>
 <div class="grid g3">
  <div class="card"><h3><span class="num">1</span>Make</h3><p class="small">One image from a five-part prompt, improved with one follow-up. Keep the file, not a screenshot. No real person, logo, named style, or text inside the image.</p></div>
  <div class="card"><h3><span class="num">2</span>Read</h3><p class="small">One source converted by a tool: a table, a page, a chart or a short recording that is yours or public. Three cells or three Ns checked against the original; say what was computed rather than copied.</p></div>
@@ -225,6 +228,8 @@ const UP=[["A photo of your own lecture notes", "yours", "Yours. Upload freely; 
   r.push(/(sentence|words|under \d+)/.test(t)?'<span class="ok">Length fixed.</span>':'<span class="bad">No length: two sentences, under 40 words.</span>');
   r.push(/(no colou?rs|no layout|not visible|only what is in)/.test(t)?'<span class="ok">Rules present.</span>':'<span class="bad">Add the rules: no colours or layout; only what is in the image; NOT VISIBLE.</span>');
   chk.innerHTML='<ul style="margin:6px 0 0 18px;line-height:1.6"><li>'+r.join('</li><li>')+'</li></ul>'; };
+ document.getElementById('altbad').onclick=()=>{document.getElementById('alt').value='A vibrant bar chart with navy bars and an orange line showing library usage trends across six months, with a clear seasonal pattern and an upward trajectory towards the autumn.'; document.getElementById('altchk').innerHTML='';};
+ document.getElementById('altgood').onclick=()=>{document.getElementById('alt').value='Library use from May to October: in-person visits fell to about 8,000 in August and rose to about 25,000 in October, while online sessions followed the same shape at a higher level. The chart shows the summer dip the report discusses.'; document.getElementById('altchk').innerHTML='';};
  document.getElementById('altcheck').onclick=()=>{ const t=document.getElementById('alt').value.trim(); if(!t){document.getElementById('altchk').innerHTML='<span class="muted">Paste the alt text first.</span>';return;}
   const words=t.split(/\s+/).length; const r=[]; const lo=t.toLowerCase();
   r.push(words<=40?'<span class="ok">'+words+' words.</span>':'<span class="bad">'+words+' words: over 40.</span>');

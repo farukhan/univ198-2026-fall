@@ -83,6 +83,8 @@ textarea{font-family:var(--mono);font-size:13px}
 .ans.a{border-top:4px solid var(--orange)}.ans.b{border-top:4px solid var(--navy)}
 @media (max-width:900px){.turn .note{display:none}.bar .lab{width:120px}}
 
+a.btn{display:inline-block;font-size:14px;padding:7px 14px;border-radius:6px;border:1px solid var(--navy);background:#fff;color:var(--navy);text-decoration:none}
+
 .still{background:#fff;border:1px solid var(--line);border-radius:8px;padding:8px;text-align:center}
 .still img{max-width:100%;max-height:220px;border-radius:4px}
 .still .ph{height:140px;display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:13px;background:var(--box);border-radius:4px}
@@ -120,17 +122,20 @@ td.hl{background:#FFE7C2;font-weight:700}
 <div class="take">The pattern is Lecture 8's: smoothing and invented specifics, in a new medium. The check is the same too: against the source, never against a second look at the answer.</div>
 </section>
 <section class="slide">
-<h1>Recordings: Find the Three Ns</h1>
-<p class="lead">Five lines from an invented meeting. On the left, what was said; on the right, what a transcription tool produced. Click each right-hand line where you think it is wrong, then press Check. The three Ns: names, numbers, negations.</p>
+<h1>Demo: A Photographed Page, and the Three Ns</h1>
+<p class="lead">Everything for the live demo is on this slide. Photograph the page below with the phone (or press <b>Open the page</b> and upload the file directly), then paste the three turns in order. If the app is slow, open the <b>sample answer</b> under each turn.</p>
+<div class="grid g2" style="grid-template-columns:1fr 2fr">
+ <div class="card" style="text-align:center"><a href="assets/L10_demo_page.jpg" target="_blank"><img src="assets/L10_demo_page.jpg" alt="The invented instructor's page: decisions, a table with a merged header and decimal commas, a crossed-out line, a handwritten margin note" style="max-width:100%;border:1px solid #ddd"></a>
+  <div class="row" style="justify-content:center;margin-top:6px"><a class="btn" href="assets/L10_demo_page.jpg" target="_blank">Open the page</a><a class="btn" href="assets/L10_demo_page.jpg" download="L10_demo_page.jpg">Download</a></div>
+  <p class="small muted" style="margin:6px 0 0">Invented. Built to have: a merged header, decimal commas, a crossed-out line, a negation, a name, a handwritten note.</p></div>
+ <div id="l10demo"></div>
+</div>
+<div class="take"><b>What to look for:</b> turn 1 looks perfect; turn 2 is where the model admits what turn 1 hid. Ask for the admission every time, and still check the three Ns yourself.</div>
+<h2>Recordings: find the three Ns</h2>
+<p class="lead">Six lines from an invented meeting. On the left, what was said; on the right, what a transcription tool produced. Three right-hand lines are wrong, one for each N: a name, a number, a negation. The other three differ only harmlessly. Click the lines you think are wrong, then press Check.</p>
 <div id="tr"></div>
 <div class="row"><button class="primary" id="trCheck">Check</button><button id="trReset">Reset</button><span class="small muted" id="trOut"></span></div>
-<div class="take hide" id="trTake"><b>All five are wrong, and all five read fluently.</b> A summary made from this transcript would inherit every error and hide them. Before you rely on a transcript: names, numbers, negations, against the recording. And before you record: everyone in the room knows and agrees (Lecture 4).</div>
-<h2>The demo, if the live one is slow</h2>
-<div class="grid g3">
- <div class="card"><h3><span class="num">1</span>Extract</h3><div class="prompt">Turn this page into text. Keep the layout: headings, lists, table. Mark anything you were unsure of with [?].</div><p class="small muted">Read the result against the page: numbers, names, the crossed-out line.</p></div>
- <div class="card"><h3><span class="num">2</span>Verify</h3><div class="prompt">List every place where you filled something in, corrected a spelling, or could not read a word.</div><p class="small muted">Typical: two silent repairs it did not mark in turn 1 appear now.</p></div>
- <div class="card"><h3><span class="num">3</span>Structure</h3><div class="prompt">Give the table as a table with the units in the header, and say which cells you read with certainty.</div><p class="small muted">A merged cell or a shifted column shows up here, if there is one.</p></div>
-</div>
+<div class="take hide" id="trTake"><b>All six read fluently, and the three wrong ones read best.</b> A summary made from this transcript would inherit every error and hide them. Before you rely on a transcript: names, numbers, negations, against the recording. And before you record: everyone in the room knows and agrees (Lecture 4).</div>
 </section>
 <section class="slide">
 <h1>Activity 1: Photo to Table</h1>
@@ -169,7 +174,7 @@ td.hl{background:#FFE7C2;font-weight:700}
  <div class="card"><h3>Copied or computed?</h3><p class="small">A total that is recomputed is not what the page says. Ask which it did.</p></div>
  <div class="card"><h3>Files are the window</h3><p class="small">The middle fades; ask for references; keep the file with the answer. Retrieval is next week.</p></div>
 </div>
-<p class="small muted" style="margin-top:14px">Next companion page: UNIV198_AI-Literacy_Fall-2026_W06-L10_CompanionPages_02_prompting-and-responsibility.html (the five parts with a file, the four patterns, alt text, uploads and disclosure, the group take-home).</p>
+<p class="small muted" style="margin-top:14px">Next companion page: UNIV198_AI-Literacy_Fall-2026_W06-L10_CompanionPages_02_prompting-and-responsibility.html (the five parts with a file, the four patterns, alt text, uploads and disclosure, the take-home).</p>
 </section>
 </main>
 <footer><div class="dots" id="dots"></div><div class="nav"><button id="prev">←</button> <span id="counter"></span> <button id="next">→</button></div></footer>
@@ -196,7 +201,7 @@ td.hl{background:#FFE7C2;font-weight:700}
   window.goSlide=go;
 })();
 
-const TRL=[["Speaker 1 (course coordinator)", "The deadline is not before Friday the fourteenth; the form closes at midnight.", "The deadline is before Friday the 14th; the form closes at midnight.", "a dropped negation: “not before” became “before”"], ["Speaker 2 (TA)", "Section 3 has 101 enrolled, and we expect about 95 submissions.", "Section 3 has 110 enrolled, and we expect about 95 submissions.", "a number: 101 became 110"], ["Speaker 1", "Please send questions to univ198instructors-group, not to Dr Gökmen directly.", "Please send questions to the instructors group, not to Dr Gokmen directly.", "a name and an address flattened"], ["Speaker 2", "UNIV198 Lecture 10 is on Thursday; the KUHub upload is Wednesday.", "UNIV198 Lecture 10 is on Thursday; the Q hub upload is Wednesday.", "an acronym the model has never seen: KUHub"], ["Speaker 1", "We will not change the marking scheme this term.", "We will change the marking scheme this term.", "a dropped negation, again"]];
+const TRL=[["Speaker 1 (course coordinator)", "The deadline is not before Friday the fourteenth; the form closes at midnight.", "The deadline is before Friday the 14th; the form closes at midnight.", "a negation: “not before” became “before”", true], ["Speaker 2 (TA)", "Section 3 has 101 enrolled, and we expect about 95 submissions.", "Section 3 has 101 enrolled and we expect about 95 submissions.", "", false], ["Speaker 1", "Please send questions to the instructors' group address, not to Dr Gökmen directly.", "Please send questions to the instructors' group address, not to Dr Gökmen directly.", "", false], ["Speaker 2", "Lecture 10 is in the usual room; the upload to KUHub is on the day before.", "Lecture 10 is in the usual room; the upload to Q Hub is on the day before.", "a name the model has never seen: KUHub became “Q Hub”", true], ["Speaker 1", "Ebru will lead the make-up session, so, er, she needs the slides by Monday.", "Ebru will lead the make-up session, so she needs the slides by Monday.", "", false], ["Speaker 2", "We print twenty-five copies of the handout per section, so about one hundred and twenty-five in all.", "We print twenty-five copies of the handout per section, so about one hundred and twenty in all.", "a number: 125 became 120", true]];
 const TROWS=[["Section 1", 103, 97, 4, "71.8"], ["Section 2", 98, 91, 11, "68.5"], ["Section 3", 101, 95, 6, "73.1"], ["Section 4", 99, 88, 9, "70.0"], ["Section 5", 104, 100, 3, "74.6"], ["All", 505, 471, 33, "71.6"]];
 
 (function(){
@@ -205,12 +210,32 @@ const TROWS=[["Section 1", 103, 97, 4, "71.8"], ["Section 2", 98, 91, 11, "68.5"
  ST.forEach(t=>{const d=document.createElement('div'); d.className='pill'; d.style.cssText='flex:1;text-align:center;padding:10px 6px'; d.innerHTML='<b>'+t[0]+'</b>'; d.onclick=()=>{[...row.children].forEach(c=>c.style.outline=''); d.style.outline='2px solid var(--navy)'; out.innerHTML='<h3>'+t[0]+'</h3><p class="small">'+t[1]+'</p>';}; row.appendChild(d);});
 })();
 (function(){
+ const T=[
+  ['Extract','Turn this page into text. Keep the layout: headings, lists, table. Mark anything you were unsure of with [?].','Read the result against the page: numbers, names, the crossed-out line.',
+   '<b>UNIV198 Section meeting, Week 5: notes</b><br><i>Invented page for the Lecture 10 demo. Nothing on it is real.</i><br><br><b>Decisions</b><ul><li>The Activity 3 form closes at 23:59, not at 23:00 as the first announcement said.</li><li>Section leader for the Thursday make-up session: Ebru Sarıkaya (not Ebru Sarı).</li><li>Lecture 10 stays in the usual room; the move was cancelled on 5 November.</li><li>Questions go to the instructors\' group address, not to the coordinator\'s inbox.</li></ul><b>Submissions for Activity 2, by section (invented)</b><br><table class="small"><tr><th>Section</th><th>Activity 1</th><th>Activity 2</th><th>Mean score (%)</th></tr><tr><td>Section 1</td><td>97</td><td>94</td><td>71.8</td></tr><tr><td>Section 2</td><td>91</td><td>88</td><td>68.5</td></tr><tr><td>Section 3</td><td>101</td><td>95</td><td>73.1</td></tr><tr><td>Section 4</td><td>88</td><td>86</td><td>70.0</td></tr><tr><td>Section 5</td><td>100</td><td>97</td><td>74.6</td></tr><tr><td>All sections</td><td>477</td><td>460</td><td>71.6</td></tr></table><b>To do before Lecture 10</b><ul><li>Print 25 copies of the alt-text handout per section.</li><li>Test the QR slides on the room projector.</li></ul>Margin note: check Section 3 count.',
+   'No [?] anywhere. The crossed-out line is gone without a trace; the merged header “Submissions (count)” has vanished; 71,8 became 71.8; “chk Sec 3 count (101 or 107?)” became a tidy sentence and lost its question.'],
+  ['Verify','List every place where you filled something in, corrected a spelling, or could not read a word.','Typical: two silent repairs it did not mark in turn 1 appear now.',
+   'Places where I made a judgement:<ol><li>One bullet under Decisions was struck through on the page (“Lecture 10 moves to room SOS B07”). I omitted it rather than marking it.</li><li>The table has a two-level header: “Submissions (count)” spans Activity 1 and Activity 2. I flattened it to one row.</li><li>The mean scores use a decimal comma (71,8). I wrote them with a decimal point.</li><li>The handwritten note reads “chk Sec 3 count (101 or 107?)”. I expanded “chk” to “check” and dropped the “(101 or 107?)”. The Section 3 count in the table could be 101 or 107; I am not certain of the middle digit.</li><li>I could not confirm whether “Sarı” in “(not Ebru Sarı)” is complete or cut off.</li></ol>',
+   'Four admissions that were invisible in turn 1, and one honest doubt about a digit. This is the turn to ask for, every time.'],
+  ['Structure','Give the table as a table with the units in the header, and say which cells you read with certainty.','A merged cell or a shifted column shows up here, if there is one.',
+   '<table class="small"><tr><th>Section</th><th>Activity 1 submissions (count)</th><th>Activity 2 submissions (count)</th><th>Mean score (%)</th><th>Certainty</th></tr><tr><td>Section 1</td><td>97</td><td>94</td><td>71.8</td><td>certain</td></tr><tr><td>Section 2</td><td>91</td><td>88</td><td>68.5</td><td>certain</td></tr><tr><td>Section 3</td><td>101 [?]</td><td>95</td><td>73.1</td><td>Activity 1 count unsure (101 or 107)</td></tr><tr><td>Section 4</td><td>88</td><td>86</td><td>70.0</td><td>certain</td></tr><tr><td>Section 5</td><td>100</td><td>97</td><td>74.6</td><td>certain</td></tr><tr><td>All sections</td><td>477</td><td>460</td><td>71.6</td><td>copied from the page, not recomputed</td></tr></table>Note: the page writes the means with a decimal comma; converted to a point here.',
+   'Units now sit in the header; the doubtful digit is flagged; the total is declared copied, not computed. Check it anyway: 97+91+101+88+100 = 477.']
+ ];
+ const box=document.getElementById('l10demo');
+ T.forEach((t,i)=>{const d=document.createElement('div'); d.className='card'; d.style.marginBottom='8px';
+  d.innerHTML='<div class="row" style="justify-content:space-between"><h3 style="margin:0"><span class="num">'+(i+1)+'</span>'+t[0]+'</h3><button class="primary">Copy</button></div><div class="prompt">'+t[1]+'</div><p class="small muted" style="margin:4px 0">'+t[2]+'</p><button class="small">Show a sample answer</button><div class="small hide" style="margin-top:6px;padding:8px 10px;background:#fff;border:1px dashed #bbb;border-radius:6px"><p class="muted" style="margin:0 0 6px"><i>Sample answer, written for this page as a typical result, not copied from an app.</i></p>'+t[3]+'<p class="muted" style="margin:6px 0 0"><b>Read it against the page:</b> '+t[4]+'</p></div>';
+  box.appendChild(d);
+  const [cb,sb]=d.querySelectorAll('button'); const ans=d.querySelector('div.hide');
+  cb.onclick=async()=>{try{await navigator.clipboard.writeText(t[1]); cb.textContent='Copied';}catch(e){cb.textContent='Select and copy';}};
+  sb.onclick=()=>{const h=ans.classList.toggle('hide'); sb.textContent=h?'Show a sample answer':'Hide the sample answer';};});
+})();
+(function(){
  const box=document.getElementById('tr'); const picked=new Set();
  TRL.forEach((l,i)=>{const d=document.createElement('div'); d.className='grid g2'; d.style.marginBottom='6px';
   d.innerHTML='<div class="card" style="padding:8px 12px"><span class="small muted">'+l[0]+', said:</span><br>'+l[1]+'</div><div class="card" style="padding:8px 12px;cursor:pointer" id="tl'+i+'"><span class="small muted">transcript:</span><br>'+l[2]+'<div class="small muted hide" id="tx'+i+'"></div></div>';
   box.appendChild(d); const c=d.querySelector('#tl'+i); c.onclick=()=>{ if(picked.has(i)){picked.delete(i); c.style.outline='';} else {picked.add(i); c.style.outline='2px solid var(--orange)';} };});
- document.getElementById('trCheck').onclick=()=>{ let n=0; TRL.forEach((l,i)=>{const c=document.getElementById('tl'+i), x=document.getElementById('tx'+i); x.classList.remove('hide'); x.innerHTML='<b>Wrong:</b> '+l[3]+'.'; c.style.background=picked.has(i)?'#F1F8F1':'#FDF1F1'; if(picked.has(i))n++;});
-  document.getElementById('trOut').textContent='You found '+n+' of 5.'; document.getElementById('trTake').classList.remove('hide'); };
+ document.getElementById('trCheck').onclick=()=>{ let n=0; TRL.forEach((l,i)=>{const c=document.getElementById('tl'+i), x=document.getElementById('tx'+i); x.classList.remove('hide'); x.innerHTML=l[4]?'<b>Wrong:</b> '+l[3]+'.':'<b>Fine:</b> a harmless difference (punctuation, a numeral, a dropped “er”).'; const ok=(picked.has(i)===l[4]); c.style.background=ok?'#F1F8F1':'#FDF1F1'; if(picked.has(i)&&l[4])n++;});
+  document.getElementById('trOut').textContent='You found '+n+' of the 3 wrong lines'+(([...picked].filter(i=>!TRL[i][4]).length)?', and marked '+[...picked].filter(i=>!TRL[i][4]).length+' correct line(s) as wrong':'')+'.'; document.getElementById('trTake').classList.remove('hide'); };
  document.getElementById('trReset').onclick=()=>{picked.clear(); TRL.forEach((l,i)=>{const c=document.getElementById('tl'+i); c.style.outline=''; c.style.background=''; document.getElementById('tx'+i).classList.add('hide');}); document.getElementById('trOut').textContent=''; document.getElementById('trTake').classList.add('hide');};
 })();
 (function(){
