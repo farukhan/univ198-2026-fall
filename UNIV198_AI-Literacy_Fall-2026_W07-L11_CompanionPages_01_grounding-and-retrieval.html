@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>UNIV198 · Lecture 11 · Grounding and Retrieval</title>
+<style>
+:root{--navy:#1F3A6E;--orange:#E08A00;--orangedk:#CC7600;--green:#2E7D32;--red:#C62828;--ink:#1a1a1a;--muted:#666;--box:#F3F6FA;--line:#C9D3E3;--mono:"SFMono-Regular",Menlo,Consolas,"Liberation Mono",monospace}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;background:#fff;color:var(--ink);font:16px/1.45 "Helvetica Neue",Helvetica,Arial,sans-serif}
+body{display:flex;flex-direction:column}
+header{flex:none;display:flex;justify-content:space-between;align-items:center;padding:10px 22px;border-bottom:3px solid var(--navy);font-size:13px;color:var(--muted)}
+header b{color:var(--navy)}
+header .title{font-size:15px;color:var(--navy);font-weight:700}
+main{position:relative;flex:1;min-height:0;overflow:hidden}
+.slide{position:absolute;inset:0;padding:26px 48px 20px;display:none;overflow:auto}
+.slide.on{display:block}
+h1{font-size:28px;margin:0 0 6px;color:var(--navy)}
+h2{font-size:17px;margin:14px 0 8px;color:var(--orange)}
+h3{font-size:15px;margin:0 0 4px;color:var(--navy)}
+p{margin:6px 0}
+.lead{font-size:17px}
+.muted{color:var(--muted)}
+.small{font-size:13px}
+.grid{display:grid;gap:14px;margin-top:10px}
+.g2{grid-template-columns:1fr 1fr}.g3{grid-template-columns:repeat(3,1fr)}.g4{grid-template-columns:repeat(4,1fr)}
+.card{background:var(--box);border:1px solid var(--line);border-radius:8px;padding:12px 14px}
+.card.orange{background:#FFF6E8;border-color:#F0C98A}
+.card.green{background:#F1F8F1;border-color:#A5C8A7}
+.card.red{background:#FDF1F1;border-color:#E6A3A3}
+.card h3{margin-bottom:6px}
+.num{display:inline-block;width:22px;height:22px;border-radius:50%;background:var(--orange);color:#fff;font-weight:700;font-size:13px;text-align:center;line-height:22px;margin-right:6px}
+pre,code,.mono{font-family:var(--mono)}
+pre{background:#fff;border:1px solid var(--line);border-radius:6px;padding:10px 12px;font-size:13.5px;white-space:pre-wrap;margin:6px 0}
+.prompt{background:#fff;border-left:4px solid var(--orange);padding:8px 12px;font-family:var(--mono);font-size:13.5px;white-space:pre-wrap;border-radius:4px}
+.model{background:#fff;border-left:4px solid var(--navy);padding:8px 12px;font-size:14px;white-space:pre-wrap;border-radius:4px}
+button{font:inherit;font-size:14px;padding:7px 14px;border-radius:6px;border:1px solid var(--navy);background:#fff;color:var(--navy);cursor:pointer}
+button.primary{background:var(--navy);color:#fff}
+button.orange{background:var(--orange);border-color:var(--orange);color:#fff}
+button:disabled{opacity:.45;cursor:default}
+button.sel{background:var(--navy);color:#fff}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin:8px 0}
+.take{background:#fff;border:2px solid var(--navy);border-radius:8px;padding:12px 16px;margin-top:12px}
+.ok{color:var(--green);font-weight:700}.bad{color:var(--red);font-weight:700}
+.tag{display:inline-block;padding:1px 8px;border-radius:10px;font-size:12px;font-weight:700;background:var(--navy);color:#fff;margin-right:6px}
+.tag.o{background:var(--orange)}.tag.g{background:var(--green)}.tag.r{background:var(--red)}.tag.grey{background:#888}
+table{border-collapse:collapse;width:100%;font-size:13.5px}
+th,td{padding:6px 8px;border-bottom:1px solid var(--line);vertical-align:top;text-align:left}
+th{color:var(--navy);border-bottom:2px solid var(--navy)}
+footer{flex:none;display:flex;justify-content:space-between;align-items:center;padding:8px 22px;border-top:1px solid var(--line);font-size:13px;color:var(--muted)}
+footer .nav button{min-width:40px}
+footer .dots span{display:inline-block;width:8px;height:8px;border-radius:50%;background:#ccd;margin:0 3px}
+footer .dots span.on{background:var(--orange)}
+.hide{display:none}
+input[type=text],textarea,select{font:inherit;font-size:14px;padding:6px 8px;border:1px solid var(--line);border-radius:6px;width:100%}
+textarea{font-family:var(--mono);font-size:13px}
+.step{opacity:.25;transition:opacity .25s}
+.step.on{opacity:1}
+.token{display:inline-block;padding:2px 6px;margin:2px;border-radius:4px;background:#E8EEF7;border:1px solid var(--line);font-family:var(--mono);font-size:13px}
+.token.new{background:#FFE7C2;border-color:var(--orange)}
+.pill{display:inline-block;padding:6px 10px;border:1px solid var(--line);border-radius:6px;background:#fff;cursor:pointer;font-size:13.5px;margin:3px}
+.pill.sel{background:var(--navy);color:#fff;border-color:var(--navy)}
+.pill.right{background:#E6F2E6;border-color:var(--green)}
+.pill.wrong{background:#FBE6E6;border-color:var(--red)}
+.blank{background:#FFE7C2;border-bottom:2px solid var(--orange);padding:0 3px;border-radius:3px}
+.kv{display:grid;grid-template-columns:150px 1fr;gap:6px 10px;font-size:14px}
+.null{color:var(--red);font-weight:700}
+.chk{font-size:14px;margin:4px 0}
+@media (max-width:900px){.g2,.g3,.g4{grid-template-columns:1fr}.slide{padding:18px 16px}h1{font-size:22px}}
+
+.turn{display:flex;gap:10px;margin:6px 0;align-items:flex-start}
+.turn .who{flex:none;width:64px;font-size:12px;font-weight:700;color:var(--navy);padding-top:9px}
+.turn .msg{flex:1;border-radius:6px;padding:8px 12px;font-size:13.5px;white-space:pre-wrap}
+.turn.u .msg{background:#fff;border-left:4px solid var(--orange);font-family:var(--mono);font-size:13px}
+.turn.m .msg{background:#fff;border-left:4px solid var(--navy)}
+.turn .note{flex:none;width:200px;font-size:12px;color:var(--muted);padding-top:6px}
+.bar{display:flex;align-items:center;gap:8px;margin:3px 0;font-size:13px}
+.bar .lab{flex:none;width:200px;font-family:var(--mono);font-size:12px}
+.bar .fill{height:16px;border-radius:3px;background:var(--navy);transition:opacity .3s,width .3s}
+.bar.rule .fill{background:var(--orange)}
+.sn{font-size:10px;color:var(--orange);font-weight:700;vertical-align:super;margin-right:2px}
+.score{display:grid;grid-template-columns:150px repeat(3,46px);gap:4px 8px;align-items:center;font-size:13px}
+.score .sq{display:inline-block;width:40px;height:28px;line-height:28px;text-align:center;border:1px solid var(--line);border-radius:5px;cursor:pointer;background:#fff}
+.score .sq.sel{background:var(--navy);color:#fff;border-color:var(--navy)}
+.ans{background:#fff;border:1px solid var(--line);border-radius:8px;padding:10px 12px;font-size:13.5px;white-space:pre-wrap;min-height:120px}
+.ans.a{border-top:4px solid var(--orange)}.ans.b{border-top:4px solid var(--navy)}
+@media (max-width:900px){.turn .note{display:none}.bar .lab{width:120px}}
+
+a.btn{display:inline-block;font-size:14px;padding:7px 14px;border-radius:6px;border:1px solid var(--navy);background:#fff;color:var(--navy);text-decoration:none}
+
+.still{background:#fff;border:1px solid var(--line);border-radius:8px;padding:8px;text-align:center}
+.still img{max-width:100%;max-height:220px;border-radius:4px}
+.still .ph{height:140px;display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:13px;background:var(--box);border-radius:4px}
+canvas.diff{border:1px solid var(--line);border-radius:6px;background:#fff}
+.chip{display:inline-block;padding:3px 9px;border-radius:12px;font-size:12px;font-weight:700;margin:2px 4px 2px 0;background:#E8EEF7;color:var(--navy)}
+.chip.o{background:#FFE7C2;color:var(--orangedk)}
+.chip.r{background:#FBE6E6;color:var(--red)}
+.numin{width:110px !important;display:inline-block;margin-right:6px}
+td.hl{background:#FFE7C2;font-weight:700}
+
+.policy h3{margin:12px 0 4px;color:var(--navy);font-size:15px}
+.policy p.clause{margin:3px 0;font-size:13.5px;line-height:1.5}
+.policy.compact{max-height:520px;overflow:auto;background:#fff;border:1px solid var(--line);border-radius:8px;padding:10px 14px}
+.policy p.clause.hit{background:#FFE7C2;border-radius:4px}
+.policy p.clause.found{background:#E6F2E6;border-radius:4px}
+.policy table{border-collapse:collapse;margin:4px 0} .policy th,.policy td{border:1px solid var(--line);padding:3px 8px;text-align:center}
+.cmp{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.ans{background:#fff;border:1px solid var(--line);border-radius:8px;padding:10px 12px;font-size:13.5px;line-height:1.55;min-height:90px}
+.ans.a{border-top:4px solid var(--red)} .ans.b{border-top:4px solid var(--green)}
+mark.h{background:#FBE6E6;color:var(--red);font-weight:700} mark.s{background:#E6F2E6;color:#1d5c1d;font-weight:700}
+.rstep{border:1px solid var(--line);border-radius:8px;padding:10px;background:#fff;cursor:pointer;text-align:center}
+.rstep.sel{border-color:var(--orange);background:#FFF6E8}
+.rstep .n{display:inline-block;width:24px;height:24px;border-radius:50%;background:var(--navy);color:#fff;font-weight:700;line-height:24px;font-size:13px}
+.res{display:flex;gap:8px;align-items:center;margin:4px 0;font-size:13.5px}
+.res .bar{flex:none;height:14px;background:var(--navy);border-radius:3px;min-width:4px}
+.res.top .bar{background:var(--orange)}
+.verd{display:inline-flex;gap:4px;margin:2px 6px 2px 0}
+.verd .pill{padding:3px 8px;font-size:12.5px;margin:0}
+.verd .pill.y{background:#E6F2E6;border-color:var(--green)} .verd .pill.n{background:#FBE6E6;border-color:var(--red)}
+.sorter .item{display:inline-block;padding:7px 10px;border:1px solid var(--line);border-radius:6px;background:#fff;margin:3px;cursor:pointer;font-size:13.5px}
+.sorter .item.ok{background:#E6F2E6;border-color:var(--green)} .sorter .item.bad{background:#FBE6E6;border-color:var(--red)}
+.bin{min-height:70px;border:2px dashed var(--line);border-radius:8px;padding:6px;margin-top:4px}
+@media (max-width:900px){.cmp{grid-template-columns:1fr}}
+</style></head>
+<body>
+<header><div><span class="title">UNIV198 · AI Literacy · Lecture 11</span><br>Working with information: RAG, documents and grounded AI</div>
+<div class="small">Companion page · <b>Grounding and Retrieval</b><br>Use ← → or the buttons below</div></header>
+<main>
+<section class="slide">
+<h1>Two Answers to the Same Question</h1>
+<p class="lead">The same model, the same minute, the same question. On the left, nothing attached. On the right, a two-page policy document attached and two rules in the prompt. Press <b>Mark</b> to see what changes.</p>
+<div class="prompt" style="margin-bottom:10px">How many hours per week may a group book a study room, and what happens if the group arrives 15 minutes late?</div>
+<div class="cmp">
+ <div><h3>Without the document</h3><div class="ans a" id="ansA">Most university libraries allow groups to book study rooms for <mark class="h">2 to 4 hours per day</mark>, <mark class="h">typically</mark> up to <mark class="h">10 hours per week</mark>. If a group arrives more than <mark class="h">10 or 15 minutes</mark> late, the booking is <mark class="h">usually</mark> cancelled and the room released to others. <mark class="h">Check your library's website</mark> for the exact policy.</div></div>
+ <div><h3>With the document, and the rules</h3><div class="ans b" id="ansB">According to the policy (<mark class="s">Section 2.1</mark>), a group may book up to <mark class="s">6 hours per week</mark>, in blocks of no more than 2 hours. Under <mark class="s">Section 3.2</mark>, if no member of the group has arrived <mark class="s">15 minutes</mark> after the start, the booking is cancelled and the room is released to the next group. The policy notes (<mark class="s">Section 2.3</mark>) that the weekly limit was 8 hours under the 2025 version.</div></div>
+</div>
+<div class="row"><button class="primary" id="markBtn">Mark</button><span class="small muted" id="markMsg"></span></div>
+<div class="grid g3" style="margin-top:10px">
+ <div class="card red"><h3>From the weights</h3><p class="small">What the model absorbed in training: broad, fluent, undated, unsourced (Lecture 3). Right about most libraries, and unable to say which. Every hedge on the left is the model telling you so.</p></div>
+ <div class="card green"><h3>From the window</h3><p class="small">What you put in front of it: the brief, the file, the retrieved passages (Lecture 7). The only part of the answer you can point at. Every section number on the right is a place you can open.</p></div>
+ <div class="card orange"><h3>Grounded</h3><p class="small">An answer whose claims come from the window and say where. Three words for one idea: <b>grounded</b>, <b>source-based</b> or <b>document-based</b>, and <b>RAG</b> when a search step did the putting.</p></div>
+</div>
+<div class="take"><b>The difference is not intelligence.</b> It is what was in the window. Grounding moves the question from “is the model right?” to “is the source right, and did the model stay inside it?”. Both halves are yours.</div>
+</section>
+<section class="slide">
+<h1>Demo: With and Without, Live</h1>
+<p class="lead">Everything for the demo is here: the document to upload, the three turns with Copy, and a sample answer under each turn if the app is slow. Two new chats, side by side: one without the file, one with it.</p>
+<div class="grid g2" style="grid-template-columns:1.05fr 1fr">
+ <div class="card"><div class="row" style="justify-content:space-between;margin:0 0 6px"><h3 style="margin:0">The document (invented, two pages)</h3><span><a class="btn" href="assets/L11_study_room_policy_v3_2026.pdf" target="_blank">Open the PDF</a> <a class="btn" href="assets/L11_study_room_policy_v3_2026.pdf" download>Download</a> <a class="btn" href="assets/L11_study_room_policy_v3_2026.txt" download>Text file</a></span></div><div id="polDemo"><div class="policy compact">
+<h2 style="margin:0">Group Study Room Policy</h2><p class="small muted" style="margin:2px 0 8px">Campus Learning Commons (an invented facility for UNIV198)<br>Version 3. Effective 1 September 2026. Replaces version 2 (2025).</p>
+<h3 id="pol1">1. Purpose and scope</h3>
+<p class="clause" id="pol1-1"><b>1.1</b> This policy applies to the eight group study rooms on floors 1 and 2 of the Learning Commons.</p>
+<p class="clause" id="pol1-2"><b>1.2</b> It replaces the 2025 policy (version 2). Where the two differ, this version applies.</p>
+<h3 id="pol2">2. Who may book, and how much</h3>
+<p class="clause" id="pol2-1"><b>2.1</b> Any registered student may book a room for a group of at least three members. A group may book up to 6 hours per week, in blocks of no more than 2 hours.</p>
+<p class="clause" id="pol2-2"><b>2.2</b> Bookings open 7 days ahead and are made online through the Learning Commons booking page.</p>
+<p class="clause" id="pol2-3"><b>2.3</b> Note: the weekly limit was 8 hours under the 2025 policy. Bookings made before 1 September 2026 keep the old limit until they expire.</p>
+<h3 id="pol3">3. Arriving, cancelling and no-shows</h3>
+<p class="clause" id="pol3-1"><b>3.1</b> A booking may be cancelled online up to 2 hours before its start.</p>
+<p class="clause" id="pol3-2"><b>3.2</b> If no member of the group has arrived 15 minutes after the start of the booking, the booking is cancelled and the room is released to the next group.</p>
+<p class="clause" id="pol3-3"><b>3.3</b> A cancellation later than 2 hours before the start, or a non-arrival under 3.2, counts as a no-show. Three no-shows in a semester suspend the group&#x27;s booking rights for 14 days.</p>
+<h3 id="pol4">4. Using the room</h3>
+<p class="clause" id="pol4-1"><b>4.1</b> Covered drinks are allowed; food is not.</p>
+<p class="clause" id="pol4-2"><b>4.2</b> Whiteboard markers are available at the service desk against a student ID card, and must be returned at the end of the booking.</p>
+<p class="clause" id="pol4-3"><b>4.3</b> Leave the room as you found it. Report any damage at the service desk before you leave.</p>
+<p class="clause" id="pol4-4"><b>4.4</b> Rooms are not soundproof. Keep voices at conversation level; music and video with sound require headphones.</p>
+<h3 id="pol5">5. The rooms</h3>
+<table class="small"><tr><th>Room</th><th>Floor</th><th>Seats</th><th>Screen</th><th>Booking window</th></tr><tr><td>101</td><td>1</td><td>4</td><td>no</td><td>7 days</td></tr><tr><td>102</td><td>1</td><td>6</td><td>yes</td><td>7 days</td></tr><tr><td>103</td><td>1</td><td>6</td><td>no</td><td>7 days</td></tr><tr><td>104</td><td>1</td><td>8</td><td>yes</td><td>7 days</td></tr><tr><td>201</td><td>2</td><td>4</td><td>no</td><td>7 days</td></tr><tr><td>202</td><td>2</td><td>8</td><td>yes</td><td>7 days</td></tr><tr><td>203</td><td>2</td><td>10</td><td>yes</td><td>7 days</td></tr><tr><td>204</td><td>2</td><td>12</td><td>no</td><td>3 days</td></tr></table>
+<p class="clause" id="pol5-1"><b>5.1</b> Room 204 is a seminar room shared with the teaching timetable; it can be booked only 3 days ahead.</p>
+<h3 id="pol6">6. Questions</h3>
+<p class="clause" id="pol6-1"><b>6.1</b> Questions about this policy go to the Learning Commons service desk during opening hours.</p>
+</div></div><p class="small muted" style="margin:6px 0 0">Upload the PDF to Copilot or Gemini (the paper-clip or plus button), or paste the text file. Nothing in it is real.</p></div>
+ <div>
+  <div class="card ccard" style="margin-bottom:8px"><div class="row" style="justify-content:space-between"><h3 style="margin:0"><span class="num">1</span>Without</h3><button class="primary cbtn">Copy</button></div><div class="prompt">How many hours per week may a group book a study room at our library, and what happens if the group is 15 minutes late?</div><p class="small muted" style="margin:4px 0">New chat, no file. Watch for “typically”, “most libraries”, and a number that fits every library and none.</p><button class="small sbtn">Show a sample answer</button><div class="small hide" style="margin-top:6px;padding:8px 10px;background:#fff;border:1px dashed #bbb;border-radius:6px"><p class="muted" style="margin:0 0 6px"><i>Sample answer, written for this page as a typical result, not copied from an app.</i></p>Most university libraries allow groups to book study rooms for 2 to 4 hours per day, typically up to 10 hours per week. If a group arrives more than 10 or 15 minutes late, the booking is usually cancelled and the room released to others. Check your library's website for the exact policy.<p class="muted" style="margin:6px 0 0"><b>Read it against the document:</b> Not one number is about this library. Every hedge is a tell. It sounds equally right about a library that does not exist.</p></div></div>
+  <div class="card ccard" style="margin-bottom:8px"><div class="row" style="justify-content:space-between"><h3 style="margin:0"><span class="num">2</span>With</h3><button class="primary cbtn">Copy</button></div><div class="prompt">Answer only from the attached policy. For each claim give the section number. If the policy does not say, write NOT IN THE DOCUMENT.</div><p class="small muted" style="margin:4px 0">New chat, PDF attached, then this text. The numbers change; the hedges go; a section number appears next to each claim.</p><button class="small sbtn">Show a sample answer</button><div class="small hide" style="margin-top:6px;padding:8px 10px;background:#fff;border:1px dashed #bbb;border-radius:6px"><p class="muted" style="margin:0 0 6px"><i>Sample answer, written for this page as a typical result, not copied from an app.</i></p>According to the attached policy: a group may book up to 6 hours per week, in blocks of no more than 2 hours (Section 2.1). If no member of the group has arrived 15 minutes after the start of the booking, the booking is cancelled and the room is released to the next group (Section 3.2). Note that the weekly limit was 8 hours under the 2025 policy (Section 2.3).<p class="muted" style="margin:6px 0 0"><b>Read it against the document:</b> 6 hours and 15 minutes are the document's numbers; 2.1, 3.2 and 2.3 are real sections. The 2025 figure is the kind of detail only the document could have supplied.</p></div></div>
+  <div class="card ccard" style="margin-bottom:8px"><div class="row" style="justify-content:space-between"><h3 style="margin:0"><span class="num">3</span>Push</h3><button class="primary cbtn">Copy</button></div><div class="prompt">What is the fine for a lost room key?</div><p class="small muted" style="margin:4px 0">Same chat as turn 2. The policy says nothing about keys. A grounded answer says so; an ungrounded one invents a fee.</p><button class="small sbtn">Show a sample answer</button><div class="small hide" style="margin-top:6px;padding:8px 10px;background:#fff;border:1px dashed #bbb;border-radius:6px"><p class="muted" style="margin:0 0 6px"><i>Sample answer, written for this page as a typical result, not copied from an app.</i></p>NOT IN THE DOCUMENT. The policy does not mention room keys or any fines. The closest passage is Section 4.2, which concerns whiteboard markers borrowed against a student ID card, and Section 4.3 on reporting damage.<p class="muted" style="margin:6px 0 0"><b>Read it against the document:</b> Four words, then the nearest passages named. Without the rule in turn 2, most apps answer the key question anyway, with a plausible fee.</p></div></div>
+ </div>
+</div>
+<div class="take"><b>What to look for:</b> turn 3 is the test. The document is in the window and the model still has its weights; the rule in turn 2 is what makes it admit the gap.</div>
+</section>
+<section class="slide">
+<h1>Activity 1: With and Without</h1>
+<p class="lead">Five minutes, on the Google Form. Ask the question twice in two <b>new</b> chats: once with nothing attached, once with the PDF attached and the rules. Write down what each answer gave, then press <b>Compare</b> to see the document's own values.</p>
+<div class="grid g2" style="grid-template-columns:1fr 1.1fr">
+ <div>
+  <div class="card ccard" style="margin-bottom:8px"><div class="row" style="justify-content:space-between"><h3 style="margin:0"><span class="num">1</span>Without</h3><button class="primary cbtn">Copy</button></div><div class="prompt">How many hours per week may a group book a study room, and what happens if the group arrives 15 minutes late?</div><p class="small muted" style="margin:4px 0">New chat, nothing attached.</p></div>
+  <div class="card ccard" style="margin-bottom:8px"><div class="row" style="justify-content:space-between"><h3 style="margin:0"><span class="num">2</span>With, and the rules</h3><button class="primary cbtn">Copy</button></div><div class="prompt">[policy attached] How many hours per week may a group book a study room, and what happens if the group arrives 15 minutes late? Answer only from the attached document. Give the section number for each claim. If it does not say, write NOT IN THE DOCUMENT.</div><p class="small muted" style="margin:4px 0">New chat, PDF attached first (the paper-clip or plus button), then this text.</p></div>
+  <div class="row"><a class="btn" href="assets/L11_study_room_policy_v3_2026.pdf" target="_blank">Open the PDF</a><a class="btn" href="assets/L11_study_room_policy_v3_2026.pdf" download>Download the PDF</a><a class="btn" href="assets/L11_study_room_policy_v3_2026.txt" download>Text file</a></div>
+ </div>
+ <div class="card">
+  <h3>What each answer gave</h3>
+  <table class="small" style="width:100%"><tr><th></th><th>Without</th><th>With</th></tr>
+  <tr><td>Hours per week</td><td><input type="text" id="w1" placeholder="e.g. 10"></td><td><input type="text" id="g1" placeholder="e.g. 6"></td></tr>
+  <tr><td>Late arrival rule</td><td><input type="text" id="w2" placeholder="e.g. cancelled after 15 min"></td><td><input type="text" id="g2" placeholder="e.g. cancelled after 15 min"></td></tr>
+  <tr><td>Hedges (usually, typically …)</td><td><input type="text" id="w3" placeholder="how many?"></td><td><input type="text" id="g3" placeholder="how many?"></td></tr>
+  <tr><td>Section numbers cited</td><td><input type="text" id="w4" placeholder="none"></td><td><input type="text" id="g4" placeholder="e.g. 2.1, 3.2"></td></tr></table>
+  <div class="row"><button class="primary" id="cmpBtn">Compare</button><button id="cmpReset">Reset</button></div>
+  <div class="small" id="cmpOut"></div>
+ </div>
+</div>
+<div class="take"><b>On the form:</b> the two pairs of numbers, whether the grounded answer cited sections, and one line: which answer would you hand to a friend who asked, and why? Submit the numbers the apps gave, not the ones you now know are right.</div>
+</section>
+<section class="slide">
+<h1>How Retrieval Works: Five Steps, and a Toy You Can Try</h1>
+<p class="lead">When the documents are too big to paste, the app searches first and puts only the winning passages in the window. Click a step. Then type a question into the toy below and see which passages of the policy would be retrieved, and which would not.</p>
+<div class="grid g5" id="steps" style="grid-template-columns:repeat(5,1fr)"></div>
+<div class="card" id="stepOut" style="min-height:70px;margin-top:8px"><p class="small muted">Click a step above.</p></div>
+<div class="card" style="margin-top:12px"><h3>Retrieval toy: which passages win?</h3>
+<p class="small">A toy, not the real thing: real systems compare meaning, not words. But the shape of the result is the same: a few winners, scored, and the rest unseen by the model. Try <i>how many hours a week</i>, then <i>what if we are late</i>, then <i>lost key fine</i>.</p>
+<div class="row"><input type="text" id="rq" placeholder="Type a question about the policy" style="flex:1"><button class="primary" id="rgo">Retrieve</button><span class="small muted">Top 3 go into the window</span></div>
+<div id="rout"></div></div>
+<div class="grid g2" style="margin-top:10px">
+ <div class="card red"><h3>Retrieval missed</h3><p class="small">The right passage was not in the top few: the question used other words, the fact sits in a table or a note, or it was split across two chunks. The answer is written from the wrong passages or from the weights, fluently. <b>Check:</b> “Quote the passage you answered from, with its location.”</p></div>
+ <div class="card red"><h3>Generation strayed</h3><p class="small">The right passage was retrieved and the model still added a claim from its weights, over-read a sentence, or merged two passages into one that neither says. The citation is real; the claim is not in it. <b>Check:</b> open the location; does the passage say what the answer says?</p></div>
+</div>
+</section>
+<section class="slide">
+<h1>Activity 2: Quote It</h1>
+<p class="lead">Six minutes, on the Google Form. One chat with the PDF attached and the rules. Ask the three questions one turn each; after each answer, ask for the quoted passage and its section. Paste the quote into the checker to see whether it exists in the document; then judge <b>says</b> and <b>supports</b> yourself.</p>
+<div class="grid g2" style="grid-template-columns:1fr 1.1fr">
+ <div>
+  <div class="card ccard" style="margin-bottom:8px"><div class="row" style="justify-content:space-between"><h3 style="margin:0"><span class="num">0</span>Opening turn</h3><button class="primary cbtn">Copy</button></div><div class="prompt">Answer only from the attached policy. For each claim give the section number. If the policy does not say, write NOT IN THE DOCUMENT.</div><p class="small muted" style="margin:4px 0">PDF attached first, then this. One chat for all three questions.</p></div>
+  <div class="card ccard" style="margin-bottom:8px"><div class="row" style="justify-content:space-between"><h3 style="margin:0"><span class="num">1</span>A fact in a sentence</h3><button class="primary cbtn">Copy</button></div><div class="prompt">What counts as a no-show, and what happens after three no-shows in a semester?</div><p class="small muted" style="margin:4px 0">Easy to retrieve: the words match. Check the number of days.</p></div>
+  <div class="card ccard" style="margin-bottom:8px"><div class="row" style="justify-content:space-between"><h3 style="margin:0"><span class="num">2</span>A fact in the table</h3><button class="primary cbtn">Copy</button></div><div class="prompt">Which room seats the most people, and does it have a screen?</div><p class="small muted" style="margin:4px 0">Tables chunk badly. Watch for a row read from the wrong line, or a smaller room named.</p></div>
+  <div class="card ccard" style="margin-bottom:8px"><div class="row" style="justify-content:space-between"><h3 style="margin:0"><span class="num">3</span>A fact that is not there</h3><button class="primary cbtn">Copy</button></div><div class="prompt">What is the fine for losing a room key?</div><p class="small muted" style="margin:4px 0">The honest answer is four words. The other kind is a paragraph.</p></div>
+  <div class="card ccard" style="margin-bottom:8px"><div class="row" style="justify-content:space-between"><h3 style="margin:0"><span class="num">4</span>After each answer</h3><button class="primary cbtn">Copy</button></div><div class="prompt">Quote the exact passage you used and give its section.</div><p class="small muted" style="margin:4px 0">Then paste the quote on the right.</p></div>
+ </div>
+ <div>
+  <div class="card"><h3>Quote checker</h3>
+   <p class="small">Paste the passage the app quoted. The page looks for it in the document, word for word (ignoring case, spaces and punctuation).</p>
+   <textarea id="qtext" rows="4" placeholder="Paste the quoted passage here. Nothing leaves this page."></textarea>
+   <div class="row"><button class="primary" id="qcheck">Exists?</button><span class="small" id="qres"></span></div>
+   <p class="small" style="margin:8px 0 2px"><b>Then your two verdicts:</b></p>
+   <div class="row"><span class="small">Says the same thing (number, name, negation)?</span><span class="verd" id="vsays"></span></div>
+   <div class="row"><span class="small">Supports the claim at its full strength?</span><span class="verd" id="vsup"></span></div>
+   <div class="small" id="vout" style="margin-top:6px"></div>
+  </div>
+  <div class="card" style="margin-top:10px"><h3>Answer key (after the activity)</h3><button id="keyBtn">Show</button>
+   <div class="hide small" id="keyBox" style="margin-top:6px">
+    <p><b>1.</b> Section 3.3: a late cancellation or a non-arrival is a no-show; three in a semester suspend booking rights for <b>14 days</b>. Nearly everyone gets this, with a real quote.</p>
+    <p><b>2.</b> Section 5, table: <b>Room 204, 12 seats, no screen</b>, and it can be booked only 3 days ahead (5.1). Common slips: Room 203 (10 seats, screen) because its row is “cleaner”, or 204 with a screen, read from the row above.</p>
+    <p><b>3.</b> <b>NOT IN THE DOCUMENT.</b> No keys, no fines anywhere. A few answers quote 4.2 (markers against an ID card) and infer a fee: one real quote, one invented claim. That is generation straying, with a citation.</p>
+   </div></div>
+ </div>
+</div>
+<div class="take"><b>On the form, for each question:</b> answered or NOT IN THE DOCUMENT; the quote exists (yes/no); the quote supports the answer (yes/no). The quote is the whole exercise; the answer is the excuse for it.</div>
+</section>
+<section class="slide">
+<h1>Lecture 11 in One Page</h1>
+<div class="card"><p class="lead" style="margin:0">A grounded answer is one whose claims come from material in the window and say where; retrieval is how the window gets filled when the material is too big to paste; and it fails in two quiet ways, a missed passage and a strayed claim, which only the quote tells apart.</p></div>
+<table class="small" style="width:100%;margin-top:12px">
+<tr><th>Idea</th><th>Do this</th><th>Mechanism</th><th>Cannot do</th></tr>
+<tr><td><b>Grounding</b></td><td>Attach the source; “only from the documents”; a section per claim</td><td>The window, not the weights (Lectures 3, 7)</td><td>Tell a wrong source from a right one</td></tr>
+<tr><td><b>Retrieval</b></td><td>Name the documents and which is current; ask what it retrieved</td><td>Chunk, embed, nearest passages, generate</td><td>Find a passage the words do not reach</td></tr>
+<tr><td><b>Citations</b></td><td>“Quote the passage and its location”; open two</td><td>The model copies from the window</td><td>Know that its own claim overreaches</td></tr>
+<tr><td><b>The gap</b></td><td>“NOT IN THE DOCUMENTS” in the rules; probe once</td><td>Without the rule, the weights answer</td><td>Stay silent unasked</td></tr>
+</table>
+<div class="grid g2" style="margin-top:12px">
+ <div class="card"><h3>Readings</h3><ul class="small" style="margin:4px 0 0 18px;line-height:1.7">
+  <li><b>Core:</b> Google Cloud, <a href="https://cloud.google.com/use-cases/retrieval-augmented-generation" target="_blank">What is Retrieval-Augmented Generation?</a>, one page</li>
+  <li><b>Core:</b> <a href="https://notebooklm.google/" target="_blank">NotebookLM</a>: make one notebook from your three documents before Lecture 12</li>
+  <li><b>Want more:</b> Lewis et al. (2020), <a href="https://arxiv.org/abs/2005.11401" target="_blank">Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks</a>, abstract and Figure 1</li>
+  <li><b>Want more:</b> Liu et al. (2023), <a href="https://arxiv.org/abs/2307.03172" target="_blank">Lost in the Middle</a>, Figure 1</li></ul></div>
+ <div class="card orange"><h3>This week</h3><ul class="small" style="margin:4px 0 0 18px;line-height:1.7">
+  <li><b>Take-home (Activity 3):</b> your three documents, one two-document question, two quotes checked, one probe, one disclosure line. Companion page 02, slide 3.</li>
+  <li><b>Bring the same three documents to Lecture 12</b> as files on your phone or laptop.</li></ul></div>
+</div>
+</section>
+</main>
+<footer><div class="dots" id="dots"></div><div class="nav"><button id="prev">←</button> <span id="counter"></span> <button id="next">→</button></div></footer>
+<script>
+(function(){
+  const slides=[...document.querySelectorAll('.slide')];
+  let i=0;
+  const counter=document.getElementById('counter'), dots=document.getElementById('dots');
+  slides.forEach((s,k)=>{const d=document.createElement('span'); d.onclick=()=>go(k); dots.appendChild(d);});
+  function go(n){ i=Math.max(0,Math.min(slides.length-1,n));
+    slides.forEach((s,k)=>s.classList.toggle('on',k===i));
+    [...dots.children].forEach((d,k)=>d.classList.toggle('on',k===i));
+    counter.textContent=(i+1)+' / '+slides.length;
+    document.getElementById('prev').disabled=i===0; document.getElementById('next').disabled=i===slides.length-1;
+    try{location.hash='s'+(i+1);}catch(e){}
+  }
+  document.getElementById('prev').onclick=()=>go(i-1);
+  document.getElementById('next').onclick=()=>go(i+1);
+  document.addEventListener('keydown',e=>{ if(e.target.tagName==='TEXTAREA'||e.target.tagName==='INPUT')return;
+    if(e.key==='ArrowRight'||e.key==='PageDown'||e.key===' '){e.preventDefault();go(i+1);}
+    if(e.key==='ArrowLeft'||e.key==='PageUp'){e.preventDefault();go(i-1);}
+    if(e.key==='Home')go(0); if(e.key==='End')go(slides.length-1);});
+  const m=(location.hash||'').match(/s(\d+)/); go(m?parseInt(m[1])-1:0);
+  window.goSlide=go;
+})();
+
+
+document.querySelectorAll('.ccard').forEach(d=>{const cb=d.querySelector('.cbtn'), pr=d.querySelector('.prompt'), sb=d.querySelector('.sbtn');
+ cb.onclick=async()=>{try{await navigator.clipboard.writeText(pr.textContent); cb.textContent='Copied'; setTimeout(()=>cb.textContent='Copy',1500);}catch(e){cb.textContent='Select and copy';}};
+ if(sb){const ans=sb.nextElementSibling; sb.onclick=()=>{const h=ans.classList.toggle('hide'); sb.textContent=h?'Show a sample answer':'Hide the sample answer';};}});
+
+(function(){ // slide 1: mark the hedges and the sections
+ const btn=document.getElementById('markBtn'); let on=false;
+ document.querySelectorAll('#ansA mark, #ansB mark').forEach(m=>m.style.background='transparent');
+ document.querySelectorAll('#ansA mark, #ansB mark').forEach(m=>{m.style.color='inherit';m.style.fontWeight='normal';});
+ btn.onclick=()=>{on=!on; document.querySelectorAll('#ansA mark').forEach(m=>{m.style.background=on?'#FBE6E6':'transparent';m.style.color=on?'#A33':'inherit';m.style.fontWeight=on?'700':'normal';});
+  document.querySelectorAll('#ansB mark').forEach(m=>{m.style.background=on?'#E6F2E6':'transparent';m.style.color=on?'#1d5c1d':'inherit';m.style.fontWeight=on?'700':'normal';});
+  document.getElementById('markMsg').textContent=on?'Left: six hedges and generic numbers. Right: the document\'s numbers and three sections you can open.':''; btn.textContent=on?'Unmark':'Mark';};
+})();
+(function(){ // slide 3: compare
+ const truth={g1:'6',g2:'15'};
+ document.getElementById('cmpBtn').onclick=()=>{const v=id=>document.getElementById(id).value.trim();
+  const rows=[];
+  rows.push('<b>The document says:</b> up to <b>6 hours per week</b> in blocks of 2 (Section 2.1); if no member has arrived <b>15 minutes</b> after the start, the booking is cancelled and the room released (Section 3.2).');
+  if(v('w1')) rows.push((/\b6\b/.test(v('w1'))?'Without, hours: 6. A lucky guess; it could not have known.':'Without, hours: “'+v('w1')+'”. Not the document\'s number, and not wrong for some library somewhere.'));
+  if(v('g1')) rows.push((/\b6\b/.test(v('g1'))?'With, hours: 6. The document\'s number.':'With, hours: “'+v('g1')+'”. Not 6: either the 2025 figure (8) was taken as current, or the file was not read. Check that the PDF attached before the question.'));
+  if(v('g4')) rows.push((/2\.1|3\.2/.test(v('g4'))?'Sections cited: good; open one to confirm.':'Sections cited: “'+v('g4')+'”. Expected 2.1 and 3.2; if none, the rule was ignored: ask again.'));
+  if(v('w3')&&v('g3')) rows.push('Hedges: '+v('w3')+' without, '+v('g3')+' with. The hedges are the model saying “I am guessing”. Grounding removes the need.');
+  document.getElementById('cmpOut').innerHTML='<ul style="margin:6px 0 0 18px;line-height:1.6">'+rows.map(r=>'<li>'+r+'</li>').join('')+'</ul>';};
+ document.getElementById('cmpReset').onclick=()=>{['w1','w2','w3','w4','g1','g2','g3','g4'].forEach(id=>document.getElementById(id).value=''); document.getElementById('cmpOut').innerHTML='';};
+})();
+(function(){ // slide 4: steps and the retrieval toy
+ const ST=[['Chunk','Documents are cut into passages of a few hundred tokens: a clause, a paragraph, a table row. Done once, when the file is added. A chunk boundary in the wrong place (a table row cut from its header) is the first place things go wrong.'],
+  ['Index','Each passage gets a position in “meaning space”: a list of numbers (an embedding) such that passages about the same thing land near each other. Also done once. Numbers, names and codes get weak positions: “room B07” and “room B17” are neighbours.'],
+  ['Search','The question is placed the same way, and the nearest passages win. Done for every question. By meaning, not by word: “late arrival” finds “no member has arrived within 15 minutes”, and can also find a passage about late fees with the same confidence.'],
+  ['Fill the window','The top few passages are pasted into the window with your question and rules. The model sees only these. If the right passage is not among them, the answer is written without it, and nothing in the answer says so.'],
+  ['Generate','The model answers from what is in front of it, citing the passages. Lecture 3\'s next-token prediction, with the source in view. It can still add a claim from its weights, in the same voice: that is the second quiet failure.']];
+ const box=document.getElementById('steps'), out=document.getElementById('stepOut');
+ ST.forEach((s,i)=>{const d=document.createElement('div'); d.className='rstep'; d.innerHTML='<span class="n">'+(i+1)+'</span><br><b>'+s[0]+'</b>'; d.onclick=()=>{[...box.children].forEach(c=>c.classList.remove('sel')); d.classList.add('sel'); out.innerHTML='<b>'+(i+1)+'. '+s[0]+'.</b> <span class="small">'+s[1]+'</span>';}; box.appendChild(d);});
+ const PAS=[["1.1", "This policy applies to the eight group study rooms on floors 1 and 2 of the Learning Commons."], ["1.2", "It replaces the 2025 policy (version 2). Where the two differ, this version applies."], ["2.1", "Any registered student may book a room for a group of at least three members. A group may book up to 6 hours per week, in blocks of no more than 2 hours."], ["2.2", "Bookings open 7 days ahead and are made online through the Learning Commons booking page."], ["2.3", "Note: the weekly limit was 8 hours under the 2025 policy. Bookings made before 1 September 2026 keep the old limit until they expire."], ["3.1", "A booking may be cancelled online up to 2 hours before its start."], ["3.2", "If no member of the group has arrived 15 minutes after the start of the booking, the booking is cancelled and the room is released to the next group."], ["3.3", "A cancellation later than 2 hours before the start, or a non-arrival under 3.2, counts as a no-show. Three no-shows in a semester suspend the group's booking rights for 14 days."], ["4.1", "Covered drinks are allowed; food is not."], ["4.2", "Whiteboard markers are available at the service desk against a student ID card, and must be returned at the end of the booking."], ["4.3", "Leave the room as you found it. Report any damage at the service desk before you leave."], ["4.4", "Rooms are not soundproof. Keep voices at conversation level; music and video with sound require headphones."], ["5, table, room 101", "Room 101: floor 1, 4 seats, screen no, booking window 7 days."], ["5, table, room 102", "Room 102: floor 1, 6 seats, screen yes, booking window 7 days."], ["5, table, room 103", "Room 103: floor 1, 6 seats, screen no, booking window 7 days."], ["5, table, room 104", "Room 104: floor 1, 8 seats, screen yes, booking window 7 days."], ["5, table, room 201", "Room 201: floor 2, 4 seats, screen no, booking window 7 days."], ["5, table, room 202", "Room 202: floor 2, 8 seats, screen yes, booking window 7 days."], ["5, table, room 203", "Room 203: floor 2, 10 seats, screen yes, booking window 7 days."], ["5, table, room 204", "Room 204: floor 2, 12 seats, screen no, booking window 3 days."], ["5.1", "Room 204 is a seminar room shared with the teaching timetable; it can be booked only 3 days ahead."], ["6.1", "Questions about this policy go to the Learning Commons service desk during opening hours."]];
+ const SYN={late:['arrived','no-show','cancelled','cancellation'],arrive:['arrived'],arriving:['arrived'],hours:['hours'],hour:['hours'],week:['week'],weekly:['week'],book:['book','booking','bookings'],booking:['book','booking','bookings'],reserve:['book','booking'],cancel:['cancelled','cancellation'],noshow:['no-show'],fine:['desk','damage'],fee:['desk','damage'],key:['desk','card','id'],keys:['desk','card','id'],lost:['damage','report'],screen:['screen'],seats:['seats'],seat:['seats'],largest:['seats'],biggest:['seats'],people:['seats','members'],room:['room'],rooms:['room'],food:['food','drinks'],drink:['drinks'],drinks:['drinks'],eat:['food'],coffee:['drinks'],marker:['markers'],markers:['markers'],whiteboard:['whiteboard','markers'],noise:['soundproof','voices'],music:['music','headphones'],group:['group','members'],members:['members'],ahead:['ahead'],advance:['ahead','open'],many:[],how:[],what:[],the:[],a:[],is:[],are:[],if:[],we:[],our:[],for:[],of:[],to:[],in:[],and:[],do:[],can:[],i:[],my:[],per:[],it:[],does:[],have:[],has:[]};
+ function toks(s){return s.toLowerCase().replace(/[^a-z0-9\s-]/g,' ').split(/\s+/).filter(Boolean);}
+ document.getElementById('rgo').onclick=()=>{const q=document.getElementById('rq').value; if(!q.trim())return;
+  const qt=toks(q); const want=new Set(); qt.forEach(t=>{if(SYN[t]){SYN[t].forEach(x=>want.add(x));} if(!SYN[t]||t.length>3) want.add(t);});
+  const scored=PAS.map(p=>{const pt=new Set(toks(p[1])); let s=0; want.forEach(w=>{if(pt.has(w)) s+=1; else if([...pt].some(x=>x.startsWith(w)&&w.length>3)) s+=0.5;}); return [s,p];}).sort((a,b)=>b[0]-a[0]);
+  const max=Math.max(scored[0][0],1); const o=document.getElementById('rout'); o.innerHTML='';
+  scored.slice(0,6).forEach((r,i)=>{const d=document.createElement('div'); d.className='res'+(i<3?' top':''); d.innerHTML='<div class="bar" style="width:'+Math.round(90*r[0]/max+4)+'px"></div><span class="small"><b>'+(i<3?'in the window':'not seen')+'</b> · '+r[1][0]+': '+r[1][1]+'</span>'; o.appendChild(d);});
+  const note=document.createElement('p'); note.className='small muted'; note.style.margin='6px 0 0';
+  note.textContent=scored[0][0]===0?'Nothing matched. A real system would still return its three nearest passages, and the model would answer from them.':'The model will answer from the three “in the window” passages only. If the answer needed another one, that is a retrieval miss, and the answer will not say so.';
+  o.appendChild(note);};
+ document.getElementById('rq').addEventListener('keydown',e=>{if(e.key==='Enter')document.getElementById('rgo').click();});
+})();
+(function(){ // slide 5: quote checker and verdicts
+ const PAS=[["1.1", "This policy applies to the eight group study rooms on floors 1 and 2 of the Learning Commons."], ["1.2", "It replaces the 2025 policy (version 2). Where the two differ, this version applies."], ["2.1", "Any registered student may book a room for a group of at least three members. A group may book up to 6 hours per week, in blocks of no more than 2 hours."], ["2.2", "Bookings open 7 days ahead and are made online through the Learning Commons booking page."], ["2.3", "Note: the weekly limit was 8 hours under the 2025 policy. Bookings made before 1 September 2026 keep the old limit until they expire."], ["3.1", "A booking may be cancelled online up to 2 hours before its start."], ["3.2", "If no member of the group has arrived 15 minutes after the start of the booking, the booking is cancelled and the room is released to the next group."], ["3.3", "A cancellation later than 2 hours before the start, or a non-arrival under 3.2, counts as a no-show. Three no-shows in a semester suspend the group's booking rights for 14 days."], ["4.1", "Covered drinks are allowed; food is not."], ["4.2", "Whiteboard markers are available at the service desk against a student ID card, and must be returned at the end of the booking."], ["4.3", "Leave the room as you found it. Report any damage at the service desk before you leave."], ["4.4", "Rooms are not soundproof. Keep voices at conversation level; music and video with sound require headphones."], ["5, table, room 101", "Room 101: floor 1, 4 seats, screen no, booking window 7 days."], ["5, table, room 102", "Room 102: floor 1, 6 seats, screen yes, booking window 7 days."], ["5, table, room 103", "Room 103: floor 1, 6 seats, screen no, booking window 7 days."], ["5, table, room 104", "Room 104: floor 1, 8 seats, screen yes, booking window 7 days."], ["5, table, room 201", "Room 201: floor 2, 4 seats, screen no, booking window 7 days."], ["5, table, room 202", "Room 202: floor 2, 8 seats, screen yes, booking window 7 days."], ["5, table, room 203", "Room 203: floor 2, 10 seats, screen yes, booking window 7 days."], ["5, table, room 204", "Room 204: floor 2, 12 seats, screen no, booking window 3 days."], ["5.1", "Room 204 is a seminar room shared with the teaching timetable; it can be booked only 3 days ahead."], ["6.1", "Questions about this policy go to the Learning Commons service desk during opening hours."]]; const norm=s=>s.toLowerCase().replace(/[^a-z0-9]/g,'');
+ const full=norm(PAS.map(p=>p[1]).join(' '));
+ document.getElementById('qcheck').onclick=()=>{const q=norm(document.getElementById('qtext').value); const r=document.getElementById('qres');
+  if(q.length<12){r.innerHTML='<span style="color:var(--red)">Paste at least a few words.</span>';return;}
+  const hit=PAS.find(p=>norm(p[1]).includes(q)); if(hit){r.innerHTML='<b style="color:#1d5c1d">Exists:</b> yes, in '+hit[0]+'.'; return;}
+  if(full.includes(q)){r.innerHTML='<b style="color:#1d5c1d">Exists:</b> yes (it spans two clauses).'; return;}
+  // partial: longest common run of words
+  const words=document.getElementById('qtext').value.toLowerCase().split(/\s+/).filter(w=>w.length>3); const found=words.filter(w=>full.includes(norm(w)));
+  r.innerHTML='<b style="color:var(--red)">Exists:</b> no. Not in the document word for word'+(found.length>words.length*0.6?' (most of the words are there; the model paraphrased or stitched two passages. Ask it to quote exactly.)':' (and most of its words are not there either: this is not from the document.)');};
+ function verd(id,cb){const b=document.getElementById(id); [['y','Yes'],['n','No']].forEach(o=>{const p=document.createElement('span'); p.className='pill'; p.textContent=o[1]; p.onclick=()=>{[...b.children].forEach(c=>c.className='pill'); p.classList.add(o[0]); cb(o[0]);}; b.appendChild(p);});}
+ const v={}; const out=()=>{const o=document.getElementById('vout'); if(v.s==='n') o.innerHTML='<b>Not grounded:</b> the passage exists but does not say what the answer says (a number, a name or a negation changed). Report: quote exists yes, supports no.'; else if(v.p==='n') o.innerHTML='<b>Not grounded:</b> the passage says something true, and the claim is bigger than it. Report: quote exists yes, supports no.'; else if(v.s==='y'&&v.p==='y') o.innerHTML='<b>Grounded.</b> Exists, says, supports. Report: yes, yes.'; else o.innerHTML='';};
+ verd('vsays',x=>{v.s=x;out();}); verd('vsup',x=>{v.p=x;out();});
+ document.getElementById('keyBtn').onclick=()=>{const k=document.getElementById('keyBox'); k.classList.toggle('hide'); document.getElementById('keyBtn').textContent=k.classList.contains('hide')?'Show':'Hide';};
+})();
+
+</script>
+</body></html>

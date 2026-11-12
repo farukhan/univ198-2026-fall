@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>UNIV198 · Lecture 11 · Documents in Practice</title>
+<style>
+:root{--navy:#1F3A6E;--orange:#E08A00;--orangedk:#CC7600;--green:#2E7D32;--red:#C62828;--ink:#1a1a1a;--muted:#666;--box:#F3F6FA;--line:#C9D3E3;--mono:"SFMono-Regular",Menlo,Consolas,"Liberation Mono",monospace}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;background:#fff;color:var(--ink);font:16px/1.45 "Helvetica Neue",Helvetica,Arial,sans-serif}
+body{display:flex;flex-direction:column}
+header{flex:none;display:flex;justify-content:space-between;align-items:center;padding:10px 22px;border-bottom:3px solid var(--navy);font-size:13px;color:var(--muted)}
+header b{color:var(--navy)}
+header .title{font-size:15px;color:var(--navy);font-weight:700}
+main{position:relative;flex:1;min-height:0;overflow:hidden}
+.slide{position:absolute;inset:0;padding:26px 48px 20px;display:none;overflow:auto}
+.slide.on{display:block}
+h1{font-size:28px;margin:0 0 6px;color:var(--navy)}
+h2{font-size:17px;margin:14px 0 8px;color:var(--orange)}
+h3{font-size:15px;margin:0 0 4px;color:var(--navy)}
+p{margin:6px 0}
+.lead{font-size:17px}
+.muted{color:var(--muted)}
+.small{font-size:13px}
+.grid{display:grid;gap:14px;margin-top:10px}
+.g2{grid-template-columns:1fr 1fr}.g3{grid-template-columns:repeat(3,1fr)}.g4{grid-template-columns:repeat(4,1fr)}
+.card{background:var(--box);border:1px solid var(--line);border-radius:8px;padding:12px 14px}
+.card.orange{background:#FFF6E8;border-color:#F0C98A}
+.card.green{background:#F1F8F1;border-color:#A5C8A7}
+.card.red{background:#FDF1F1;border-color:#E6A3A3}
+.card h3{margin-bottom:6px}
+.num{display:inline-block;width:22px;height:22px;border-radius:50%;background:var(--orange);color:#fff;font-weight:700;font-size:13px;text-align:center;line-height:22px;margin-right:6px}
+pre,code,.mono{font-family:var(--mono)}
+pre{background:#fff;border:1px solid var(--line);border-radius:6px;padding:10px 12px;font-size:13.5px;white-space:pre-wrap;margin:6px 0}
+.prompt{background:#fff;border-left:4px solid var(--orange);padding:8px 12px;font-family:var(--mono);font-size:13.5px;white-space:pre-wrap;border-radius:4px}
+.model{background:#fff;border-left:4px solid var(--navy);padding:8px 12px;font-size:14px;white-space:pre-wrap;border-radius:4px}
+button{font:inherit;font-size:14px;padding:7px 14px;border-radius:6px;border:1px solid var(--navy);background:#fff;color:var(--navy);cursor:pointer}
+button.primary{background:var(--navy);color:#fff}
+button.orange{background:var(--orange);border-color:var(--orange);color:#fff}
+button:disabled{opacity:.45;cursor:default}
+button.sel{background:var(--navy);color:#fff}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin:8px 0}
+.take{background:#fff;border:2px solid var(--navy);border-radius:8px;padding:12px 16px;margin-top:12px}
+.ok{color:var(--green);font-weight:700}.bad{color:var(--red);font-weight:700}
+.tag{display:inline-block;padding:1px 8px;border-radius:10px;font-size:12px;font-weight:700;background:var(--navy);color:#fff;margin-right:6px}
+.tag.o{background:var(--orange)}.tag.g{background:var(--green)}.tag.r{background:var(--red)}.tag.grey{background:#888}
+table{border-collapse:collapse;width:100%;font-size:13.5px}
+th,td{padding:6px 8px;border-bottom:1px solid var(--line);vertical-align:top;text-align:left}
+th{color:var(--navy);border-bottom:2px solid var(--navy)}
+footer{flex:none;display:flex;justify-content:space-between;align-items:center;padding:8px 22px;border-top:1px solid var(--line);font-size:13px;color:var(--muted)}
+footer .nav button{min-width:40px}
+footer .dots span{display:inline-block;width:8px;height:8px;border-radius:50%;background:#ccd;margin:0 3px}
+footer .dots span.on{background:var(--orange)}
+.hide{display:none}
+input[type=text],textarea,select{font:inherit;font-size:14px;padding:6px 8px;border:1px solid var(--line);border-radius:6px;width:100%}
+textarea{font-family:var(--mono);font-size:13px}
+.step{opacity:.25;transition:opacity .25s}
+.step.on{opacity:1}
+.token{display:inline-block;padding:2px 6px;margin:2px;border-radius:4px;background:#E8EEF7;border:1px solid var(--line);font-family:var(--mono);font-size:13px}
+.token.new{background:#FFE7C2;border-color:var(--orange)}
+.pill{display:inline-block;padding:6px 10px;border:1px solid var(--line);border-radius:6px;background:#fff;cursor:pointer;font-size:13.5px;margin:3px}
+.pill.sel{background:var(--navy);color:#fff;border-color:var(--navy)}
+.pill.right{background:#E6F2E6;border-color:var(--green)}
+.pill.wrong{background:#FBE6E6;border-color:var(--red)}
+.blank{background:#FFE7C2;border-bottom:2px solid var(--orange);padding:0 3px;border-radius:3px}
+.kv{display:grid;grid-template-columns:150px 1fr;gap:6px 10px;font-size:14px}
+.null{color:var(--red);font-weight:700}
+.chk{font-size:14px;margin:4px 0}
+@media (max-width:900px){.g2,.g3,.g4{grid-template-columns:1fr}.slide{padding:18px 16px}h1{font-size:22px}}
+
+.turn{display:flex;gap:10px;margin:6px 0;align-items:flex-start}
+.turn .who{flex:none;width:64px;font-size:12px;font-weight:700;color:var(--navy);padding-top:9px}
+.turn .msg{flex:1;border-radius:6px;padding:8px 12px;font-size:13.5px;white-space:pre-wrap}
+.turn.u .msg{background:#fff;border-left:4px solid var(--orange);font-family:var(--mono);font-size:13px}
+.turn.m .msg{background:#fff;border-left:4px solid var(--navy)}
+.turn .note{flex:none;width:200px;font-size:12px;color:var(--muted);padding-top:6px}
+.bar{display:flex;align-items:center;gap:8px;margin:3px 0;font-size:13px}
+.bar .lab{flex:none;width:200px;font-family:var(--mono);font-size:12px}
+.bar .fill{height:16px;border-radius:3px;background:var(--navy);transition:opacity .3s,width .3s}
+.bar.rule .fill{background:var(--orange)}
+.sn{font-size:10px;color:var(--orange);font-weight:700;vertical-align:super;margin-right:2px}
+.score{display:grid;grid-template-columns:150px repeat(3,46px);gap:4px 8px;align-items:center;font-size:13px}
+.score .sq{display:inline-block;width:40px;height:28px;line-height:28px;text-align:center;border:1px solid var(--line);border-radius:5px;cursor:pointer;background:#fff}
+.score .sq.sel{background:var(--navy);color:#fff;border-color:var(--navy)}
+.ans{background:#fff;border:1px solid var(--line);border-radius:8px;padding:10px 12px;font-size:13.5px;white-space:pre-wrap;min-height:120px}
+.ans.a{border-top:4px solid var(--orange)}.ans.b{border-top:4px solid var(--navy)}
+@media (max-width:900px){.turn .note{display:none}.bar .lab{width:120px}}
+
+a.btn{display:inline-block;font-size:14px;padding:7px 14px;border-radius:6px;border:1px solid var(--navy);background:#fff;color:var(--navy);text-decoration:none}
+
+.still{background:#fff;border:1px solid var(--line);border-radius:8px;padding:8px;text-align:center}
+.still img{max-width:100%;max-height:220px;border-radius:4px}
+.still .ph{height:140px;display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:13px;background:var(--box);border-radius:4px}
+canvas.diff{border:1px solid var(--line);border-radius:6px;background:#fff}
+.chip{display:inline-block;padding:3px 9px;border-radius:12px;font-size:12px;font-weight:700;margin:2px 4px 2px 0;background:#E8EEF7;color:var(--navy)}
+.chip.o{background:#FFE7C2;color:var(--orangedk)}
+.chip.r{background:#FBE6E6;color:var(--red)}
+.numin{width:110px !important;display:inline-block;margin-right:6px}
+td.hl{background:#FFE7C2;font-weight:700}
+
+.policy h3{margin:12px 0 4px;color:var(--navy);font-size:15px}
+.policy p.clause{margin:3px 0;font-size:13.5px;line-height:1.5}
+.policy.compact{max-height:520px;overflow:auto;background:#fff;border:1px solid var(--line);border-radius:8px;padding:10px 14px}
+.policy p.clause.hit{background:#FFE7C2;border-radius:4px}
+.policy p.clause.found{background:#E6F2E6;border-radius:4px}
+.policy table{border-collapse:collapse;margin:4px 0} .policy th,.policy td{border:1px solid var(--line);padding:3px 8px;text-align:center}
+.cmp{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.ans{background:#fff;border:1px solid var(--line);border-radius:8px;padding:10px 12px;font-size:13.5px;line-height:1.55;min-height:90px}
+.ans.a{border-top:4px solid var(--red)} .ans.b{border-top:4px solid var(--green)}
+mark.h{background:#FBE6E6;color:var(--red);font-weight:700} mark.s{background:#E6F2E6;color:#1d5c1d;font-weight:700}
+.rstep{border:1px solid var(--line);border-radius:8px;padding:10px;background:#fff;cursor:pointer;text-align:center}
+.rstep.sel{border-color:var(--orange);background:#FFF6E8}
+.rstep .n{display:inline-block;width:24px;height:24px;border-radius:50%;background:var(--navy);color:#fff;font-weight:700;line-height:24px;font-size:13px}
+.res{display:flex;gap:8px;align-items:center;margin:4px 0;font-size:13.5px}
+.res .bar{flex:none;height:14px;background:var(--navy);border-radius:3px;min-width:4px}
+.res.top .bar{background:var(--orange)}
+.verd{display:inline-flex;gap:4px;margin:2px 6px 2px 0}
+.verd .pill{padding:3px 8px;font-size:12.5px;margin:0}
+.verd .pill.y{background:#E6F2E6;border-color:var(--green)} .verd .pill.n{background:#FBE6E6;border-color:var(--red)}
+.sorter .item{display:inline-block;padding:7px 10px;border:1px solid var(--line);border-radius:6px;background:#fff;margin:3px;cursor:pointer;font-size:13.5px}
+.sorter .item.ok{background:#E6F2E6;border-color:var(--green)} .sorter .item.bad{background:#FBE6E6;border-color:var(--red)}
+.bin{min-height:70px;border:2px dashed var(--line);border-radius:8px;padding:6px;margin-top:4px}
+@media (max-width:900px){.cmp{grid-template-columns:1fr}}
+</style></head>
+<body>
+<header><div><span class="title">UNIV198 · AI Literacy · Lecture 11</span><br>Working with information: RAG, documents and grounded AI</div>
+<div class="small">Companion page · <b>Documents in Practice</b><br>Use ← → or the buttons below</div></header>
+<main>
+<section class="slide">
+<h1>The Five Parts, for a Grounded Task</h1>
+<p class="lead">The same five parts as Lectures 5 and 10. For documents, <b>Context</b> (which document is current) and <b>Rules</b> (only from the documents; NOT IN THE DOCUMENTS) carry the weight. Fill the parts; the prompt assembles on the right.</p>
+<div class="grid g2">
+ <div>
+  <p class="small"><b>1. Task.</b> Answer, summarise, compare, find.</p><input type="text" id="f1" placeholder="What must the final report contain, and which reading supports each requirement?">
+  <p class="small"><b>2. Context.</b> What the documents are, and which is current.</p><input type="text" id="f2" placeholder="These are the syllabus and two assigned readings for my course; the syllabus is the current one and wins if they disagree">
+  <p class="small"><b>3. Input.</b> The files, named.</p><input type="text" id="f3" placeholder="Three files attached: A (syllabus), B (reading 1), C (reading 2)">
+  <p class="small"><b>4. Format.</b> The answer, then a quote and location for each claim.</p><input type="text" id="f4" placeholder="After each claim, quote the passage and give the document and page">
+  <p class="small"><b>5. Rules.</b></p><input type="text" id="f5" value="Use only these documents. If something is not in them, write NOT IN THE DOCUMENTS.">
+ </div>
+ <div>
+  <h3>Your opening turn</h3><div class="prompt" id="fout" style="min-height:130px"></div>
+  <div class="row"><button class="primary" id="fcopy">Copy</button><button id="fcheck">Check</button><button id="fexample">Load the example</button><span class="small muted" id="fmsg"></span></div>
+  <div class="small" id="fchk"></div>
+  <div class="card" style="margin-top:10px"><h3>Why the two orange parts</h3><p class="small"><b>Context:</b> the model cannot tell a 2025 policy from a 2026 one, or a draft from the final; say which is current and which wins. <b>Rules:</b> without “only from the documents” the weights fill every gap; without “NOT IN THE DOCUMENTS” there is no honest way to say no, so it will not.</p></div>
+ </div>
+</div>
+</section>
+<section class="slide">
+<h1>The Four Follow-ups, and Which Tool</h1>
+<p class="lead">Lecture 7's loop, with a document under it: each follow-up pushes the model back towards the window. Copy them in order. The last one is the version you check: two quotes opened, against the page.</p>
+<div class="grid g2">
+ <div>
+  <div class="card ccard" style="margin-bottom:8px"><div class="row" style="justify-content:space-between"><h3 style="margin:0"><span class="num">1</span>What else was in the window</h3><button class="primary cbtn">Copy</button></div><div class="prompt">Which passages did you retrieve and not use? List them.</div><p class="small muted" style="margin:4px 0">Shows what the search returned. A relevant passage listed here and not used is a stray in the making.</p></div>
+  <div class="card ccard" style="margin-bottom:8px"><div class="row" style="justify-content:space-between"><h3 style="margin:0"><span class="num">2</span>The stray</h3><button class="primary cbtn">Copy</button></div><div class="prompt">Which of your claims has no quote? Remove it or mark it.</div><p class="small muted" style="margin:4px 0">Most answers contain one. This turn makes it visible.</p></div>
+  <div class="card ccard" style="margin-bottom:8px"><div class="row" style="justify-content:space-between"><h3 style="margin:0"><span class="num">3</span>The miss, by keyword</h3><button class="primary cbtn">Copy</button></div><div class="prompt">Search the documents for the word “appendix”. Does anything change?</div><p class="small muted" style="margin:4px 0">Replace “appendix” with the word you expected and did not see. A keyword search catches what meaning search missed.</p></div>
+  <div class="card ccard" style="margin-bottom:8px"><div class="row" style="justify-content:space-between"><h3 style="margin:0"><span class="num">4</span>The version you keep</h3><button class="primary cbtn">Copy</button></div><div class="prompt">Give the same answer in one sentence per requirement, with the document and page in brackets after each.</div><p class="small muted" style="margin:4px 0">Short, cited, checkable. Open two of the brackets.</p></div>
+ </div>
+ <div>
+  <div class="card"><h3>Which tool, for which documents</h3>
+  <table class="small" style="width:100%"><tr><th></th><th>Microsoft Copilot</th><th>Google Gemini</th><th>NotebookLM</th></tr>
+  <tr><td><b>One or two files</b></td><td>Attach in the chat; the file is in the window</td><td>Attach, or point at a Drive file; same</td><td>Add as a source; citations by default</td></tr>
+  <tr><td><b>A folder, many files</b></td><td>“Work” mode searches OneDrive and SharePoint: real retrieval, citations as links</td><td>Drive documents can be searched from the chat (plan-dependent)</td><td>Dozens of sources per notebook; every answer carries numbered citations</td></tr>
+  <tr><td><b>The web</b></td><td>Search on: results are retrieved passages with links</td><td>Search on; same</td><td>Can add web pages as sources</td></tr>
+  <tr><td><b>Weakest at</b></td><td>Long PDFs with tables; says little about what it retrieved</td><td>Same; the Drive search is quiet about what it found</td><td>Will not answer outside the sources: the point, and the limit</td></tr></table>
+  <p class="small muted" style="margin:6px 0 0">Whichever you use: a new chat per task, the documents named in the context part, the two rules, a quote after every claim. Features change monthly; the habits do not.</p></div>
+ </div>
+</div>
+</section>
+<section class="slide">
+<h1>Activity 3, Take-Home: One Question, Three Sources</h1>
+<p class="lead">This week, one submission each, on the Google Form. Your three documents on one topic in one chat (or a NotebookLM notebook). One question that needs at least two of them; a quote and location for every claim; two quotes checked; one probe; one disclosure line. Build the pieces here and copy them into the form.</p>
+<div class="grid g2">
+ <div>
+  <div class="card"><h3>1. The question</h3>
+   <p class="small">Name the documents and which is current, then a question that needs two of them.</p>
+   <input type="text" id="t1" placeholder="Documents: A = syllabus (current), B = reading 1, C = reading 2"><div style="height:6px"></div>
+   <input type="text" id="t2" placeholder="Question: does reading B agree with reading A about … ? / which reading supports each requirement in A?">
+   <div class="prompt" id="tout" style="margin-top:8px;min-height:90px"></div>
+   <div class="row"><button class="primary" id="tcopy">Copy the opening turn</button><button id="tcheck">Check</button><span class="small muted" id="tmsg"></span></div><div class="small" id="tchk"></div></div>
+  <div class="card" style="margin-top:10px"><h3>3. The probe</h3><p class="small">A question you know the documents do not answer. Did it say NOT IN THE DOCUMENTS?</p>
+   <input type="text" id="pq" placeholder="The question you asked"><div class="row"><span class="small">What happened:</span><span class="verd" id="vprobe"></span></div><div class="small" id="pout"></div></div>
+ </div>
+ <div>
+  <div class="card"><h3>2. Two quotes checked</h3>
+   <p class="small">For each: the claim, where it points, and three verdicts. Open the location before you click.</p>
+   <div id="checks"></div></div>
+  <div class="card" style="margin-top:10px"><h3>4. The disclosure line</h3>
+   <div class="row"><input type="text" id="d1" placeholder="Tool (Copilot, Gemini, NotebookLM)" style="flex:1"><input type="text" id="d2" placeholder="Date, e.g. 18 November 2026" style="flex:1"></div>
+   <input type="text" id="d3" placeholder="Documents, by name and version" style="margin-top:6px">
+   <div class="prompt" id="dout" style="margin-top:8px;min-height:60px"></div>
+   <div class="row"><button class="primary" id="dcopy">Copy</button><span class="small muted" id="dmsg"></span></div></div>
+ </div>
+</div>
+<div class="take"><b>Marked for the two checks and the probe, not for the answer.</b> An answer with a failed check reported honestly scores higher than a perfect answer with no checks. Keep the chat and the files: the check must be possible later.</div>
+</section>
+<section class="slide">
+<h1>Before You Upload: Lecture 4, for Files and Folders</h1>
+<p class="lead">Retrieval makes uploading many files easy, and “many” is where other people's data hides. Click each item, then the bin it belongs in. Press <b>Check</b>.</p>
+<div class="sorter">
+ <div class="card"><h3>Items</h3><div id="items"></div></div>
+ <div class="grid g3" style="margin-top:10px">
+  <div class="card green"><h3>Yours, or public</h3><p class="small muted" style="margin:0">Upload; read the data terms once.</p><div class="bin" data-bin="ok"></div></div>
+  <div class="card orange"><h3>Someone else's, with care</h3><p class="small muted" style="margin:0">Only with agreement; never with memory on.</p><div class="bin" data-bin="care"></div></div>
+  <div class="card red"><h3>Never</h3><p class="small muted" style="margin:0">Not even “just to summarise”.</p><div class="bin" data-bin="never"></div></div>
+ </div>
+ <div class="row"><button class="primary" id="sortCheck">Check</button><button id="sortReset">Reset</button><span class="small muted" id="sortOut"></span></div>
+</div>
+<div class="take"><b>The line most students cross this week:</b> a classmate's annotated copy of a reading, uploaded because it was the handiest PDF. The annotations are theirs. Ask, or find the clean copy. And check a folder before the folder goes in.</div>
+</section>
+<section class="slide">
+<h1>After Lecture 11</h1>
+<div class="grid g2">
+ <div class="card"><h3>Two things to do this week</h3><ul class="small" style="margin:4px 0 0 18px;line-height:1.7">
+  <li><b>The take-home (Activity 3):</b> three documents, one two-document question, two quotes checked, one probe, one disclosure line. Start tonight; the checks take longer than the asking.</li>
+  <li><b>Bring the same three documents to Lecture 12</b> as files on your phone or laptop, not as links to open in class. The exercise asks five kinds of question of them, and one kind will fail.</li></ul></div>
+ <div class="card"><h3>Readings</h3><ul class="small" style="margin:4px 0 0 18px;line-height:1.7">
+  <li><b>Core:</b> Google Cloud, <a href="https://cloud.google.com/use-cases/retrieval-augmented-generation" target="_blank">What is Retrieval-Augmented Generation?</a></li>
+  <li><b>Core:</b> <a href="https://notebooklm.google/" target="_blank">NotebookLM</a>: one notebook from your three documents, ten minutes</li>
+  <li><b>Want more:</b> Lewis et al. (2020), <a href="https://arxiv.org/abs/2005.11401" target="_blank">Retrieval-Augmented Generation</a>; Liu et al. (2023), <a href="https://arxiv.org/abs/2307.03172" target="_blank">Lost in the Middle</a></li>
+  <li><b>Explainers:</b> <a href="https://www.ibm.com/think/topics/retrieval-augmented-generation" target="_blank">IBM, What is RAG?</a>; <a href="https://learn.microsoft.com/en-us/azure/search/retrieval-augmented-generation-overview" target="_blank">Microsoft Learn, RAG in Azure AI Search</a></li>
+  <li><b>For the curious:</b> <a href="https://arxiv.org/abs/2004.04906" target="_blank">Dense Passage Retrieval</a>; <a href="https://arxiv.org/abs/2312.10997" target="_blank">RAG survey (Gao et al.)</a>; <a href="https://arxiv.org/abs/2104.07567" target="_blank">Retrieval Augmentation Reduces Hallucination</a></li></ul></div>
+</div>
+<div class="take" style="margin-top:12px"><b>Lecture 12:</b> grounded or not: the citation test in full (exists, says, supports), the document question-answering exercise with your own three documents, and where retrieval stops.</div>
+</section>
+</main>
+<footer><div class="dots" id="dots"></div><div class="nav"><button id="prev">←</button> <span id="counter"></span> <button id="next">→</button></div></footer>
+<script>
+(function(){
+  const slides=[...document.querySelectorAll('.slide')];
+  let i=0;
+  const counter=document.getElementById('counter'), dots=document.getElementById('dots');
+  slides.forEach((s,k)=>{const d=document.createElement('span'); d.onclick=()=>go(k); dots.appendChild(d);});
+  function go(n){ i=Math.max(0,Math.min(slides.length-1,n));
+    slides.forEach((s,k)=>s.classList.toggle('on',k===i));
+    [...dots.children].forEach((d,k)=>d.classList.toggle('on',k===i));
+    counter.textContent=(i+1)+' / '+slides.length;
+    document.getElementById('prev').disabled=i===0; document.getElementById('next').disabled=i===slides.length-1;
+    try{location.hash='s'+(i+1);}catch(e){}
+  }
+  document.getElementById('prev').onclick=()=>go(i-1);
+  document.getElementById('next').onclick=()=>go(i+1);
+  document.addEventListener('keydown',e=>{ if(e.target.tagName==='TEXTAREA'||e.target.tagName==='INPUT')return;
+    if(e.key==='ArrowRight'||e.key==='PageDown'||e.key===' '){e.preventDefault();go(i+1);}
+    if(e.key==='ArrowLeft'||e.key==='PageUp'){e.preventDefault();go(i-1);}
+    if(e.key==='Home')go(0); if(e.key==='End')go(slides.length-1);});
+  const m=(location.hash||'').match(/s(\d+)/); go(m?parseInt(m[1])-1:0);
+  window.goSlide=go;
+})();
+
+
+document.querySelectorAll('.ccard').forEach(d=>{const cb=d.querySelector('.cbtn'), pr=d.querySelector('.prompt'), sb=d.querySelector('.sbtn');
+ cb.onclick=async()=>{try{await navigator.clipboard.writeText(pr.textContent); cb.textContent='Copied'; setTimeout(()=>cb.textContent='Copy',1500);}catch(e){cb.textContent='Select and copy';}};
+ if(sb){const ans=sb.nextElementSibling; sb.onclick=()=>{const h=ans.classList.toggle('hide'); sb.textContent=h?'Show a sample answer':'Hide the sample answer';};}});
+
+(function(){ // slide 1: five parts builder
+ const ids=['f1','f2','f3','f4','f5']; const out=document.getElementById('fout');
+ const ex={f1:'What must the final report contain, and which reading supports each requirement?',f2:'These are the syllabus and two assigned readings for my course; the syllabus is the current one and wins if they disagree.',f3:'Three files attached: A (syllabus), B (reading 1), C (reading 2).',f4:'After each claim, quote the passage and give the document and page.',f5:'Use only these documents. If something is not in them, write NOT IN THE DOCUMENTS.'};
+ function build(){const v=ids.map(i=>document.getElementById(i).value.trim()); const parts=[]; if(v[2])parts.push('['+v[2]+']'); if(v[1])parts.push(v[1]); if(v[0])parts.push('Using only these documents, answer: '+v[0]); if(v[3])parts.push(v[3]); if(v[4])parts.push(v[4]); out.textContent=parts.join(' ');}
+ ids.forEach(i=>document.getElementById(i).addEventListener('input',build)); build();
+ document.getElementById('fexample').onclick=()=>{ids.forEach(i=>document.getElementById(i).value=ex[i]); build();};
+ document.getElementById('fcopy').onclick=async()=>{try{await navigator.clipboard.writeText(out.textContent); document.getElementById('fmsg').textContent='Copied. Attach the files first, then paste.';}catch(e){document.getElementById('fmsg').textContent='Select the text and copy it.';}};
+ document.getElementById('fcheck').onclick=()=>{const t=out.textContent; const m=[];
+  if(!/current|wins|latest|final/i.test(t)) m.push('Context: say which document is current and which wins when they disagree.');
+  if(!/attached|file/i.test(t)) m.push('Input: name the files (A, B, C) so the citations can name them too.');
+  if(!/quote|page|location|section/i.test(t)) m.push('Format: ask for a quote and a location after each claim, or there is nothing to open.');
+  if(!/only/i.test(t)) m.push('Rules: “only from the documents”, or the weights fill the gaps.');
+  if(!/NOT IN THE DOCUMENT/i.test(t)) m.push('Rules: give it a way to say no: “write NOT IN THE DOCUMENTS”.');
+  if(/summarise everything|summarize everything|how many times|list every/i.test(t)) m.push('Task: that is a whole-document question; retrieval answers it from a sample (Lecture 12). Ask for specific claims instead.');
+  document.getElementById('fchk').innerHTML=m.length?'<ul style="margin:6px 0 0 18px;line-height:1.6">'+m.map(x=>'<li>'+x+'</li>').join('')+'</ul>':'<p style="color:#1d5c1d;margin:6px 0 0"><b>All five parts present.</b> Attach the files, paste, and ask the four follow-ups.</p>';};
+})();
+(function(){ // slide 3: take-home builder
+ const t1=document.getElementById('t1'), t2=document.getElementById('t2'), out=document.getElementById('tout');
+ function build(){const a=t1.value.trim(), q=t2.value.trim(); out.textContent=(a?'[three files attached] '+a+'. ':'')+(q?'Using only these documents: '+q+' ':'')+'After each claim, quote the passage and give the document and page. If the documents do not say, write NOT IN THE DOCUMENTS.';}
+ [t1,t2].forEach(x=>x.addEventListener('input',build)); build();
+ document.getElementById('tcopy').onclick=async()=>{try{await navigator.clipboard.writeText(out.textContent); document.getElementById('tmsg').textContent='Copied.';}catch(e){document.getElementById('tmsg').textContent='Select the text and copy it.';}};
+ document.getElementById('tcheck').onclick=()=>{const q=t2.value, a=t1.value, m=[];
+  if(!/current|wins|latest/i.test(a)) m.push('Say which document is current.');
+  if(!/\b(A|B|C)\b.*\b(A|B|C)\b/.test(q)&&!/agree|compare|both|support|differ|versus|vs/i.test(q)) m.push('The question must need two documents: “does B agree with A”, “which reading supports”, “compare A and C on”.');
+  if(/summarise|summarize|everything|how many times|list every/i.test(q)) m.push('That is a whole-document question; ask for specific claims (Lecture 12 explains why).');
+  document.getElementById('tchk').innerHTML=m.length?'<ul style="margin:6px 0 0 18px;line-height:1.6">'+m.map(x=>'<li>'+x+'</li>').join('')+'</ul>':'<p style="color:#1d5c1d;margin:6px 0 0"><b>Good:</b> two documents named, one question that needs both, the two rules.</p>';};
+ // checks
+ const box=document.getElementById('checks'); const V=[{},{}];
+ function verd(parent,k,i,label){const w=document.createElement('div'); w.className='row'; w.style.margin='2px 0'; w.innerHTML='<span class="small" style="width:150px">'+label+'</span>'; const b=document.createElement('span'); b.className='verd'; [['y','Yes'],['n','No']].forEach(o=>{const p=document.createElement('span'); p.className='pill'; p.textContent=o[1]; p.onclick=()=>{[...b.children].forEach(c=>c.className='pill'); p.classList.add(o[0]); V[i][k]=o[0]; res(i);}; b.appendChild(p);}); w.appendChild(b); parent.appendChild(w);}
+ function res(i){const v=V[i]; const o=document.getElementById('cres'+i); if(v.e==='n') o.innerHTML='<b style="color:var(--red)">Fails at exists.</b> Report: the citation could not be opened or the quote is not there; remove the claim.'; else if(v.s==='n') o.innerHTML='<b style="color:var(--red)">Fails at says.</b> A number, name or negation differs; correct the claim from the passage.'; else if(v.p==='n') o.innerHTML='<b style="color:var(--red)">Fails at supports.</b> The claim is bigger than the passage; cut it down to what the passage says.'; else if(v.e==='y'&&v.s==='y'&&v.p==='y') o.innerHTML='<b style="color:#1d5c1d">Grounded.</b> Report: exists, says, supports, all yes.'; else o.innerHTML='';}
+ for(let i=0;i<2;i++){const d=document.createElement('div'); d.style.cssText='border:1px solid var(--line);border-radius:6px;padding:8px;margin-bottom:8px;background:#fff'; d.innerHTML='<p class="small" style="margin:0 0 4px"><b>Quote '+(i+1)+'</b></p><input type="text" placeholder="The claim, in the answer\'s words"><div style="height:4px"></div><input type="text" placeholder="Where it points: document and page or section">'; box.appendChild(d); verd(d,'e',i,'Exists?'); verd(d,'s',i,'Says?'); verd(d,'p',i,'Supports?'); const r=document.createElement('div'); r.className='small'; r.id='cres'+i; d.appendChild(r);}
+ // probe
+ const pb=document.getElementById('vprobe'); [['y','It said NOT IN THE DOCUMENTS'],['n','It answered anyway']].forEach(o=>{const p=document.createElement('span'); p.className='pill'; p.textContent=o[1]; p.onclick=()=>{[...pb.children].forEach(c=>c.className='pill'); p.classList.add(o[0]); document.getElementById('pout').innerHTML=o[0]==='y'?'<b style="color:#1d5c1d">Honest gap.</b> The rule worked. Report the question and the four words.':'<b style="color:var(--red)">Invented, with a citation or without.</b> Ask it to quote the passage; it will not find one. Report what it said and that the rule was in the prompt.';}; pb.appendChild(p);});
+ // disclosure
+ const d=['d1','d2','d3'].map(i=>document.getElementById(i)); const dout=document.getElementById('dout');
+ function dl(){const [t,dt,docs]=d.map(x=>x.value.trim()); dout.textContent='Answer drafted with '+(t||'[tool]')+' on '+(dt||'[date]')+' from three uploaded documents ('+(docs||'[names and versions]')+'); every claim cited to document and page; two citations opened and checked by the author'+(V[0].e==='n'||V[0].s==='n'||V[0].p==='n'||V[1].e==='n'||V[1].s==='n'||V[1].p==='n'?', one corrected':'')+'; one probe question answered NOT IN THE DOCUMENTS.';}
+ d.forEach(x=>x.addEventListener('input',dl)); document.addEventListener('click',()=>setTimeout(dl,0)); dl();
+ document.getElementById('dcopy').onclick=async()=>{try{await navigator.clipboard.writeText(dout.textContent); document.getElementById('dmsg').textContent='Copied. Edit the “one corrected” part to match what you found.';}catch(e){document.getElementById('dmsg').textContent='Select the text and copy it.';}};
+})();
+(function(){ // slide 4: sorter
+ const ITEMS=[["Your own lecture notes from this course", "ok"], ["The three readings posted on KUHub for the course", "ok"], ["A published journal article (open access)", "ok"], ["The university's public regulations page, saved as PDF", "ok"], ["A classmate's annotated copy of a reading", "care"], ["The slides a lecturer has not published yet", "care"], ["The transcript of a group meeting you recorded with everyone's agreement", "care"], ["A shared project folder that also holds a colleague's CV", "care"], ["The exam scripts you mark as a TA", "never"], ["A patient file from your placement", "never"], ["A client contract from your internship, marked confidential", "never"], ["A chat export with other people's messages, uploaded for a quick summary", "never"]];
+
+ const items=document.getElementById('items'); let sel=null; const place={};
+ ITEMS.sort(()=>Math.random()-0.5).forEach((it,i)=>{const s=document.createElement('span'); s.className='item'; s.textContent=it[0]; s.dataset.k=it[1]; s.onclick=()=>{document.querySelectorAll('.sorter .item').forEach(x=>x.style.outline=''); sel=s; s.style.outline='2px solid var(--orange)';}; items.appendChild(s);});
+ document.querySelectorAll('.bin').forEach(b=>b.onclick=()=>{if(!sel)return; b.appendChild(sel); sel.style.outline=''; sel.classList.remove('ok','bad'); place[sel.textContent]=b.dataset.bin; sel=null;});
+ document.getElementById('sortCheck').onclick=()=>{let n=0,t=0; document.querySelectorAll('.bin .item').forEach(s=>{t++; const ok=s.dataset.k===s.parentElement.dataset.bin; s.classList.toggle('ok',ok); s.classList.toggle('bad',!ok); if(ok)n++;}); document.getElementById('sortOut').textContent=t?n+' of '+t+' placed right'+(t<ITEMS.length?' ('+(ITEMS.length-t)+' not yet placed)':'')+'.':'Place some items first.';};
+ document.getElementById('sortReset').onclick=()=>{document.querySelectorAll('.bin .item').forEach(s=>{s.classList.remove('ok','bad'); items.appendChild(s);}); document.getElementById('sortOut').textContent='';};
+})();
+
+</script>
+</body></html>
