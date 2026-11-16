@@ -1,0 +1,38 @@
+Group Study Room Policy
+Campus Learning Commons (an invented facility for UNIV198)
+Version 3. Effective 1 September 2026. Replaces version 2 (2025).
+
+1. Purpose and scope
+  1.1 This policy applies to the eight group study rooms on floors 1 and 2 of the Learning Commons.
+  1.2 It replaces the 2025 policy (version 2). Where the two differ, this version applies.
+
+2. Who may book, and how much
+  2.1 Any registered student may book a room for a group of at least three members. A group may book up to 6 hours per week, in blocks of no more than 2 hours.
+  2.2 Bookings open 7 days ahead and are made online through the Learning Commons booking page.
+  2.3 Note: the weekly limit was 8 hours under the 2025 policy. Bookings made before 1 September 2026 keep the old limit until they expire.
+
+3. Arriving, cancelling and no-shows
+  3.1 A booking may be cancelled online up to 2 hours before its start.
+  3.2 If no member of the group has arrived 15 minutes after the start of the booking, the booking is cancelled and the room is released to the next group.
+  3.3 A cancellation later than 2 hours before the start, or a non-arrival under 3.2, counts as a no-show. Three no-shows in a semester suspend the group's booking rights for 14 days.
+
+4. Using the room
+  4.1 Covered drinks are allowed; food is not.
+  4.2 Whiteboard markers are available at the service desk against a student ID card, and must be returned at the end of the booking.
+  4.3 Leave the room as you found it. Report any damage at the service desk before you leave.
+  4.4 Rooms are not soundproof. Keep voices at conversation level; music and video with sound require headphones.
+
+5. The rooms
+  Room | Floor | Seats | Screen | Booking window
+  101 | 1 | 4 | no | 7 days
+  102 | 1 | 6 | yes | 7 days
+  103 | 1 | 6 | no | 7 days
+  104 | 1 | 8 | yes | 7 days
+  201 | 2 | 4 | no | 7 days
+  202 | 2 | 8 | yes | 7 days
+  203 | 2 | 10 | yes | 7 days
+  204 | 2 | 12 | no | 3 days
+  5.1 Room 204 is a seminar room shared with the teaching timetable; it can be booked only 3 days ahead.
+
+6. Questions
+  6.1 Questions about this policy go to the Learning Commons service desk during opening hours.

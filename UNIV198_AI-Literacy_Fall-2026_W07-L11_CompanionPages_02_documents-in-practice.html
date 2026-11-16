@@ -164,8 +164,69 @@ mark.h{background:#FBE6E6;color:var(--red);font-weight:700} mark.s{background:#E
 </div>
 </section>
 <section class="slide">
+<h1>NotebookLM: What It Is, How to Get In, How to Use It</h1>
+<p class="lead"><img src="assets/notebooklm_logo.png" alt="NotebookLM" style="height:26px;vertical-align:middle;margin-right:8px">Google's notebook for grounded work: you add sources, you ask, and every answer carries numbered citations that open the passage. It will not answer outside your sources, which is the point of this week, and its limit.</p>
+<div class="grid g3">
+ <div class="card"><h3>What it is</h3><ul class="small" style="margin:4px 0 0 18px;line-height:1.6">
+  <li>A <b>notebook</b> holds up to a few dozen sources: PDFs, Google Docs and Slides, web pages, pasted text, YouTube links, audio files.</li>
+  <li>The chat answers <b>only from those sources</b>, with a numbered citation after each claim. Click the number: the passage opens, highlighted.</li>
+  <li>The <b>Studio</b> panel makes things from the sources: a study guide, a briefing document, an FAQ, a mind map, an audio overview (two voices discussing your sources).</li>
+  <li>Lecture 11's five steps, with step 5's citations shown rather than asked for.</li></ul></div>
+ <div class="card orange"><h3>How to get access</h3><ol class="small" style="margin:4px 0 0 18px;line-height:1.6">
+  <li>Go to <a href="https://notebooklm.google/" target="_blank">notebooklm.google</a> on a laptop (the mobile app exists; the web version is easier for uploads).</li>
+  <li>Sign in with a Google account. Try your <b>@ku.edu.tr</b> account first; if the university has not enabled NotebookLM for Workspace accounts, a personal Google account works. You must be 18 or over.</li>
+  <li>The free tier is enough for this course: at the time of writing, up to 100 notebooks, 50 sources per notebook and 500,000 words per source. Limits change; the app shows the current ones.</li>
+  <li>Before the first upload: Lecture 4. Your own notes, course readings and public documents go in; other people's data does not. Read the data terms once.</li></ol></div>
+ <div class="card green"><h3>How to use it, in six steps</h3><ol class="small" style="margin:4px 0 0 18px;line-height:1.6">
+  <li><b>New notebook</b>, named after the task, not “Notebook 7”.</li>
+  <li><b>Add sources</b>: upload the three documents (PDF or Docs). Give each a clear title; the citations will use it.</li>
+  <li><b>Ask</b> in the chat. The five parts still apply: name which document is current, ask for the quote, give it a way to say no.</li>
+  <li><b>Open two citations</b>: click the numbers. Exists is one click here; <b>says</b> and <b>supports</b> are still yours to judge.</li>
+  <li><b>Save</b> the answer as a note, or copy it with the citations into your work.</li>
+  <li><b>Disclose</b>: tool, date, the sources, how many citations you opened, what you changed.</li></ol></div>
+</div>
+<div class="grid g2" style="margin-top:10px">
+ <div class="card"><h3>The opening turn, for NotebookLM</h3><div class="prompt" id="nbprompt">Source A is the current syllabus and wins if the sources disagree; B and C are the assigned readings. Using only these sources, answer: which reading supports each requirement for the final report? One sentence per requirement, with a citation after each. If the sources do not say, write NOT IN THE SOURCES.</div>
+  <div class="row"><button class="primary" id="nbcopy">Copy</button><span class="small muted" id="nbmsg"></span></div>
+  <p class="small muted" style="margin:6px 0 0">NotebookLM cites by default, so the format part is short. The context part (which source wins) and the rule (NOT IN THE SOURCES) are still needed: it will otherwise pick one version silently.</p></div>
+ <div class="card red"><h3>Where it is weaker, and what to do</h3><ul class="small" style="margin:4px 0 0 18px;line-height:1.6">
+  <li><b>Counting and “list every”</b>: it retrieves passages like any RAG system; a count is a count of the sample. Ask per source, and add up yourself.</li>
+  <li><b>Tables in PDFs</b>: rows can be cut from their headers. Ask for the row with its header, and open the citation.</li>
+  <li><b>Two versions that disagree</b>: it does not know which is current unless you say so.</li>
+  <li><b>Audio overviews and study guides</b> are generated text with the same risks; they are not a substitute for reading the sources. Treat them as a first draft, and check against the pages.</li>
+  <li>Nothing outside the sources: ask it about the weather and it declines. That is a feature. Lecture 12 explains why.</li></ul></div>
+</div>
+<div class="take"><b>For this week's take-home:</b> one notebook, your three documents as sources, the opening turn above adapted to your question, two citations opened, the probe, the disclosure line. Companion page 02, slide 6 has the check sheet.</div>
+</section>
+<section class="slide">
+<h1>Before You Upload: Lecture 4, for Files and Folders</h1>
+<p class="lead">Retrieval makes uploading many files easy, and “many” is where other people's data hides. Click each item, then the bin it belongs in. Press <b>Check</b>.</p>
+<div class="sorter">
+ <div class="card"><h3>Items</h3><div id="items"></div></div>
+ <div class="grid g3" style="margin-top:10px">
+  <div class="card green"><h3>Yours, or public</h3><p class="small muted" style="margin:0">Upload; read the data terms once.</p><div class="bin" data-bin="ok"></div></div>
+  <div class="card orange"><h3>Someone else's, with care</h3><p class="small muted" style="margin:0">Only with agreement; never with memory on.</p><div class="bin" data-bin="care"></div></div>
+  <div class="card red"><h3>Never</h3><p class="small muted" style="margin:0">Not even “just to summarise”.</p><div class="bin" data-bin="never"></div></div>
+ </div>
+ <div class="row"><button class="primary" id="sortCheck">Check</button><button id="sortReset">Reset</button><span class="small muted" id="sortOut"></span></div>
+</div>
+<div class="take"><b>The line most students cross this week:</b> a classmate's annotated copy of a reading, uploaded because it was the handiest PDF. The annotations are theirs. Ask, or find the clean copy. And check a folder before the folder goes in.</div>
+</section>
+<section class="slide">
+<h1>Lecture 11 in One Page</h1>
+<div class="card"><p class="lead" style="margin:0">A grounded answer is one whose claims come from material in the window and say where; retrieval is how the window gets filled when the material is too big to paste; and it fails in two quiet ways, a missed passage and a strayed claim, which only the quote tells apart.</p></div>
+<table class="small" style="width:100%;margin-top:12px">
+<tr><th>Idea</th><th>Do this</th><th>Mechanism</th><th>Cannot do</th></tr>
+<tr><td><b>Grounding</b></td><td>Attach the source; “only from the documents”; a section per claim</td><td>The window, not the weights (Lectures 3, 7)</td><td>Tell a wrong source from a right one</td></tr>
+<tr><td><b>Retrieval</b></td><td>Name the documents and which is current; ask what it retrieved</td><td>Chunk, embed, nearest passages, generate</td><td>Find a passage the words do not reach</td></tr>
+<tr><td><b>Citations</b></td><td>“Quote the passage and its location”; open two</td><td>The model copies from the window</td><td>Know that its own claim overreaches</td></tr>
+<tr><td><b>The gap</b></td><td>“NOT IN THE DOCUMENTS” in the rules; probe once</td><td>Without the rule, the weights answer</td><td>Stay silent unasked</td></tr>
+</table>
+<div class="take" style="margin-top:12px"><b>Next:</b> the take-home task on the following slide. Then Lecture 12: grounded or not, the citation test in full, the document question-answering exercise with your own three documents, and where retrieval stops.</div>
+</section>
+<section class="slide">
 <h1>Activity 3, Take-Home: One Question, Three Sources</h1>
-<p class="lead">This week, one submission each, on the Google Form. Your three documents on one topic in one chat (or a NotebookLM notebook). One question that needs at least two of them; a quote and location for every claim; two quotes checked; one probe; one disclosure line. Build the pieces here and copy them into the form.</p>
+<p class="lead">This week, one submission each, on the Google Form. Your three documents on one topic in one chat (or a NotebookLM notebook: slide 3). One question that needs at least two of them; a quote and location for every claim; two quotes checked; one probe; one disclosure line. Build the pieces here and copy them into the form.</p>
 <div class="grid g2">
  <div>
   <div class="card"><h3>1. The question</h3>
@@ -189,20 +250,6 @@ mark.h{background:#FBE6E6;color:var(--red);font-weight:700} mark.s{background:#E
  </div>
 </div>
 <div class="take"><b>Marked for the two checks and the probe, not for the answer.</b> An answer with a failed check reported honestly scores higher than a perfect answer with no checks. Keep the chat and the files: the check must be possible later.</div>
-</section>
-<section class="slide">
-<h1>Before You Upload: Lecture 4, for Files and Folders</h1>
-<p class="lead">Retrieval makes uploading many files easy, and “many” is where other people's data hides. Click each item, then the bin it belongs in. Press <b>Check</b>.</p>
-<div class="sorter">
- <div class="card"><h3>Items</h3><div id="items"></div></div>
- <div class="grid g3" style="margin-top:10px">
-  <div class="card green"><h3>Yours, or public</h3><p class="small muted" style="margin:0">Upload; read the data terms once.</p><div class="bin" data-bin="ok"></div></div>
-  <div class="card orange"><h3>Someone else's, with care</h3><p class="small muted" style="margin:0">Only with agreement; never with memory on.</p><div class="bin" data-bin="care"></div></div>
-  <div class="card red"><h3>Never</h3><p class="small muted" style="margin:0">Not even “just to summarise”.</p><div class="bin" data-bin="never"></div></div>
- </div>
- <div class="row"><button class="primary" id="sortCheck">Check</button><button id="sortReset">Reset</button><span class="small muted" id="sortOut"></span></div>
-</div>
-<div class="take"><b>The line most students cross this week:</b> a classmate's annotated copy of a reading, uploaded because it was the handiest PDF. The annotations are theirs. Ask, or find the clean copy. And check a folder before the folder goes in.</div>
 </section>
 <section class="slide">
 <h1>After Lecture 11</h1>
@@ -265,7 +312,10 @@ document.querySelectorAll('.ccard').forEach(d=>{const cb=d.querySelector('.cbtn'
   if(/summarise everything|summarize everything|how many times|list every/i.test(t)) m.push('Task: that is a whole-document question; retrieval answers it from a sample (Lecture 12). Ask for specific claims instead.');
   document.getElementById('fchk').innerHTML=m.length?'<ul style="margin:6px 0 0 18px;line-height:1.6">'+m.map(x=>'<li>'+x+'</li>').join('')+'</ul>':'<p style="color:#1d5c1d;margin:6px 0 0"><b>All five parts present.</b> Attach the files, paste, and ask the four follow-ups.</p>';};
 })();
-(function(){ // slide 3: take-home builder
+(function(){ // NotebookLM copy
+ document.getElementById('nbcopy').onclick=async()=>{try{await navigator.clipboard.writeText(document.getElementById('nbprompt').textContent); document.getElementById('nbmsg').textContent='Copied.';}catch(e){document.getElementById('nbmsg').textContent='Select the text and copy it.';}};
+})();
+(function(){ // slide 6: take-home builder
  const t1=document.getElementById('t1'), t2=document.getElementById('t2'), out=document.getElementById('tout');
  function build(){const a=t1.value.trim(), q=t2.value.trim(); out.textContent=(a?'[three files attached] '+a+'. ':'')+(q?'Using only these documents: '+q+' ':'')+'After each claim, quote the passage and give the document and page. If the documents do not say, write NOT IN THE DOCUMENTS.';}
  [t1,t2].forEach(x=>x.addEventListener('input',build)); build();
@@ -288,7 +338,7 @@ document.querySelectorAll('.ccard').forEach(d=>{const cb=d.querySelector('.cbtn'
  d.forEach(x=>x.addEventListener('input',dl)); document.addEventListener('click',()=>setTimeout(dl,0)); dl();
  document.getElementById('dcopy').onclick=async()=>{try{await navigator.clipboard.writeText(dout.textContent); document.getElementById('dmsg').textContent='Copied. Edit the “one corrected” part to match what you found.';}catch(e){document.getElementById('dmsg').textContent='Select the text and copy it.';}};
 })();
-(function(){ // slide 4: sorter
+(function(){ // slide 4: sorter (before you upload)
  const ITEMS=[["Your own lecture notes from this course", "ok"], ["The three readings posted on KUHub for the course", "ok"], ["A published journal article (open access)", "ok"], ["The university's public regulations page, saved as PDF", "ok"], ["A classmate's annotated copy of a reading", "care"], ["The slides a lecturer has not published yet", "care"], ["The transcript of a group meeting you recorded with everyone's agreement", "care"], ["A shared project folder that also holds a colleague's CV", "care"], ["The exam scripts you mark as a TA", "never"], ["A patient file from your placement", "never"], ["A client contract from your internship, marked confidential", "never"], ["A chat export with other people's messages, uploaded for a quick summary", "never"]];
 
  const items=document.getElementById('items'); let sel=null; const place={};
