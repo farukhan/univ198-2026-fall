@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>UNIV198 · Lecture 12 · Limits and the Study Guide</title>
+<style>
+:root{--navy:#1F3A6E;--orange:#E08A00;--orangedk:#CC7600;--green:#2E7D32;--red:#C62828;--ink:#1a1a1a;--muted:#666;--box:#F3F6FA;--line:#C9D3E3;--mono:"SFMono-Regular",Menlo,Consolas,"Liberation Mono",monospace}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;background:#fff;color:var(--ink);font:16px/1.45 "Helvetica Neue",Helvetica,Arial,sans-serif}
+body{display:flex;flex-direction:column}
+header{flex:none;display:flex;justify-content:space-between;align-items:center;padding:10px 22px;border-bottom:3px solid var(--navy);font-size:13px;color:var(--muted)}
+header b{color:var(--navy)}
+header .title{font-size:15px;color:var(--navy);font-weight:700}
+main{position:relative;flex:1;min-height:0;overflow:hidden}
+.slide{position:absolute;inset:0;padding:26px 48px 20px;display:none;overflow:auto}
+.slide.on{display:block}
+h1{font-size:28px;margin:0 0 6px;color:var(--navy)}
+h2{font-size:17px;margin:14px 0 8px;color:var(--orange)}
+h3{font-size:15px;margin:0 0 4px;color:var(--navy)}
+p{margin:6px 0}
+.lead{font-size:17px}
+.muted{color:var(--muted)}
+.small{font-size:13px}
+.grid{display:grid;gap:14px;margin-top:10px}
+.g2{grid-template-columns:1fr 1fr}.g3{grid-template-columns:repeat(3,1fr)}.g4{grid-template-columns:repeat(4,1fr)}
+.card{background:var(--box);border:1px solid var(--line);border-radius:8px;padding:12px 14px}
+.card.orange{background:#FFF6E8;border-color:#F0C98A}
+.card.green{background:#F1F8F1;border-color:#A5C8A7}
+.card.red{background:#FDF1F1;border-color:#E6A3A3}
+.card h3{margin-bottom:6px}
+.num{display:inline-block;width:22px;height:22px;border-radius:50%;background:var(--orange);color:#fff;font-weight:700;font-size:13px;text-align:center;line-height:22px;margin-right:6px}
+pre,code,.mono{font-family:var(--mono)}
+pre{background:#fff;border:1px solid var(--line);border-radius:6px;padding:10px 12px;font-size:13.5px;white-space:pre-wrap;margin:6px 0}
+.prompt{background:#fff;border-left:4px solid var(--orange);padding:8px 12px;font-family:var(--mono);font-size:13.5px;white-space:pre-wrap;border-radius:4px}
+.model{background:#fff;border-left:4px solid var(--navy);padding:8px 12px;font-size:14px;white-space:pre-wrap;border-radius:4px}
+button{font:inherit;font-size:14px;padding:7px 14px;border-radius:6px;border:1px solid var(--navy);background:#fff;color:var(--navy);cursor:pointer}
+button.primary{background:var(--navy);color:#fff}
+button.orange{background:var(--orange);border-color:var(--orange);color:#fff}
+button:disabled{opacity:.45;cursor:default}
+button.sel{background:var(--navy);color:#fff}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin:8px 0}
+.take{background:#fff;border:2px solid var(--navy);border-radius:8px;padding:12px 16px;margin-top:12px}
+.ok{color:var(--green);font-weight:700}.bad{color:var(--red);font-weight:700}
+.tag{display:inline-block;padding:1px 8px;border-radius:10px;font-size:12px;font-weight:700;background:var(--navy);color:#fff;margin-right:6px}
+.tag.o{background:var(--orange)}.tag.g{background:var(--green)}.tag.r{background:var(--red)}.tag.grey{background:#888}
+table{border-collapse:collapse;width:100%;font-size:13.5px}
+th,td{padding:6px 8px;border-bottom:1px solid var(--line);vertical-align:top;text-align:left}
+th{color:var(--navy);border-bottom:2px solid var(--navy)}
+footer{flex:none;display:flex;justify-content:space-between;align-items:center;padding:8px 22px;border-top:1px solid var(--line);font-size:13px;color:var(--muted)}
+footer .nav button{min-width:40px}
+footer .dots span{display:inline-block;width:8px;height:8px;border-radius:50%;background:#ccd;margin:0 3px}
+footer .dots span.on{background:var(--orange)}
+.hide{display:none}
+input[type=text],textarea,select{font:inherit;font-size:14px;padding:6px 8px;border:1px solid var(--line);border-radius:6px;width:100%}
+textarea{font-family:var(--mono);font-size:13px}
+.step{opacity:.25;transition:opacity .25s}
+.step.on{opacity:1}
+.token{display:inline-block;padding:2px 6px;margin:2px;border-radius:4px;background:#E8EEF7;border:1px solid var(--line);font-family:var(--mono);font-size:13px}
+.token.new{background:#FFE7C2;border-color:var(--orange)}
+.pill{display:inline-block;padding:6px 10px;border:1px solid var(--line);border-radius:6px;background:#fff;cursor:pointer;font-size:13.5px;margin:3px}
+.pill.sel{background:var(--navy);color:#fff;border-color:var(--navy)}
+.pill.right{background:#E6F2E6;border-color:var(--green)}
+.pill.wrong{background:#FBE6E6;border-color:var(--red)}
+.blank{background:#FFE7C2;border-bottom:2px solid var(--orange);padding:0 3px;border-radius:3px}
+.kv{display:grid;grid-template-columns:150px 1fr;gap:6px 10px;font-size:14px}
+.null{color:var(--red);font-weight:700}
+.chk{font-size:14px;margin:4px 0}
+@media (max-width:900px){.g2,.g3,.g4{grid-template-columns:1fr}.slide{padding:18px 16px}h1{font-size:22px}}
+
+.turn{display:flex;gap:10px;margin:6px 0;align-items:flex-start}
+.turn .who{flex:none;width:64px;font-size:12px;font-weight:700;color:var(--navy);padding-top:9px}
+.turn .msg{flex:1;border-radius:6px;padding:8px 12px;font-size:13.5px;white-space:pre-wrap}
+.turn.u .msg{background:#fff;border-left:4px solid var(--orange);font-family:var(--mono);font-size:13px}
+.turn.m .msg{background:#fff;border-left:4px solid var(--navy)}
+.turn .note{flex:none;width:200px;font-size:12px;color:var(--muted);padding-top:6px}
+.bar{display:flex;align-items:center;gap:8px;margin:3px 0;font-size:13px}
+.bar .lab{flex:none;width:200px;font-family:var(--mono);font-size:12px}
+.bar .fill{height:16px;border-radius:3px;background:var(--navy);transition:opacity .3s,width .3s}
+.bar.rule .fill{background:var(--orange)}
+.sn{font-size:10px;color:var(--orange);font-weight:700;vertical-align:super;margin-right:2px}
+.score{display:grid;grid-template-columns:150px repeat(3,46px);gap:4px 8px;align-items:center;font-size:13px}
+.score .sq{display:inline-block;width:40px;height:28px;line-height:28px;text-align:center;border:1px solid var(--line);border-radius:5px;cursor:pointer;background:#fff}
+.score .sq.sel{background:var(--navy);color:#fff;border-color:var(--navy)}
+.ans{background:#fff;border:1px solid var(--line);border-radius:8px;padding:10px 12px;font-size:13.5px;white-space:pre-wrap;min-height:120px}
+.ans.a{border-top:4px solid var(--orange)}.ans.b{border-top:4px solid var(--navy)}
+@media (max-width:900px){.turn .note{display:none}.bar .lab{width:120px}}
+
+a.btn{display:inline-block;font-size:14px;padding:7px 14px;border-radius:6px;border:1px solid var(--navy);background:#fff;color:var(--navy);text-decoration:none}
+
+.still{background:#fff;border:1px solid var(--line);border-radius:8px;padding:8px;text-align:center}
+.still img{max-width:100%;max-height:220px;border-radius:4px}
+.still .ph{height:140px;display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:13px;background:var(--box);border-radius:4px}
+canvas.diff{border:1px solid var(--line);border-radius:6px;background:#fff}
+.chip{display:inline-block;padding:3px 9px;border-radius:12px;font-size:12px;font-weight:700;margin:2px 4px 2px 0;background:#E8EEF7;color:var(--navy)}
+.chip.o{background:#FFE7C2;color:var(--orangedk)}
+.chip.r{background:#FBE6E6;color:var(--red)}
+.numin{width:110px !important;display:inline-block;margin-right:6px}
+td.hl{background:#FFE7C2;font-weight:700}
+
+.policy h3{margin:12px 0 4px;color:var(--navy);font-size:15px}
+.policy p.clause{margin:3px 0;font-size:13.5px;line-height:1.5}
+.policy.compact{max-height:520px;overflow:auto;background:#fff;border:1px solid var(--line);border-radius:8px;padding:10px 14px}
+.policy p.clause.hit{background:#FFE7C2;border-radius:4px}
+.policy p.clause.found{background:#E6F2E6;border-radius:4px}
+.policy table{border-collapse:collapse;margin:4px 0} .policy th,.policy td{border:1px solid var(--line);padding:3px 8px;text-align:center}
+.cmp{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.ans{background:#fff;border:1px solid var(--line);border-radius:8px;padding:10px 12px;font-size:13.5px;line-height:1.55;min-height:90px}
+.ans.a{border-top:4px solid var(--red)} .ans.b{border-top:4px solid var(--green)}
+mark.h{background:#FBE6E6;color:var(--red);font-weight:700} mark.s{background:#E6F2E6;color:#1d5c1d;font-weight:700}
+.rstep{border:1px solid var(--line);border-radius:8px;padding:10px;background:#fff;cursor:pointer;text-align:center}
+.rstep.sel{border-color:var(--orange);background:#FFF6E8}
+.rstep .n{display:inline-block;width:24px;height:24px;border-radius:50%;background:var(--navy);color:#fff;font-weight:700;line-height:24px;font-size:13px}
+.res{display:flex;gap:8px;align-items:center;margin:4px 0;font-size:13.5px}
+.res .bar{flex:none;height:14px;background:var(--navy);border-radius:3px;min-width:4px}
+.res.top .bar{background:var(--orange)}
+.verd{display:inline-flex;gap:4px;margin:2px 6px 2px 0}
+.verd .pill{padding:3px 8px;font-size:12.5px;margin:0}
+.verd .pill.y{background:#E6F2E6;border-color:var(--green)} .verd .pill.n{background:#FBE6E6;border-color:var(--red)}
+.sorter .item{display:inline-block;padding:7px 10px;border:1px solid var(--line);border-radius:6px;background:#fff;margin:3px;cursor:pointer;font-size:13.5px}
+.sorter .item.ok{background:#E6F2E6;border-color:var(--green)} .sorter .item.bad{background:#FBE6E6;border-color:var(--red)}
+.bin{min-height:70px;border:2px dashed var(--line);border-radius:8px;padding:6px;margin-top:4px}
+@media (max-width:900px){.cmp{grid-template-columns:1fr}}
+</style></head>
+<body>
+<header><div><span class="title">UNIV198 · AI Literacy · Lecture 12</span><br>Working with information: RAG, documents and grounded AI</div>
+<div class="small">Companion page · <b>Limits and the Study Guide</b><br>Use ← → or the buttons below</div></header>
+<main>
+<section class="slide">
+<h1>Where Retrieval Stops, and What to Do Instead</h1>
+<p class="lead">Every row has the same shape: retrieval hands the model a sample; the question needed the whole. When it fits, paste the whole; when it does not, ask in pieces and assemble the answer yourself. Then sort the eight requests below.</p>
+<table class="small" style="width:100%">
+<tr><th>The edge</th><th>Why</th><th>Instead</th></tr>
+<tr><td><b>Counting and “every”</b></td><td>The model sees the top few passages, not the document; a count is a count of the sample</td><td>Paste the whole document if it fits; or ask section by section and add up yourself</td></tr>
+<tr><td><b>Two versions that disagree</b></td><td>Both are retrieved; the model picks one, or blends them, without saying</td><td>Name the current one in the context; ask which document says this and whether the others differ</td></tr>
+<tr><td><b>A stale source</b></td><td>Grounding on last year's policy gives last year's answer, perfectly cited</td><td>Date the document before you ask; a correct citation to a wrong source is still wrong</td></tr>
+<tr><td><b>Tables, figures, footnotes</b></td><td>Chunking cuts rows from headers and notes from the text they qualify</td><td>Ask for the row with its header; for a figure, read it yourself (Lecture 10)</td></tr>
+<tr><td><b>An argument across the whole text</b></td><td>“What is the author's position?” needs the whole chapter, not three paragraphs</td><td>Paste the chapter; ask for a summary with page numbers; then read those pages</td></tr>
+</table>
+<div class="card" style="margin-top:10px"><h3>Retrieval, or the whole?</h3><p class="small">For each request: can retrieval answer it from a few passages, or does it need the whole document (or a different approach)?</p><div id="edges"></div>
+<div class="row"><button class="primary" id="eCheck">Check</button><span class="small muted" id="eOut"></span></div></div>
+</section>
+<section class="slide">
+<h1>The Web as a Document: Search-Grounded Answers</h1>
+<p class="lead">With search on, the app retrieves a few pages and answers from them: Lecture 11's five steps with the web as the store. The links are the citations and the three gates apply unchanged. One thing is new: you did not choose the documents, so a fourth gate joins the test: <b>is the source worth citing?</b></p>
+<div class="grid g2">
+ <div class="card"><h3>Rate a cited page</h3><p class="small">For one link under a search-grounded answer, answer the four questions. The verdict is a habit, not a formula.</p>
+  <p class="small" style="margin:6px 0 2px"><b>Who wrote it?</b></p><select id="s1"><option value="">choose…</option><option value="2">A named author at an institution, a journal, a government or standards body</option><option value="1">A company or organisation with a stake in the answer</option><option value="0">Anonymous, a forum, a content farm, an AI-written page</option></select>
+  <p class="small" style="margin:6px 0 2px"><b>When?</b></p><select id="s2"><option value="">choose…</option><option value="2">Dated, and recent enough for the question</option><option value="1">Dated, but older than the thing it describes</option><option value="0">Undated</option></select>
+  <p class="small" style="margin:6px 0 2px"><b>Why does the page exist?</b></p><select id="s3"><option value="">choose…</option><option value="2">To report, teach or regulate</option><option value="1">To sell or persuade, openly</option><option value="0">To rank in search, or unclear</option></select>
+  <p class="small" style="margin:6px 0 2px"><b>Does the page itself say what the answer says?</b></p><select id="s4"><option value="">choose…</option><option value="2">Yes, I read the page, not the snippet</option><option value="1">The snippet does; I did not open the page</option><option value="0">No, or I could not find it</option></select>
+  <div class="row"><button class="primary" id="sRate">Verdict</button></div><div class="small" id="sOut" style="margin-top:6px"></div></div>
+ <div>
+  <div class="card orange"><h3>What is different on the web</h3><ul class="small" style="margin:4px 0 0 18px;line-height:1.6">
+   <li>The retrieved page may itself be wrong, old, or an advertisement. A perfect citation to a bad page is a grounded claim about a bad page.</li>
+   <li>An AI overview on a search page is the same mechanism, made by the search engine; the links under it are the grounding.</li>
+   <li>“Not there” almost never happens: the web always has <i>something</i> near the question, so the invented answer comes better dressed.</li></ul></div>
+  <div class="card green" style="margin-top:10px"><h3>The habit</h3><p class="small" style="margin:0">Open two of the links before you believe the summary. Read the page, not the snippet. A page that fails the fourth gate makes the claim ungrounded for your coursework, however good the quote. Mike Caulfield's <a href="https://hapgood.us/2019/06/19/sift-the-four-moves/" target="_blank">SIFT</a> is the same idea in four moves: stop, investigate the source, find better coverage, trace to the original.</p></div>
+ </div>
+</div>
+</section>
+<section class="slide">
+<h1>Disclosing Grounded Work: The Line Builder</h1>
+<p class="lead">A reader of grounded work needs to know what was in the window, because that is what the answer is about. Five parts, about thirty words. Fill the parts; the line assembles below. “Checked” means a number; “changed” is the proof.</p>
+<div class="grid g2">
+ <div>
+  <div class="row"><select id="dkind" style="flex:1"><option value="doc">Documents I uploaded</option><option value="web">Web search in the app</option></select></div>
+  <div class="row" style="margin-top:6px"><input type="text" id="dtool" placeholder="Tool (Copilot, Gemini, NotebookLM)" style="flex:1"><input type="text" id="ddate" placeholder="Date, e.g. 19 November 2026" style="flex:1"></div>
+  <input type="text" id="ddocs" placeholder="What went in: documents by name and version / the pages you opened" style="margin-top:6px">
+  <div class="row" style="margin-top:6px"><input type="number" id="dopen" placeholder="citations opened" style="flex:1" min="0"><input type="number" id="dtotal" placeholder="of how many" style="flex:1" min="0"></div>
+  <input type="text" id="dchanged" placeholder="What changed: removed / corrected / discarded, and why" style="margin-top:6px">
+ </div>
+ <div>
+  <div class="prompt" id="dline" style="min-height:90px"></div>
+  <div class="row"><button class="primary" id="dcopy2">Copy</button><button id="dex1">Example: documents</button><button id="dex2">Example: web</button><span class="small muted" id="dmsg2"></span></div>
+  <div class="card" style="margin-top:10px"><h3>Three tests for the line</h3><ul class="small" style="margin:4px 0 0 18px;line-height:1.6">
+   <li>Could a reader tell what was in the window? (tool, date, documents and versions)</li>
+   <li>Could a reader tell how much you checked? (a number, not “all checked”)</li>
+   <li>Could a reader tell what you changed? (a line with no changes needs a reason)</li></ul></div>
+ </div>
+</div>
+</section>
+<section class="slide">
+<h1>Activity 3, Take-Home: A Study Guide With Page Numbers</h1>
+<p class="lead">This week, one submission each, on the Google Form. From your three documents, a one-page study guide of at most ten claims for one course; every claim carries a document and page. Open and check five of the ten with the citation test; correct or remove what fails; add the disclosure line. Marked for the five checks and the line, not for the guide.</p>
+<div class="grid g2">
+ <div>
+  <div class="card"><h3>1. The prompt</h3>
+   <input type="text" id="g1" placeholder="Course, e.g. UNIV198"><div style="height:6px"></div>
+   <input type="text" id="g2" placeholder="Documents: A = syllabus (current), B = reading 1, C = reading 2"><div style="height:6px"></div>
+   <input type="text" id="g3" placeholder="The session or topic the guide is for, e.g. the midterm"><div style="height:6px"></div>
+   <div class="prompt" id="gout" style="min-height:110px"></div>
+   <div class="row"><button class="primary" id="gcopy">Copy</button><button id="gcheck">Check</button><span class="small muted" id="gmsg"></span></div><div class="small" id="gchk"></div>
+   <p class="small muted" style="margin:6px 0 0">Ask for the ten most useful claims, not “a summary”: a summary is a whole-document question.</p></div>
+  <div class="card" style="margin-top:10px"><h3>Before you upload</h3><p class="small" style="margin:0">Your own notes, the readings the course posted, published papers, public regulations: in. A classmate's annotated copy, a lecturer's unpublished slides, anything confidential: not without agreement, and never into a notebook with memory on. Lecture 4, for every file.</p></div>
+ </div>
+ <div>
+  <div class="card"><h3>2. Five checks</h3><p class="small">For each of five claims: where it points, the three verdicts in order, what you did.</p><div id="gchecks"></div>
+   <div class="small" id="gsum"></div></div>
+  <div class="card" style="margin-top:10px"><h3>3. The line</h3><p class="small" style="margin:0 0 6px">Build it on slide 3, or write it here: tool, date, documents and versions, every claim cited, five of ten checked, what changed.</p><textarea id="gline" rows="3" placeholder="Drafted with … on … from three uploaded documents (…); every claim cited to document and page; five of ten citations opened and checked by the author; …"></textarea>
+   <div class="row"><button id="glinecheck">Check the line</button><span class="small" id="glineout"></span></div></div>
+ </div>
+</div>
+<div class="take"><b>Two failures out of five is a normal result; zero failures with no evidence of checking is not.</b> A guide with two honest corrections scores higher than a flawless one with “all checked” and nothing to show for it.</div>
+</section>
+<section class="slide">
+<h1>Week 7 in One Page</h1>
+<div class="card"><p class="lead" style="margin:0">Put the source in the window and the model can answer from it and say where; retrieval does the putting when the source is large; a cited claim is checked in thirty seconds with three questions; and any question that needs the whole document is answered from a sample unless you paste the whole.</p></div>
+<table class="small" style="width:100%;margin-top:12px">
+<tr><th>Idea</th><th>Do this</th><th>Mechanism</th><th>Cannot do</th></tr>
+<tr><td><b>Grounding</b></td><td>Attach; “only from the documents”; NOT IN THE DOCUMENTS</td><td>The window, not the weights</td><td>Tell a wrong source from a right one</td></tr>
+<tr><td><b>Retrieval</b></td><td>Name the documents and which is current; ask what it retrieved</td><td>Chunk, embed, nearest passages, generate</td><td>Find a passage the words do not reach</td></tr>
+<tr><td><b>The citation test</b></td><td>Exists, says, supports; open two; stop at the first failure</td><td>The model copies from the window</td><td>Know its claim overreaches</td></tr>
+<tr><td><b>The limits</b></td><td>Paste the whole when it fits; ask per document; date the source</td><td>A sample of the document, not the document</td><td>Count, list every, summarise everything</td></tr>
+</table>
+<div class="grid g2" style="margin-top:12px">
+ <div class="card"><h3>Readings</h3><ul class="small" style="margin:4px 0 0 18px;line-height:1.7">
+  <li><b>Core:</b> Mike Caulfield, <a href="https://hapgood.us/2019/06/19/sift-the-four-moves/" target="_blank">SIFT: The Four Moves</a>, one page</li>
+  <li><b>Core:</b> <a href="https://support.google.com/notebooklm/" target="_blank">NotebookLM Help</a>: “citations” and “sources”</li>
+  <li><b>Want more:</b> Bohnet et al. (2022), <a href="https://arxiv.org/abs/2212.08037" target="_blank">Attributed Question Answering</a>, the abstract</li>
+  <li><b>Want more:</b> Es et al. (2023), <a href="https://arxiv.org/abs/2309.15217" target="_blank">RAGAS</a>, Section 3: faithfulness and relevance</li>
+  <li><b>Explainers:</b> <a href="https://github.com/vectara/hallucination-leaderboard" target="_blank">Vectara's hallucination leaderboard</a>; <a href="https://www.oneusefulthing.org/" target="_blank">One Useful Thing</a></li></ul></div>
+ <div class="card orange"><h3>This week</h3><ul class="small" style="margin:4px 0 0 18px;line-height:1.7">
+  <li><b>Two take-homes:</b> Lecture 11's one question, three sources; and the study guide with page numbers (slide 4). Same documents, same chat if you like.</li>
+  <li><b>Re-check one old answer:</b> any AI answer you used this term, run through the three gates. Nothing to submit.</li>
+  <li><b>Week 8:</b> the next topic on the syllabus, one week on from the printed schedule. Bring the study guide; it comes back.</li></ul></div>
+</div>
+</section>
+</main>
+<footer><div class="dots" id="dots"></div><div class="nav"><button id="prev">←</button> <span id="counter"></span> <button id="next">→</button></div></footer>
+<script>
+(function(){
+  const slides=[...document.querySelectorAll('.slide')];
+  let i=0;
+  const counter=document.getElementById('counter'), dots=document.getElementById('dots');
+  slides.forEach((s,k)=>{const d=document.createElement('span'); d.onclick=()=>go(k); dots.appendChild(d);});
+  function go(n){ i=Math.max(0,Math.min(slides.length-1,n));
+    slides.forEach((s,k)=>s.classList.toggle('on',k===i));
+    [...dots.children].forEach((d,k)=>d.classList.toggle('on',k===i));
+    counter.textContent=(i+1)+' / '+slides.length;
+    document.getElementById('prev').disabled=i===0; document.getElementById('next').disabled=i===slides.length-1;
+    try{location.hash='s'+(i+1);}catch(e){}
+  }
+  document.getElementById('prev').onclick=()=>go(i-1);
+  document.getElementById('next').onclick=()=>go(i+1);
+  document.addEventListener('keydown',e=>{ if(e.target.tagName==='TEXTAREA'||e.target.tagName==='INPUT')return;
+    if(e.key==='ArrowRight'||e.key==='PageDown'||e.key===' '){e.preventDefault();go(i+1);}
+    if(e.key==='ArrowLeft'||e.key==='PageUp'){e.preventDefault();go(i-1);}
+    if(e.key==='Home')go(0); if(e.key==='End')go(slides.length-1);});
+  const m=(location.hash||'').match(/s(\d+)/); go(m?parseInt(m[1])-1:0);
+  window.goSlide=go;
+})();
+
+
+document.querySelectorAll('.ccard').forEach(d=>{const cb=d.querySelector('.cbtn'), pr=d.querySelector('.prompt'), sb=d.querySelector('.sbtn');
+ cb.onclick=async()=>{try{await navigator.clipboard.writeText(pr.textContent); cb.textContent='Copied'; setTimeout(()=>cb.textContent='Copy',1500);}catch(e){cb.textContent='Select and copy';}};
+ if(sb){const ans=sb.nextElementSibling; sb.onclick=()=>{const h=ans.classList.toggle('hide'); sb.textContent=h?'Show a sample answer':'Hide the sample answer';};}});
+
+(function(){ // slide 1: edges sorter
+ const E=[["How many of the readings mention \u201csampling bias\u201d?", "whole", "A count across documents: retrieval sees a sample. Ask per document, or search each by keyword."], ["What does the syllabus say about late submissions?", "ret", "A lookup: the words match a passage."], ["List every figure in reading B with its caption.", "whole", "\u201cEvery\u201d: a sample cannot promise completeness. Paste the document, or go through it yourself."], ["Which version of the policy is current, and what is the weekly limit?", "ret", "Retrievable, if you named the current version in the context; otherwise it may blend the two."], ["What is the author's overall argument in chapter 3?", "whole", "An argument across a whole chapter: paste the chapter and ask for a summary with page numbers."], ["When does the booking window open for Room 204?", "ret", "A number in a table note: retrievable, but open the citation: table rows chunk badly."], ["Summarise everything the three documents say about group work.", "whole", "\u201cEverything\u201d is a whole-document question dressed as a summary. Ask for specific claims with pages instead."], ["Does reading C define \u201cgrounding\u201d the same way reading B does?", "ret", "Across documents: retrievable (two passages), but the comparison is the model's own; read both quotes."]];
+
+ const box=document.getElementById('edges'); const sel={};
+ E.forEach((e,i)=>{const d=document.createElement('div'); d.className='row'; d.style.cssText='justify-content:space-between;border-bottom:1px solid var(--line);padding:5px 0'; d.innerHTML='<span class="small" style="flex:1">'+(i+1)+'. '+e[0]+'</span>'; const v=document.createElement('span'); v.className='verd'; [['ret','Retrieval can'],['whole','Needs the whole']].forEach(o=>{const p=document.createElement('span'); p.className='pill'; p.textContent=o[1]; p.onclick=()=>{[...v.children].forEach(c=>c.className='pill'); p.classList.add('y'); sel[i]=o[0];}; v.appendChild(p);}); d.appendChild(v); const r=document.createElement('div'); r.className='small'; r.id='er'+i; r.style.width='100%'; box.appendChild(d); box.appendChild(r);});
+ document.getElementById('eCheck').onclick=()=>{let n=0,t=0; E.forEach((e,i)=>{const r=document.getElementById('er'+i); if(!sel[i]){r.textContent='';return;} t++; const ok=sel[i]===e[1]; if(ok)n++; r.innerHTML=(ok?'<b style="color:#1d5c1d">Yes.</b> ':'<b style="color:var(--red)">No.</b> ')+e[2];}); document.getElementById('eOut').textContent=t?n+' of '+t+' right.':'Choose for some requests first.';};
+})();
+(function(){ // slide 2: source rater
+ document.getElementById('sRate').onclick=()=>{const v=['s1','s2','s3','s4'].map(i=>document.getElementById(i).value); const o=document.getElementById('sOut'); if(v.some(x=>x==='')){o.innerHTML='<span style="color:var(--red)">Answer all four.</span>';return;} const n=v.map(Number); const s=n.reduce((a,b)=>a+b,0);
+  if(n[3]===0) o.innerHTML='<b style="color:var(--red)">Not grounded:</b> the page does not say what the answer says. Whatever the source is worth, this claim is not resting on it.';
+  else if(n[3]===1) o.innerHTML='<b style="color:var(--red)">Not checked yet:</b> a snippet is a retrieved chunk, not the page. Open it; the snippet can quote a sentence the page then contradicts.';
+  else if(n[0]===0||n[1]===0||n[2]===0) o.innerHTML='<b style="color:var(--red)">Fails the fourth gate:</b> the page says it, but the page is anonymous, undated or exists to rank. Find better coverage (SIFT) and cite that instead.';
+  else if(s>=7) o.innerHTML='<b style="color:#1d5c1d">Worth citing.</b> Named, dated, written to inform, and it says what the answer says. Cite the page, not the AI answer.';
+  else o.innerHTML='<b style="color:var(--orange)">Usable with care:</b> an interested or ageing source. Say so when you cite it, and look for a second one.';};
+})();
+(function(){ // slide 3: line builder
+ const f=id=>document.getElementById(id); const out=f('dline');
+ function build(){const kind=f('dkind').value, t=f('dtool').value.trim()||'[tool]', d=f('ddate').value.trim()||'[date]', docs=f('ddocs').value.trim(), op=f('dopen').value, tot=f('dtotal').value, ch=f('dchanged').value.trim();
+  if(kind==='doc') out.textContent='Drafted with '+t+' on '+d+' from uploaded documents ('+(docs||'[names and versions]')+'); every claim cited to document and page; '+(op||'[n]')+' of '+(tot||'[m]')+' citations opened and checked by the author; '+(ch||'[what was removed or corrected, and why]')+'.';
+  else out.textContent='Background drafted with '+t+' (web search on) on '+d+'; '+(op||'[n]')+' of '+(tot||'[m]')+' cited pages opened by the author ('+(docs||'[which kept, which discarded]')+'); '+(ch||'[what was re-checked or changed]')+'.';}
+ ['dkind','dtool','ddate','ddocs','dopen','dtotal','dchanged'].forEach(i=>f(i).addEventListener('input',build)); f('dkind').addEventListener('change',build); build();
+ f('dex1').onclick=()=>{f('dkind').value='doc'; f('dtool').value='Google Gemini'; f('ddate').value='19 November 2026'; f('ddocs').value='course syllabus v2, Reading A, Reading B'; f('dopen').value=5; f('dtotal').value=12; f('dchanged').value='one claim removed (citation did not exist), one corrected (7 days, not 14)'; build();};
+ f('dex2').onclick=()=>{f('dkind').value='web'; f('dtool').value='Microsoft Copilot'; f('ddate').value='18 November 2026'; f('ddocs').value='two kept: a government statistics page and a journal article; two discarded: a forum post and an undated blog'; f('dopen').value=4; f('dtotal').value=4; f('dchanged').value='figures re-checked against the statistics page'; build();};
+ f('dcopy2').onclick=async()=>{try{await navigator.clipboard.writeText(out.textContent); f('dmsg2').textContent='Copied.';}catch(e){f('dmsg2').textContent='Select the text and copy it.';}};
+})();
+(function(){ // slide 4: study guide
+ const f=id=>document.getElementById(id); const out=f('gout');
+ function build(){const c=f('g1').value.trim()||'[course]', d=f('g2').value.trim()||'[A = …, B = …, C = …]', t=f('g3').value.trim()||'[the session]'; out.textContent='[three files attached] Documents for '+c+': '+d+'; A is current and wins if they disagree. Using only these documents, give the ten most useful claims for '+t+', one line each, each followed by the document and page it comes from. If the documents do not support a claim, leave it out; if asked something they do not say, write NOT IN THE DOCUMENTS.';}
+ ['g1','g2','g3'].forEach(i=>f(i).addEventListener('input',build)); build();
+ f('gcopy').onclick=async()=>{try{await navigator.clipboard.writeText(out.textContent); f('gmsg').textContent='Copied. Attach the files first, then paste.';}catch(e){f('gmsg').textContent='Select the text and copy it.';}};
+ f('gcheck').onclick=()=>{const m=[]; if(!/current|wins/i.test(f('g2').value+' current')) m.push('Say which document is current.'); if(!f('g2').value.trim()) m.push('Name the three documents.'); if(/summar/i.test(f('g3').value)) m.push('Not “a summary”: ask for claims with pages.'); f('gchk').innerHTML=m.length?'<ul style="margin:6px 0 0 18px">'+m.map(x=>'<li>'+x+'</li>').join('')+'</ul>':'<p style="color:#1d5c1d;margin:6px 0 0"><b>Good.</b> Ten claims, each with a page, and a way to say no.</p>';};
+ const box=f('gchecks'); const V=[];
+ for(let i=0;i<5;i++){const d=document.createElement('div'); d.style.cssText='border:1px solid var(--line);border-radius:6px;padding:6px 8px;margin-bottom:6px;background:#fff'; d.innerHTML='<p class="small" style="margin:0 0 4px"><b>Claim '+(i+1)+'</b></p><input type="text" placeholder="Where it points: document and page">'; const row=document.createElement('div'); row.className='row'; row.style.marginTop='4px'; V[i]={};
+  [['e','Exists?'],['s','Says?'],['p','Supports?']].forEach(([k,lab])=>{const l=document.createElement('span'); l.className='small'; l.textContent=lab; row.appendChild(l); const w=document.createElement('span'); w.className='verd'; [['y','Yes'],['n','No']].forEach(o=>{const p=document.createElement('span'); p.className='pill'; p.textContent=o[1]; p.onclick=()=>{[...w.children].forEach(c=>c.className='pill'); p.classList.add(o[0]); V[i][k]=o[0]; sum();}; w.appendChild(p);}); row.appendChild(w);});
+  const act=document.createElement('select'); act.innerHTML='<option value="">what I did…</option><option>kept</option><option>corrected</option><option>removed</option>'; act.onchange=()=>{V[i].a=act.value; sum();}; row.appendChild(act); d.appendChild(row); box.appendChild(d);}
+ function sum(){const done=V.filter(v=>v.e&&v.s&&v.p).length; const failed=V.filter(v=>v.e==='n'||v.s==='n'||v.p==='n').length; const fixed=V.filter(v=>(v.e==='n'||v.s==='n'||v.p==='n')&&(v.a==='corrected'||v.a==='removed')).length; const bad=V.filter(v=>(v.e==='n'||v.s==='n'||v.p==='n')&&v.a==='kept').length;
+  f('gsum').innerHTML=done?'<b>'+done+' of 5 checked; '+failed+' failed; '+fixed+' corrected or removed.</b>'+(bad?' <span style="color:var(--red)">A failed claim marked “kept”: correct it or remove it; a known-wrong claim stays wrong.</span>':'')+(done===5&&failed===0?' <span class="muted">Zero failures is possible; say in the line what you opened, so the marker can see the checking happened.</span>':''):'';}
+ f('glinecheck').onclick=()=>{const t=f('gline').value; const m=[]; if(!/20\d\d/.test(t)) m.push('a date'); if(!/(copilot|gemini|notebooklm)/i.test(t)) m.push('the tool'); if(!/\d+ of \d+|\d+ of ten|five of/i.test(t)) m.push('a number of citations checked'); if(!/(removed|corrected|changed|no change)/i.test(t)) m.push('what changed'); if(!/(syllabus|reading|v\d|version|\()/i.test(t)) m.push('the documents by name'); f('glineout').innerHTML=m.length?'<span style="color:var(--red)">Missing: '+m.join(', ')+'.</span>':'<span style="color:#1d5c1d"><b>All five parts present.</b></span>';};
+})();
+
+</script>
+</body></html>
