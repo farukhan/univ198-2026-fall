@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>UNIV198 · Lecture 13 · From Chat to Agents</title>
+<style>
+:root{--navy:#1F3A6E;--orange:#E08A00;--orangedk:#CC7600;--green:#2E7D32;--red:#C62828;--ink:#1a1a1a;--muted:#666;--box:#F3F6FA;--line:#C9D3E3;--mono:"SFMono-Regular",Menlo,Consolas,"Liberation Mono",monospace}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;background:#fff;color:var(--ink);font:16px/1.45 "Helvetica Neue",Helvetica,Arial,sans-serif}
+body{display:flex;flex-direction:column}
+header{flex:none;display:flex;justify-content:space-between;align-items:center;padding:10px 22px;border-bottom:3px solid var(--navy);font-size:13px;color:var(--muted)}
+header b{color:var(--navy)}
+header .title{font-size:15px;color:var(--navy);font-weight:700}
+main{position:relative;flex:1;min-height:0;overflow:hidden}
+.slide{position:absolute;inset:0;padding:26px 48px 20px;display:none;overflow:auto}
+.slide.on{display:block}
+h1{font-size:28px;margin:0 0 6px;color:var(--navy)}
+h2{font-size:17px;margin:14px 0 8px;color:var(--orange)}
+h3{font-size:15px;margin:0 0 4px;color:var(--navy)}
+p{margin:6px 0}
+.lead{font-size:17px}
+.muted{color:var(--muted)}
+.small{font-size:13px}
+.grid{display:grid;gap:14px;margin-top:10px}
+.g2{grid-template-columns:1fr 1fr}.g3{grid-template-columns:repeat(3,1fr)}.g4{grid-template-columns:repeat(4,1fr)}
+.card{background:var(--box);border:1px solid var(--line);border-radius:8px;padding:12px 14px}
+.card.orange{background:#FFF6E8;border-color:#F0C98A}
+.card.green{background:#F1F8F1;border-color:#A5C8A7}
+.card.red{background:#FDF1F1;border-color:#E6A3A3}
+.card h3{margin-bottom:6px}
+.num{display:inline-block;width:22px;height:22px;border-radius:50%;background:var(--orange);color:#fff;font-weight:700;font-size:13px;text-align:center;line-height:22px;margin-right:6px}
+pre,code,.mono{font-family:var(--mono)}
+pre{background:#fff;border:1px solid var(--line);border-radius:6px;padding:10px 12px;font-size:13.5px;white-space:pre-wrap;margin:6px 0}
+.prompt{background:#fff;border-left:4px solid var(--orange);padding:8px 12px;font-family:var(--mono);font-size:13.5px;white-space:pre-wrap;border-radius:4px}
+.model{background:#fff;border-left:4px solid var(--navy);padding:8px 12px;font-size:14px;white-space:pre-wrap;border-radius:4px}
+button{font:inherit;font-size:14px;padding:7px 14px;border-radius:6px;border:1px solid var(--navy);background:#fff;color:var(--navy);cursor:pointer}
+button.primary{background:var(--navy);color:#fff}
+button.orange{background:var(--orange);border-color:var(--orange);color:#fff}
+button:disabled{opacity:.45;cursor:default}
+button.sel{background:var(--navy);color:#fff}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin:8px 0}
+.take{background:#fff;border:2px solid var(--navy);border-radius:8px;padding:12px 16px;margin-top:12px}
+.ok{color:var(--green);font-weight:700}.bad{color:var(--red);font-weight:700}
+.tag{display:inline-block;padding:1px 8px;border-radius:10px;font-size:12px;font-weight:700;background:var(--navy);color:#fff;margin-right:6px}
+.tag.o{background:var(--orange)}.tag.g{background:var(--green)}.tag.r{background:var(--red)}.tag.grey{background:#888}
+table{border-collapse:collapse;width:100%;font-size:13.5px}
+th,td{padding:6px 8px;border-bottom:1px solid var(--line);vertical-align:top;text-align:left}
+th{color:var(--navy);border-bottom:2px solid var(--navy)}
+footer{flex:none;display:flex;justify-content:space-between;align-items:center;padding:8px 22px;border-top:1px solid var(--line);font-size:13px;color:var(--muted)}
+footer .nav button{min-width:40px}
+footer .dots span{display:inline-block;width:8px;height:8px;border-radius:50%;background:#ccd;margin:0 3px}
+footer .dots span.on{background:var(--orange)}
+.hide{display:none}
+input[type=text],textarea,select{font:inherit;font-size:14px;padding:6px 8px;border:1px solid var(--line);border-radius:6px;width:100%}
+textarea{font-family:var(--mono);font-size:13px}
+.step{opacity:.25;transition:opacity .25s}
+.step.on{opacity:1}
+.token{display:inline-block;padding:2px 6px;margin:2px;border-radius:4px;background:#E8EEF7;border:1px solid var(--line);font-family:var(--mono);font-size:13px}
+.token.new{background:#FFE7C2;border-color:var(--orange)}
+.pill{display:inline-block;padding:6px 10px;border:1px solid var(--line);border-radius:6px;background:#fff;cursor:pointer;font-size:13.5px;margin:3px}
+.pill.sel{background:var(--navy);color:#fff;border-color:var(--navy)}
+.pill.right{background:#E6F2E6;border-color:var(--green)}
+.pill.wrong{background:#FBE6E6;border-color:var(--red)}
+.blank{background:#FFE7C2;border-bottom:2px solid var(--orange);padding:0 3px;border-radius:3px}
+.kv{display:grid;grid-template-columns:150px 1fr;gap:6px 10px;font-size:14px}
+.null{color:var(--red);font-weight:700}
+.chk{font-size:14px;margin:4px 0}
+@media (max-width:900px){.g2,.g3,.g4{grid-template-columns:1fr}.slide{padding:18px 16px}h1{font-size:22px}}
+
+.turn{display:flex;gap:10px;margin:6px 0;align-items:flex-start}
+.turn .who{flex:none;width:64px;font-size:12px;font-weight:700;color:var(--navy);padding-top:9px}
+.turn .msg{flex:1;border-radius:6px;padding:8px 12px;font-size:13.5px;white-space:pre-wrap}
+.turn.u .msg{background:#fff;border-left:4px solid var(--orange);font-family:var(--mono);font-size:13px}
+.turn.m .msg{background:#fff;border-left:4px solid var(--navy)}
+.turn .note{flex:none;width:200px;font-size:12px;color:var(--muted);padding-top:6px}
+.bar{display:flex;align-items:center;gap:8px;margin:3px 0;font-size:13px}
+.bar .lab{flex:none;width:200px;font-family:var(--mono);font-size:12px}
+.bar .fill{height:16px;border-radius:3px;background:var(--navy);transition:opacity .3s,width .3s}
+.bar.rule .fill{background:var(--orange)}
+.sn{font-size:10px;color:var(--orange);font-weight:700;vertical-align:super;margin-right:2px}
+.score{display:grid;grid-template-columns:150px repeat(3,46px);gap:4px 8px;align-items:center;font-size:13px}
+.score .sq{display:inline-block;width:40px;height:28px;line-height:28px;text-align:center;border:1px solid var(--line);border-radius:5px;cursor:pointer;background:#fff}
+.score .sq.sel{background:var(--navy);color:#fff;border-color:var(--navy)}
+.ans{background:#fff;border:1px solid var(--line);border-radius:8px;padding:10px 12px;font-size:13.5px;white-space:pre-wrap;min-height:120px}
+.ans.a{border-top:4px solid var(--orange)}.ans.b{border-top:4px solid var(--navy)}
+@media (max-width:900px){.turn .note{display:none}.bar .lab{width:120px}}
+
+a.btn{display:inline-block;font-size:14px;padding:7px 14px;border-radius:6px;border:1px solid var(--navy);background:#fff;color:var(--navy);text-decoration:none}
+
+.still{background:#fff;border:1px solid var(--line);border-radius:8px;padding:8px;text-align:center}
+.still img{max-width:100%;max-height:220px;border-radius:4px}
+.still .ph{height:140px;display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:13px;background:var(--box);border-radius:4px}
+canvas.diff{border:1px solid var(--line);border-radius:6px;background:#fff}
+.chip{display:inline-block;padding:3px 9px;border-radius:12px;font-size:12px;font-weight:700;margin:2px 4px 2px 0;background:#E8EEF7;color:var(--navy)}
+.chip.o{background:#FFE7C2;color:var(--orangedk)}
+.chip.r{background:#FBE6E6;color:var(--red)}
+.numin{width:110px !important;display:inline-block;margin-right:6px}
+td.hl{background:#FFE7C2;font-weight:700}
+
+.policy h3{margin:12px 0 4px;color:var(--navy);font-size:15px}
+.policy p.clause{margin:3px 0;font-size:13.5px;line-height:1.5}
+.policy.compact{max-height:520px;overflow:auto;background:#fff;border:1px solid var(--line);border-radius:8px;padding:10px 14px}
+.policy p.clause.hit{background:#FFE7C2;border-radius:4px}
+.policy p.clause.found{background:#E6F2E6;border-radius:4px}
+.policy table{border-collapse:collapse;margin:4px 0} .policy th,.policy td{border:1px solid var(--line);padding:3px 8px;text-align:center}
+.cmp{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.ans{background:#fff;border:1px solid var(--line);border-radius:8px;padding:10px 12px;font-size:13.5px;line-height:1.55;min-height:90px}
+.ans.a{border-top:4px solid var(--red)} .ans.b{border-top:4px solid var(--green)}
+mark.h{background:#FBE6E6;color:var(--red);font-weight:700} mark.s{background:#E6F2E6;color:#1d5c1d;font-weight:700}
+.rstep{border:1px solid var(--line);border-radius:8px;padding:10px;background:#fff;cursor:pointer;text-align:center}
+.rstep.sel{border-color:var(--orange);background:#FFF6E8}
+.rstep .n{display:inline-block;width:24px;height:24px;border-radius:50%;background:var(--navy);color:#fff;font-weight:700;line-height:24px;font-size:13px}
+.res{display:flex;gap:8px;align-items:center;margin:4px 0;font-size:13.5px}
+.res .bar{flex:none;height:14px;background:var(--navy);border-radius:3px;min-width:4px}
+.res.top .bar{background:var(--orange)}
+.verd{display:inline-flex;gap:4px;margin:2px 6px 2px 0}
+.verd .pill{padding:3px 8px;font-size:12.5px;margin:0}
+.verd .pill.y{background:#E6F2E6;border-color:var(--green)} .verd .pill.n{background:#FBE6E6;border-color:var(--red)}
+.sorter .item{display:inline-block;padding:7px 10px;border:1px solid var(--line);border-radius:6px;background:#fff;margin:3px;cursor:pointer;font-size:13.5px}
+.sorter .item.ok{background:#E6F2E6;border-color:var(--green)} .sorter .item.bad{background:#FBE6E6;border-color:var(--red)}
+.bin{min-height:70px;border:2px dashed var(--line);border-radius:8px;padding:6px;margin-top:4px}
+@media (max-width:900px){.cmp{grid-template-columns:1fr}}
+
+.rung{border:1px solid var(--line);border-radius:8px;padding:10px;background:#fff;cursor:pointer;text-align:center;font-size:13.5px}
+.rung.sel{border-color:var(--orange);background:#FFF6E8}
+.logline{display:flex;gap:10px;align-items:flex-start;padding:6px 8px;border-left:4px solid var(--line);margin:3px 0;background:#fff;border-radius:0 6px 6px 0;font-size:13.5px}
+.logline.search{border-left-color:var(--navy)} .logline.open{border-left-color:#888} .logline.plan,.logline.note{border-left-color:var(--orange)} .logline.report{border-left-color:var(--green)}
+.logline .k{flex:none;width:130px;font-weight:700;font-size:12.5px}
+.logline .r{flex:none;font-size:12px;color:#555;max-width:220px}
+.src{border:1px solid var(--line);border-radius:6px;padding:8px 10px;margin:4px 0;background:#fff;font-size:13px}
+.src.hit{background:#FFE7C2}
+.zone{min-height:80px;border:2px dashed var(--line);border-radius:8px;padding:6px;margin-top:4px}
+.chip{display:inline-block;padding:2px 7px;border-radius:4px;font-size:11.5px;font-weight:700}
+.chip.y{background:#E6F2E6;color:#1d5c1d} .chip.n{background:#FBE6E6;color:#A33}
+.steprow{display:grid;grid-template-columns:28px 1fr 170px 60px 60px 60px;gap:6px;align-items:center;margin:4px 0;font-size:13px}
+.steprow .hd{font-weight:700;font-size:12px;color:#555}
+</style></head>
+<body>
+<header><div><span class="title">UNIV198 · AI Literacy · Lecture 13</span><br>AI agents and AI-assisted workflows</div>
+<div class="small">Companion page · <b>From Chat to Agents</b><br>Use ← → or the buttons below</div></header>
+<main>
+<section class="slide">
+<h1>One Task, Four Ways: The Ladder</h1>
+<p class="lead">The task, all lecture long: <i>prepare next week's seminar for my study group: find three recent readings on our topic, summarise each in five lines, make a one-page handout, and send it to the group.</i> Click a rung to see who does what.</p>
+<div class="grid g5" id="rungs" style="grid-template-columns:repeat(5,1fr);gap:8px"></div>
+<div class="card" id="rungOut" style="margin-top:8px;min-height:120px"><p class="small muted">Click a rung.</p></div>
+<div class="take"><b>Same model underneath, often the same app.</b> What changes from left to right is who decides the steps and who executes them. Conventional automation stands beside the ladder, not on it: no model, a rule written once, exact and brittle.</div>
+</section>
+<section class="slide">
+<h1>The Ladder in One Table, and Four Systems to Place</h1>
+<table class="small" style="width:100%">
+<tr><th></th><th>Who decides the steps</th><th>Who executes</th><th>Acts outside the chat?</th><th>Fails by</th><th>You check</th></tr>
+<tr><td><b>Conventional automation</b></td><td>a programmer, once</td><td>software, exactly</td><td><span class="chip y">yes, exactly</span></td><td>a rule that did not foresee the case</td><td>the rule, once</td></tr>
+<tr><td><b>Conversational AI</b></td><td>you, turn by turn</td><td>you</td><td><span class="chip n">no</span></td><td>invented specifics, smoothing</td><td>every answer</td></tr>
+<tr><td><b>Tool-augmented model</b></td><td>you, turn by turn</td><td>the app, on request</td><td>one call at a time</td><td>a wrong call; a misread result</td><td>the result of each call</td></tr>
+<tr><td><b>AI-assisted workflow</b></td><td>a designer, in advance</td><td>software, model, you</td><td>at scripted points</td><td>a step that did not fit; bad content in a right step</td><td>the checkpoints</td></tr>
+<tr><td><b>Agent</b></td><td><b>the model, at run time</b></td><td>the model, via tools</td><td><span class="chip y">as far as permitted</span></td><td>a wrong route; compounding errors; acting on bad input</td><td>the log, and the permissions first</td></tr>
+</table>
+<h2>Pause: where would you put these?</h2>
+<p class="small">Pick a rung for each, then check one at a time or all four.</p>
+<div id="pause"></div>
+<div class="row"><button class="primary" id="pauseAll">Check all four</button><span class="small muted" id="pauseOut"></span></div>
+<div class="take"><b>Two confusions to avoid.</b> Automation is not an agent: a rule that forwards every invoice decides nothing. A chatbot with a search button is not an agent either: it runs one tool when you ask. The word is earned by the loop.</div>
+</section>
+<section class="slide">
+<h1>Activity 1: Chat, Tool, Workflow, Automation or Agent?</h1>
+<p class="lead">Five minutes, on the Google Form. Eight systems; pick the rung for each. Ask one question of each: <b>who chooses the next step</b>: a rule, you, a designer in advance, or the model at run time? Do the form first, then check here, one item or all eight.</p>
+<div id="sys"></div>
+<div class="row"><button class="primary" id="sysAll">Check all eight</button><button id="sysReset">Reset</button><span class="small muted" id="sysOut"></span></div>
+<div class="take"><b>For the form:</b> the eight rungs; for two of them, the one word that decided it (rule, text, one call, fixed, loop); and one line on the hardest. Item 6 is the trap: the product calls itself an agent.</div>
+</section>
+<section class="slide">
+<h1>What the Room Usually Finds, and What Comes Next</h1>
+<div class="grid g3">
+ <div class="card green"><h3>The ends are easy</h3><p class="small">The spreadsheet rule and the apartment search are placed by nearly everyone. Rules and loops are recognisable.</p></div>
+ <div class="card orange"><h3>The middle blurs</h3><p class="small">Tool-augmented or workflow? The test is who chose the sequence: you, now, or someone, earlier. Half the room swaps them once.</p></div>
+ <div class="card red"><h3>“Agent” is over-used</h3><p class="small">Item 6 says “agent” in its marketing and reads one document. The word in the product name is not the rung.</p></div>
+</div>
+<div class="take" style="margin-top:12px"><b>The lesson:</b> before you trust, or fear, a system that calls itself an agent, find the loop. If there is none, it is a tool or a script, and you already know how to check those.</div>
+<div class="card" style="margin-top:12px"><h3>Companion page 02</h3><p class="small" style="margin:0">Inside an agent: the loop step by step, the recorded research run (the demo's fallback, with every citation checkable), the compounding-error calculator, the decomposition builder for Activity 2, the delegation sorter, and the take-home record sheet.</p></div>
+</section>
+</main>
+<footer><div class="dots" id="dots"></div><div class="nav"><button id="prev">←</button> <span id="counter"></span> <button id="next">→</button></div></footer>
+<script>
+(function(){
+  const slides=[...document.querySelectorAll('.slide')];
+  let i=0;
+  const counter=document.getElementById('counter'), dots=document.getElementById('dots');
+  slides.forEach((s,k)=>{const d=document.createElement('span'); d.onclick=()=>go(k); dots.appendChild(d);});
+  function go(n){ i=Math.max(0,Math.min(slides.length-1,n));
+    slides.forEach((s,k)=>s.classList.toggle('on',k===i));
+    [...dots.children].forEach((d,k)=>d.classList.toggle('on',k===i));
+    counter.textContent=(i+1)+' / '+slides.length;
+    document.getElementById('prev').disabled=i===0; document.getElementById('next').disabled=i===slides.length-1;
+    try{location.hash='s'+(i+1);}catch(e){}
+  }
+  document.getElementById('prev').onclick=()=>go(i-1);
+  document.getElementById('next').onclick=()=>go(i+1);
+  document.addEventListener('keydown',e=>{ if(e.target.tagName==='TEXTAREA'||e.target.tagName==='INPUT')return;
+    if(e.key==='ArrowRight'||e.key==='PageDown'||e.key===' '){e.preventDefault();go(i+1);}
+    if(e.key==='ArrowLeft'||e.key==='PageUp'){e.preventDefault();go(i-1);}
+    if(e.key==='Home')go(0); if(e.key==='End')go(slides.length-1);});
+  const m=(location.hash||'').match(/s(\d+)/); go(m?parseInt(m[1])-1:0);
+  window.goSlide=go;
+})();
+
+
+document.querySelectorAll('.ccard').forEach(d=>{const cb=d.querySelector('.cbtn'), pr=d.querySelector('.prompt'), sb=d.querySelector('.sbtn');
+ cb.onclick=async()=>{try{await navigator.clipboard.writeText(pr.textContent); cb.textContent='Copied'; setTimeout(()=>cb.textContent='Copy',1500);}catch(e){cb.textContent='Select and copy';}};
+ if(sb){const ans=sb.nextElementSibling; sb.onclick=()=>{const h=ans.classList.toggle('hide'); sb.textContent=h?'Show a sample answer':'Hide the sample answer';};}});
+
+(function(){ // slide 1: rungs
+ const R=[['auto','Conventional automation','A booking page, a macro, a forwarding rule. No model. <b>Seminar task:</b> nothing here can find readings or summarise; a rule could send the same reminder every week, exactly, and nothing else.','A programmer, once','Software, exactly','Exact and brittle: a rule that did not foresee the case.'],
+  ['chat','Conversational AI','Weeks 3 to 7. Your words and files in, text out; nothing happens outside the chat. <b>Seminar task:</b> a plausible summary of three readings it may be inventing (Lecture 8). The handout and the email are yours.','You, turn by turn','You','Invented specifics, smoothing; every answer needs checking.'],
+  ['tool','Tool-augmented model','The model can ask the app to run something: a web search, a calculator, a code interpreter, a file reader. The result comes back into the window as text. <b>Seminar task:</b> “search for three 2025 papers on X” returns real papers with links; “make a chart of their sample sizes” runs code. Still one step per turn, chosen by you.','You, turn by turn','The app, on request','A wrong call; a misread result.'],
+  ['wf','AI-assisted workflow','A fixed sequence designed by a person in advance; some steps call a model, some call ordinary software, some wait for a human. <b>Seminar task:</b> every week, the same day: search (tool), summarise (model), fill the template (software), <b>pause for your approval</b>, send (software). Predictable, inspectable, cheap to check.','A designer, in advance','Software, model, you','A step that did not fit the case; bad content in a right step.'],
+  ['agent','Agent','Given a goal, the model decides the next step, calls a tool, reads the result, decides again, until it judges the goal met or it is stuck. <b>Seminar task:</b> “prepare the seminar”: it searches, finds two readings, decides to search again with other words, drafts, formats, then (if allowed) sends. Or asks first. Autonomy is a dial: how many steps before it reports back, and what it may touch.','The model, at run time','The model, via tools','A wrong route; compounding errors; acting on bad input.']];
+ const box=document.getElementById('rungs'), out=document.getElementById('rungOut');
+ R.forEach((r,i)=>{const d=document.createElement('div'); d.className='rung'; d.innerHTML='<b>'+r[1]+'</b>'+(i===0?'<br><span class="small muted">beside the ladder</span>':'<br><span class="small muted">rung '+i+'</span>'); d.onclick=()=>{[...box.children].forEach(c=>c.classList.remove('sel')); d.classList.add('sel'); out.innerHTML='<h3 style="margin:0 0 6px">'+r[1]+'</h3><p class="small">'+r[2]+'</p><div class="grid g3"><div class="small"><b>Who decides the steps:</b> '+r[3]+'</div><div class="small"><b>Who executes:</b> '+r[4]+'</div><div class="small"><b>Fails by:</b> '+r[5]+'</div></div>';}; box.appendChild(d);});
+})();
+(function(){ // slide 2: pause four
+ const P=[['A. The library\'s booking page: you pick a room and a slot; it checks the rules (three members, 6 hours a week) and confirms or refuses.','auto','No model anywhere. Exact, brittle, right 100% of the time about the rules it was given.'],
+  ['B. “Deep Research” in Gemini: you type a question; it shows a plan, searches for ten minutes across dozens of pages, writes a cited report.','agent','Plans, acts, observes, revises, reports. Read-only by design.'],
+  ['C. Copilot with a spreadsheet attached: “which month had the highest sales?” It writes and runs a short program over the sheet and answers.','tool','One tool call, chosen because you asked. The next step is yours again.'],
+  ['D. A clinic\'s referral pipeline: every referral letter is read by a model, the key fields go into the system, and a nurse approves each one before it is filed.','wf','Fixed steps, a model inside one of them, a person at the checkpoint. The one most organisations actually run.']];
+ const RUNGS={"auto": "Conventional automation", "chat": "Conversational AI", "tool": "Tool-augmented model", "wf": "AI-assisted workflow", "agent": "Agent"}; const box=document.getElementById('pause'); const sel={};
+ P.forEach((p,i)=>{const d=document.createElement('div'); d.className='card'; d.style.marginBottom='6px'; d.innerHTML='<p class="small" style="margin:0 0 6px">'+p[0]+'</p>'; const row=document.createElement('div'); row.className='row'; const s=document.createElement('select'); s.innerHTML='<option value="">rung…</option>'+Object.entries(RUNGS).map(([k,v])=>'<option value="'+k+'">'+v+'</option>').join(''); s.onchange=()=>sel[i]=s.value; const b=document.createElement('button'); b.textContent='Check'; const r=document.createElement('span'); r.className='small'; r.id='pr'+i; b.onclick=()=>chk(i); row.append(s,b,r); d.appendChild(row); box.appendChild(d);});
+ function chk(i){const r=document.getElementById('pr'+i); if(!sel[i]){r.innerHTML='<span class="muted">Pick a rung.</span>';return false;} const ok=sel[i]===P[i][1]; r.innerHTML=(ok?'<b style="color:#1d5c1d">Yes.</b> ':'<b style="color:var(--red)">No: '+RUNGS[P[i][1]]+'.</b> ')+P[i][2]; return ok;}
+ document.getElementById('pauseAll').onclick=()=>{let n=0; P.forEach((p,i)=>{if(chk(i))n++;}); document.getElementById('pauseOut').textContent=n+' of 4 right.';};
+})();
+(function(){ // slide 3: eight systems
+ const SYS=[["A spreadsheet rule that colours every cell red when a budget line goes over its limit.", "auto", "rule", "No model, no choice: a rule written once, applied exactly. Automation."], ["You ask a chatbot to explain the difference between mean and median; it writes three paragraphs.", "chat", "text", "Text in, text out; nothing happens outside the chat. Conversational AI."], ["You attach a CSV and ask \u201cwhich month had the most returns?\u201d; the assistant writes and runs a small program and answers.", "tool", "one call", "One tool call, because you asked; the next step is yours. Tool-augmented."], ["Every evening a script collects the day\u2019s support tickets, a model sorts them into four categories, and a manager reviews the list before anything is assigned.", "wf", "fixed", "Fixed steps designed in advance; a model inside one of them; a person at the checkpoint. AI-assisted workflow."], ["You type \u201cfind me three apartments near campus under 20,000 TL, compare them, and shortlist two\u201d; it searches several sites, opens listings, discards some, searches again with a smaller radius, and presents a shortlist.", "agent", "loop", "It chose the steps as it went, observed results and revised its search. Agent."], ["A travel assistant app, marketed as an \u201cAI agent\u201d, that answers questions about your itinerary from the booking confirmation you forwarded.", "tool", "one call", "It reads one document and answers: retrieval, one call per question. The word in the name is not the rung. Tool-augmented."], ["A coding assistant that, given \u201cfix the failing test\u201d, edits files, runs the tests, reads the errors, edits again, and opens a pull request for review.", "agent", "loop", "Edit, run, read, edit again: the loop, with a human review before merge. Agent."], ["A university form that automatically rejects applications with a missing document and emails the applicant a standard list of what is missing.", "auto", "rule", "A rule and a template; nothing is judged. Automation (and a good example of why rules are brittle: a renamed file is \u201cmissing\u201d)."]], RUNGS={"auto": "Conventional automation", "chat": "Conversational AI", "tool": "Tool-augmented model", "wf": "AI-assisted workflow", "agent": "Agent"}; const box=document.getElementById('sys'); const sel={};
+ SYS.forEach((q,i)=>{const d=document.createElement('div'); d.className='card'; d.style.marginBottom='6px'; d.innerHTML='<p class="small" style="margin:0 0 6px"><span class="num">'+(i+1)+'</span>'+q[0]+'</p>'; const row=document.createElement('div'); row.className='row'; const s=document.createElement('select'); s.innerHTML='<option value="">rung…</option>'+Object.entries(RUNGS).map(([k,v])=>'<option value="'+k+'">'+v+'</option>').join(''); s.onchange=()=>sel[i]=s.value; const b=document.createElement('button'); b.textContent='Check'; const r=document.createElement('span'); r.className='small'; r.id='sr'+i; r.style.flex='1'; b.onclick=()=>chk(i); row.append(s,b,r); d.appendChild(row); box.appendChild(d);});
+ function chk(i){const r=document.getElementById('sr'+i); if(!sel[i]){r.innerHTML='<span class="muted">Pick a rung.</span>';return false;} const ok=sel[i]===SYS[i][1]; r.innerHTML=(ok?'<b style="color:#1d5c1d">Yes</b> (the word: '+SYS[i][2]+'). ':'<b style="color:var(--red)">No: '+RUNGS[SYS[i][1]]+'</b> (the word: '+SYS[i][2]+'). ')+SYS[i][3]; return ok;}
+ document.getElementById('sysAll').onclick=()=>{let n=0; SYS.forEach((q,i)=>{if(chk(i))n++;}); document.getElementById('sysOut').textContent=n+' of 8 right.';};
+ document.getElementById('sysReset').onclick=()=>{box.querySelectorAll('select').forEach(s=>s.value=''); Object.keys(sel).forEach(k=>delete sel[k]); SYS.forEach((q,i)=>document.getElementById('sr'+i).textContent=''); document.getElementById('sysOut').textContent='';};
+})();
+
+</script>
+</body></html>

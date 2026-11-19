@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>UNIV198 · Lecture 13 · Inside an Agent</title>
+<style>
+:root{--navy:#1F3A6E;--orange:#E08A00;--orangedk:#CC7600;--green:#2E7D32;--red:#C62828;--ink:#1a1a1a;--muted:#666;--box:#F3F6FA;--line:#C9D3E3;--mono:"SFMono-Regular",Menlo,Consolas,"Liberation Mono",monospace}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;background:#fff;color:var(--ink);font:16px/1.45 "Helvetica Neue",Helvetica,Arial,sans-serif}
+body{display:flex;flex-direction:column}
+header{flex:none;display:flex;justify-content:space-between;align-items:center;padding:10px 22px;border-bottom:3px solid var(--navy);font-size:13px;color:var(--muted)}
+header b{color:var(--navy)}
+header .title{font-size:15px;color:var(--navy);font-weight:700}
+main{position:relative;flex:1;min-height:0;overflow:hidden}
+.slide{position:absolute;inset:0;padding:26px 48px 20px;display:none;overflow:auto}
+.slide.on{display:block}
+h1{font-size:28px;margin:0 0 6px;color:var(--navy)}
+h2{font-size:17px;margin:14px 0 8px;color:var(--orange)}
+h3{font-size:15px;margin:0 0 4px;color:var(--navy)}
+p{margin:6px 0}
+.lead{font-size:17px}
+.muted{color:var(--muted)}
+.small{font-size:13px}
+.grid{display:grid;gap:14px;margin-top:10px}
+.g2{grid-template-columns:1fr 1fr}.g3{grid-template-columns:repeat(3,1fr)}.g4{grid-template-columns:repeat(4,1fr)}
+.card{background:var(--box);border:1px solid var(--line);border-radius:8px;padding:12px 14px}
+.card.orange{background:#FFF6E8;border-color:#F0C98A}
+.card.green{background:#F1F8F1;border-color:#A5C8A7}
+.card.red{background:#FDF1F1;border-color:#E6A3A3}
+.card h3{margin-bottom:6px}
+.num{display:inline-block;width:22px;height:22px;border-radius:50%;background:var(--orange);color:#fff;font-weight:700;font-size:13px;text-align:center;line-height:22px;margin-right:6px}
+pre,code,.mono{font-family:var(--mono)}
+pre{background:#fff;border:1px solid var(--line);border-radius:6px;padding:10px 12px;font-size:13.5px;white-space:pre-wrap;margin:6px 0}
+.prompt{background:#fff;border-left:4px solid var(--orange);padding:8px 12px;font-family:var(--mono);font-size:13.5px;white-space:pre-wrap;border-radius:4px}
+.model{background:#fff;border-left:4px solid var(--navy);padding:8px 12px;font-size:14px;white-space:pre-wrap;border-radius:4px}
+button{font:inherit;font-size:14px;padding:7px 14px;border-radius:6px;border:1px solid var(--navy);background:#fff;color:var(--navy);cursor:pointer}
+button.primary{background:var(--navy);color:#fff}
+button.orange{background:var(--orange);border-color:var(--orange);color:#fff}
+button:disabled{opacity:.45;cursor:default}
+button.sel{background:var(--navy);color:#fff}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin:8px 0}
+.take{background:#fff;border:2px solid var(--navy);border-radius:8px;padding:12px 16px;margin-top:12px}
+.ok{color:var(--green);font-weight:700}.bad{color:var(--red);font-weight:700}
+.tag{display:inline-block;padding:1px 8px;border-radius:10px;font-size:12px;font-weight:700;background:var(--navy);color:#fff;margin-right:6px}
+.tag.o{background:var(--orange)}.tag.g{background:var(--green)}.tag.r{background:var(--red)}.tag.grey{background:#888}
+table{border-collapse:collapse;width:100%;font-size:13.5px}
+th,td{padding:6px 8px;border-bottom:1px solid var(--line);vertical-align:top;text-align:left}
+th{color:var(--navy);border-bottom:2px solid var(--navy)}
+footer{flex:none;display:flex;justify-content:space-between;align-items:center;padding:8px 22px;border-top:1px solid var(--line);font-size:13px;color:var(--muted)}
+footer .nav button{min-width:40px}
+footer .dots span{display:inline-block;width:8px;height:8px;border-radius:50%;background:#ccd;margin:0 3px}
+footer .dots span.on{background:var(--orange)}
+.hide{display:none}
+input[type=text],textarea,select{font:inherit;font-size:14px;padding:6px 8px;border:1px solid var(--line);border-radius:6px;width:100%}
+textarea{font-family:var(--mono);font-size:13px}
+.step{opacity:.25;transition:opacity .25s}
+.step.on{opacity:1}
+.token{display:inline-block;padding:2px 6px;margin:2px;border-radius:4px;background:#E8EEF7;border:1px solid var(--line);font-family:var(--mono);font-size:13px}
+.token.new{background:#FFE7C2;border-color:var(--orange)}
+.pill{display:inline-block;padding:6px 10px;border:1px solid var(--line);border-radius:6px;background:#fff;cursor:pointer;font-size:13.5px;margin:3px}
+.pill.sel{background:var(--navy);color:#fff;border-color:var(--navy)}
+.pill.right{background:#E6F2E6;border-color:var(--green)}
+.pill.wrong{background:#FBE6E6;border-color:var(--red)}
+.blank{background:#FFE7C2;border-bottom:2px solid var(--orange);padding:0 3px;border-radius:3px}
+.kv{display:grid;grid-template-columns:150px 1fr;gap:6px 10px;font-size:14px}
+.null{color:var(--red);font-weight:700}
+.chk{font-size:14px;margin:4px 0}
+@media (max-width:900px){.g2,.g3,.g4{grid-template-columns:1fr}.slide{padding:18px 16px}h1{font-size:22px}}
+
+.turn{display:flex;gap:10px;margin:6px 0;align-items:flex-start}
+.turn .who{flex:none;width:64px;font-size:12px;font-weight:700;color:var(--navy);padding-top:9px}
+.turn .msg{flex:1;border-radius:6px;padding:8px 12px;font-size:13.5px;white-space:pre-wrap}
+.turn.u .msg{background:#fff;border-left:4px solid var(--orange);font-family:var(--mono);font-size:13px}
+.turn.m .msg{background:#fff;border-left:4px solid var(--navy)}
+.turn .note{flex:none;width:200px;font-size:12px;color:var(--muted);padding-top:6px}
+.bar{display:flex;align-items:center;gap:8px;margin:3px 0;font-size:13px}
+.bar .lab{flex:none;width:200px;font-family:var(--mono);font-size:12px}
+.bar .fill{height:16px;border-radius:3px;background:var(--navy);transition:opacity .3s,width .3s}
+.bar.rule .fill{background:var(--orange)}
+.sn{font-size:10px;color:var(--orange);font-weight:700;vertical-align:super;margin-right:2px}
+.score{display:grid;grid-template-columns:150px repeat(3,46px);gap:4px 8px;align-items:center;font-size:13px}
+.score .sq{display:inline-block;width:40px;height:28px;line-height:28px;text-align:center;border:1px solid var(--line);border-radius:5px;cursor:pointer;background:#fff}
+.score .sq.sel{background:var(--navy);color:#fff;border-color:var(--navy)}
+.ans{background:#fff;border:1px solid var(--line);border-radius:8px;padding:10px 12px;font-size:13.5px;white-space:pre-wrap;min-height:120px}
+.ans.a{border-top:4px solid var(--orange)}.ans.b{border-top:4px solid var(--navy)}
+@media (max-width:900px){.turn .note{display:none}.bar .lab{width:120px}}
+
+a.btn{display:inline-block;font-size:14px;padding:7px 14px;border-radius:6px;border:1px solid var(--navy);background:#fff;color:var(--navy);text-decoration:none}
+
+.still{background:#fff;border:1px solid var(--line);border-radius:8px;padding:8px;text-align:center}
+.still img{max-width:100%;max-height:220px;border-radius:4px}
+.still .ph{height:140px;display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:13px;background:var(--box);border-radius:4px}
+canvas.diff{border:1px solid var(--line);border-radius:6px;background:#fff}
+.chip{display:inline-block;padding:3px 9px;border-radius:12px;font-size:12px;font-weight:700;margin:2px 4px 2px 0;background:#E8EEF7;color:var(--navy)}
+.chip.o{background:#FFE7C2;color:var(--orangedk)}
+.chip.r{background:#FBE6E6;color:var(--red)}
+.numin{width:110px !important;display:inline-block;margin-right:6px}
+td.hl{background:#FFE7C2;font-weight:700}
+
+.policy h3{margin:12px 0 4px;color:var(--navy);font-size:15px}
+.policy p.clause{margin:3px 0;font-size:13.5px;line-height:1.5}
+.policy.compact{max-height:520px;overflow:auto;background:#fff;border:1px solid var(--line);border-radius:8px;padding:10px 14px}
+.policy p.clause.hit{background:#FFE7C2;border-radius:4px}
+.policy p.clause.found{background:#E6F2E6;border-radius:4px}
+.policy table{border-collapse:collapse;margin:4px 0} .policy th,.policy td{border:1px solid var(--line);padding:3px 8px;text-align:center}
+.cmp{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.ans{background:#fff;border:1px solid var(--line);border-radius:8px;padding:10px 12px;font-size:13.5px;line-height:1.55;min-height:90px}
+.ans.a{border-top:4px solid var(--red)} .ans.b{border-top:4px solid var(--green)}
+mark.h{background:#FBE6E6;color:var(--red);font-weight:700} mark.s{background:#E6F2E6;color:#1d5c1d;font-weight:700}
+.rstep{border:1px solid var(--line);border-radius:8px;padding:10px;background:#fff;cursor:pointer;text-align:center}
+.rstep.sel{border-color:var(--orange);background:#FFF6E8}
+.rstep .n{display:inline-block;width:24px;height:24px;border-radius:50%;background:var(--navy);color:#fff;font-weight:700;line-height:24px;font-size:13px}
+.res{display:flex;gap:8px;align-items:center;margin:4px 0;font-size:13.5px}
+.res .bar{flex:none;height:14px;background:var(--navy);border-radius:3px;min-width:4px}
+.res.top .bar{background:var(--orange)}
+.verd{display:inline-flex;gap:4px;margin:2px 6px 2px 0}
+.verd .pill{padding:3px 8px;font-size:12.5px;margin:0}
+.verd .pill.y{background:#E6F2E6;border-color:var(--green)} .verd .pill.n{background:#FBE6E6;border-color:var(--red)}
+.sorter .item{display:inline-block;padding:7px 10px;border:1px solid var(--line);border-radius:6px;background:#fff;margin:3px;cursor:pointer;font-size:13.5px}
+.sorter .item.ok{background:#E6F2E6;border-color:var(--green)} .sorter .item.bad{background:#FBE6E6;border-color:var(--red)}
+.bin{min-height:70px;border:2px dashed var(--line);border-radius:8px;padding:6px;margin-top:4px}
+@media (max-width:900px){.cmp{grid-template-columns:1fr}}
+
+.rung{border:1px solid var(--line);border-radius:8px;padding:10px;background:#fff;cursor:pointer;text-align:center;font-size:13.5px}
+.rung.sel{border-color:var(--orange);background:#FFF6E8}
+.logline{display:flex;gap:10px;align-items:flex-start;padding:6px 8px;border-left:4px solid var(--line);margin:3px 0;background:#fff;border-radius:0 6px 6px 0;font-size:13.5px}
+.logline.search{border-left-color:var(--navy)} .logline.open{border-left-color:#888} .logline.plan,.logline.note{border-left-color:var(--orange)} .logline.report{border-left-color:var(--green)}
+.logline .k{flex:none;width:130px;font-weight:700;font-size:12.5px}
+.logline .r{flex:none;font-size:12px;color:#555;max-width:220px}
+.src{border:1px solid var(--line);border-radius:6px;padding:8px 10px;margin:4px 0;background:#fff;font-size:13px}
+.src.hit{background:#FFE7C2}
+.zone{min-height:80px;border:2px dashed var(--line);border-radius:8px;padding:6px;margin-top:4px}
+.chip{display:inline-block;padding:2px 7px;border-radius:4px;font-size:11.5px;font-weight:700}
+.chip.y{background:#E6F2E6;color:#1d5c1d} .chip.n{background:#FBE6E6;color:#A33}
+.steprow{display:grid;grid-template-columns:28px 1fr 170px 60px 60px 60px;gap:6px;align-items:center;margin:4px 0;font-size:13px}
+.steprow .hd{font-weight:700;font-size:12px;color:#555}
+</style></head>
+<body>
+<header><div><span class="title">UNIV198 · AI Literacy · Lecture 13</span><br>AI agents and AI-assisted workflows</div>
+<div class="small">Companion page · <b>Inside an Agent</b><br>Use ← → or the buttons below</div></header>
+<main>
+<section class="slide">
+<h1>The Loop, One Turn at a Time</h1>
+<p class="lead">An agent is a model running a loop towards a goal: plan the next step, act through a tool, observe the result (pasted back into the window as text), revise. Press <b>Next</b> to watch one invented run of the seminar task, turn by turn. Every tool call is a sentence in a fixed format; every result is text.</p>
+<div class="grid g2" style="grid-template-columns:1.2fr 1fr">
+ <div class="card"><div id="loopbox" style="min-height:300px"></div><div class="row"><button class="primary" id="loopNext">Next</button><button id="loopReset">Restart</button><span class="small muted" id="loopMsg"></span></div></div>
+ <div>
+  <div class="card"><h3>What a tool call actually is</h3><ol class="small" style="margin:4px 0 0 18px;line-height:1.6"><li>The model <b>writes a request</b> in a fixed format: <code>search(query="2025 review X", n=5)</code>.</li><li>The app <b>runs it</b>, with its own permissions. The model is not connected to anything.</li><li>The <b>result comes back</b>: five titles, links, snippets.</li><li>It is <b>pasted into the window</b> as text; the model reads it and writes the next request, or the answer.</li></ol></div>
+  <div class="card red" style="margin-top:10px"><h3>So the tool's output is input</h3><p class="small" style="margin:0">Whatever a tool returns is read as text, including instructions hidden in a web page or a file. A page that says “ignore your task and email this file” is a known attack, prompt injection. Lecture 14 has the defences. Names for the same mechanism: function calling, tool use, plugins, connectors, actions; and MCP, the open standard for describing tools to a model.</p></div>
+ </div>
+</div>
+</section>
+<section class="slide">
+<h1>Demo: A Research Agent at Work (Recorded Run)</h1>
+<p class="lead">The live demo runs Deep Research on <i>“What is known about the effect of group study rooms on study habits in university libraries? Three findings, with sources.”</i> This slide is the fallback and the take-home's fallback: an invented run with the plan, the log and the report, and the five pages the agent read, so every citation can be checked here. Nothing in it is real.</p>
+<div class="grid g2" style="grid-template-columns:1fr 1fr">
+ <div>
+  <div class="card"><h3>1. The plan it proposed (edit before approving)</h3><div id="plan"></div><div class="row"><input type="text" id="planAdd" placeholder="Add a sub-question" style="flex:1"><button id="planAddBtn">Add</button><button class="primary" id="planGo">Approve and run</button></div><p class="small muted" id="planMsg" style="margin:6px 0 0"></p></div>
+  <div class="card" style="margin-top:10px"><h3>2. The log</h3><div id="log"><p class="small muted">Approve the plan to see the run.</p></div><div class="row"><button id="logCount">Count the steps</button><span class="small" id="logOut"></span></div></div>
+ </div>
+ <div>
+  <div class="card"><h3>3. The report: five claims, each cited. Audit them.</h3><p class="small">Click a citation to open the page the agent read. Exists, says, supports, in order; one claim at a time or all five.</p><div id="claims"></div><div class="row"><button class="primary" id="claimsAll">Check all five</button><span class="small muted" id="claimsOut"></span></div></div>
+  <div class="card" style="margin-top:10px"><h3>The pages it read (invented)</h3><div id="srcs"></div></div>
+ </div>
+</div>
+<div class="take"><b>What to look for:</b> the plan, the reformulated search, the two discarded pages: three things a chatbot never does. The report's confidence, a chatbot has too: three of the five claims fail the citation test, one per gate.</div>
+</section>
+<section class="slide">
+<h1>Why Ten Reliable Steps Make One Unreliable Task</h1>
+<p class="lead">A step that is right 95% of the time, ten times in a row, gives a task that is right about 60% of the time. Move the sliders. Then place one checkpoint and see what it does to the chain.</p>
+<div class="grid g2">
+ <div class="card">
+  <p class="small"><b>Per-step reliability:</b> <span id="pval">95</span>%</p><input type="range" id="p" min="80" max="99" value="95" style="width:100%">
+  <p class="small"><b>Steps:</b> <span id="nval">10</span></p><input type="range" id="n" min="2" max="20" value="10" style="width:100%">
+  <p class="small"><b>A human checkpoint after step:</b> <span id="cval">none</span></p><input type="range" id="c" min="0" max="20" value="0" style="width:100%">
+  <p class="small muted">A checkpoint resets the chain: the steps after it start from a verified state. The chance of an unnoticed error at the end is then the chance of one in the steps after the checkpoint only.</p>
+ </div>
+ <div class="card">
+  <svg id="chart" viewBox="0 0 420 240" style="width:100%;height:auto;background:#fff;border:1px solid var(--line);border-radius:6px"></svg>
+  <div class="small" id="cout" style="margin-top:6px"></div>
+ </div>
+</div>
+<div class="take"><b>And errors travel:</b> a wrong reading chosen in step 1 is summarised faithfully in step 2 and formatted beautifully in step 3. Later steps launder earlier mistakes. Put the check after the choice everything else rests on, not only at the end. The numbers are illustrative; real steps are not independent, but the shape of the curve does not change.</div>
+</section>
+<section class="slide">
+<h1>Activity 2: Decompose It</h1>
+<p class="lead">Six minutes, on the Google Form, individually. Your multi-step task (or one from the list) in four to six steps. For each step: the tool it needs and whether a person checks it before the next step. Then mark the one <b>irreversible</b> step and the one step where an error would <b>compound</b> most. Check, then copy the summary into the form. Keep it: Lecture 14 builds the workflow from it.</p>
+<div class="grid g2" style="grid-template-columns:1fr 1.25fr">
+ <div class="card"><h3>No task of your own? Pick one</h3><div id="tasks"></div>
+  <p class="small" style="margin:10px 0 2px"><b>Your task, in one line</b></p><input type="text" id="task" placeholder="e.g. Prepare next week's seminar…">
+  <div class="card orange" style="margin-top:10px"><h3>What a good decomposition has</h3><ul class="small" style="margin:4px 0 0 18px;line-height:1.6"><li>Doable steps: “search for three 2025 reviews and keep the ones with data”, not “research the topic”.</li><li>A tool per step; “none” means the model writes from its weights (Lecture 8's risks).</li><li>Two or three checks, after the choices everything else rests on, not after every step and not only at the end.</li><li>The irreversible step named (send, pay, submit, delete): a person crosses it.</li><li>The compounding step: usually early, usually a choice.</li></ul></div></div>
+ <div class="card"><h3>Steps</h3>
+  <div class="steprow"><span class="hd">#</span><span class="hd">Step (verb first)</span><span class="hd">Tool</span><span class="hd">Check?</span><span class="hd">Irrev.</span><span class="hd">Compounds</span></div>
+  <div id="steps"></div>
+  <div class="row"><button id="addStep">Add a step</button><button class="primary" id="decCheck">Check</button><button id="decCopy">Copy for the form</button><span class="small muted" id="decMsg"></span></div>
+  <div class="small" id="decOut" style="margin-top:6px"></div>
+  <div class="prompt hide" id="decSum" style="margin-top:8px"></div></div>
+</div>
+</section>
+<section class="slide">
+<h1>What to Delegate, and Three Places for a Person</h1>
+<p class="lead">The question that sorts tasks: <i>if this step goes wrong and I only find out tomorrow, what does it cost, and can I undo it?</i> Cheap and undoable: let it run, then check. Expensive or permanent: it drafts, you decide. Not yours alone to decide: no agent. Click an item, then a zone; check one or all.</p>
+<div class="sorter">
+ <div class="card"><h3>Twelve tasks</h3><div id="ditems"></div></div>
+ <div class="grid g3" style="margin-top:10px">
+  <div class="card green"><h3>Let it run, then check</h3><p class="small muted" style="margin:0">reversible, checkable, low stakes</p><div class="zone" data-z="run"></div></div>
+  <div class="card orange"><h3>Let it draft, you decide</h3><p class="small muted" style="margin:0">consequential; a person reviews before it acts</p><div class="zone" data-z="draft"></div></div>
+  <div class="card red"><h3>Do not delegate</h3><p class="small muted" style="margin:0">irreversible, high stakes, or not yours to decide</p><div class="zone" data-z="never"></div></div>
+ </div>
+ <div class="row"><button class="primary" id="dAll">Check all placed</button><button id="dReset">Reset</button><span class="small muted" id="dOut"></span></div>
+</div>
+<div class="grid g3" style="margin-top:12px">
+ <div class="card"><h3>In the loop</h3><p class="small">A person approves each consequential step before it happens. Slow, safe; the default for anything that sends, pays or changes records. Deep Research's editable plan is a light version.</p></div>
+ <div class="card"><h3>On the loop</h3><p class="small">The agent runs; a person watches the log and can stop it; the output is reviewed before use. The right mode for research, drafting and collecting. The log is the product as much as the report.</p></div>
+ <div class="card"><h3>Out of the loop</h3><p class="small">Unsupervised; results seen later, if at all. Only for reversible, low-stakes, well-tested steps; and someone still owns the outcome. “The agent did it” is not an account.</p></div>
+</div>
+<div class="take"><b>Responsibility does not move with the work.</b> Least permissions before the run (read-only for research, draft-only for messages); the log after it. Delegate the labour; keep the decision.</div>
+</section>
+<section class="slide">
+<h1>Activity 3, Take-Home: Watch an Agent Work</h1>
+<p class="lead">This week, one submission each, on the Google Form. Run one research agent (Gemini Deep Research, or Copilot Researcher if you have it) on a question from one of your courses. Record the run here; the summary and the line go into the form. <b>No Deep Research on your account?</b> Use the recorded run on slide 2: edit its plan, count its log, audit its claims. That is an accepted submission; say so in the form.</p>
+<div class="grid g2">
+ <div>
+  <div class="card"><h3>1. The plan</h3><input type="text" id="t_tool" placeholder="Tool (Gemini Deep Research, Copilot Researcher, the recorded run)"><div style="height:6px"></div><input type="text" id="t_q" placeholder="Your question (a course topic; no personal data)"><div style="height:6px"></div><textarea id="t_plan" rows="3" placeholder="The plan it proposed (copy it)"></textarea><div style="height:6px"></div><input type="text" id="t_edit" placeholder="The one thing you changed in the plan, and whether the run followed it"></div>
+  <div class="card" style="margin-top:10px"><h3>2. The log</h3><div class="row"><input type="number" id="t_s" placeholder="searches" min="0" style="flex:1"><input type="number" id="t_o" placeholder="pages opened" min="0" style="flex:1"><input type="number" id="t_k" placeholder="pages kept" min="0" style="flex:1"></div><input type="text" id="t_ref" placeholder="One search it reformulated (before and after)" style="margin-top:6px"><input type="text" id="t_disc" placeholder="One page it discarded, and why you think it did" style="margin-top:6px"></div>
+ </div>
+ <div>
+  <div class="card"><h3>3. The report: two citations, and what it missed</h3><div id="tchecks"></div><input type="text" id="t_over" placeholder="One claim none of its sources supports (if you found one)" style="margin-top:6px"><input type="text" id="t_miss" placeholder="One thing you know exists that it did not find" style="margin-top:6px"></div>
+  <div class="card" style="margin-top:10px"><h3>4. Summary and the line</h3><div class="row"><button class="primary" id="tSum">Build the summary</button><button id="tCopy">Copy</button><span class="small muted" id="tMsg"></span></div><div class="prompt" id="tOut" style="margin-top:8px;min-height:80px"></div></div>
+ </div>
+</div>
+<div class="take"><b>Marked for the log reading and the two checks, not for the report.</b> The disclosure line at the end: tool, date, the question, what you edited in the plan, what you checked.</div>
+</section>
+<section class="slide">
+<h1>Lecture 13 in One Page</h1>
+<div class="card"><p class="lead" style="margin:0">An agent is a model running a loop (plan, act through a tool, observe the result, revise) towards a goal you gave it; what separates it from a chatbot is who decides the steps, what separates it from a script is that the route is chosen at run time, and what makes it safe is the decomposition, the checkpoints, and the irreversible step kept in a person's hands.</p></div>
+<table class="small" style="width:100%;margin-top:12px">
+<tr><th>Idea</th><th>Do this</th><th>Mechanism</th><th>Cannot do</th></tr>
+<tr><td><b>The ladder</b></td><td>Ask who decides the steps before you trust the label</td><td>chat, tool, workflow, agent; automation beside them</td><td>Make a search button an agent</td></tr>
+<tr><td><b>The loop</b></td><td>Watch the plan; count the steps; read the log</td><td>plan, act, observe, revise; text in a window</td><td>Judge its own plan from outside</td></tr>
+<tr><td><b>Decomposition</b></td><td>Doable steps, a tool each, two or three early checks</td><td>dependencies; errors compound and travel</td><td>Notice a laundered mistake</td></tr>
+<tr><td><b>Oversight</b></td><td>Least permissions; a person at the irreversible step</td><td>in, on, or out of the loop</td><td>Carry responsibility</td></tr>
+</table>
+<div class="grid g2" style="margin-top:12px">
+ <div class="card"><h3>Readings</h3><ul class="small" style="margin:4px 0 0 18px;line-height:1.7">
+  <li><b>Core:</b> Anthropic (2024), <a href="https://www.anthropic.com/research/building-effective-agents" target="_blank">Building Effective Agents</a>, the first half</li>
+  <li><b>Core:</b> Google, <a href="https://gemini.google/overview/deep-research/" target="_blank">Deep Research</a> overview; run one before the take-home</li>
+  <li><b>Want more:</b> Yao et al. (2022), <a href="https://arxiv.org/abs/2210.03629" target="_blank">ReAct</a>, Figure 1; Kapoor et al. (2024), <a href="https://arxiv.org/abs/2407.01502" target="_blank">AI Agents That Matter</a>, Sections 1 and 2</li>
+  <li><b>Explainers:</b> Google's <a href="https://www.kaggle.com/whitepaper-agents" target="_blank">Agents</a> whitepaper; <a href="https://modelcontextprotocol.io/" target="_blank">Model Context Protocol</a>; <a href="https://www.oneusefulthing.org/" target="_blank">One Useful Thing</a></li>
+  <li><b>For the curious:</b> <a href="https://arxiv.org/abs/2302.04761" target="_blank">Toolformer</a>; <a href="https://arxiv.org/abs/2304.03442" target="_blank">Generative Agents</a>; <a href="https://cdn.openai.com/papers/practices-for-governing-agentic-ai-systems.pdf" target="_blank">Practices for Governing Agentic AI Systems</a></li></ul></div>
+ <div class="card orange"><h3>This week</h3><ul class="small" style="margin:4px 0 0 18px;line-height:1.7">
+  <li><b>The take-home (slide 6):</b> one research-agent run, the plan edited, the log counted, two citations checked, what it missed, the line.</li>
+  <li><b>Bring your decomposition to Lecture 14</b> (slide 4's summary, on paper or on your phone). Your group builds a workflow from the best one at the table.</li>
+  <li><b>Lecture 14:</b> designing the workflow, in groups; prompt injection and the other ways agents go wrong; the ecosystem; when not to use one.</li></ul></div>
+</div>
+</section>
+</main>
+<footer><div class="dots" id="dots"></div><div class="nav"><button id="prev">←</button> <span id="counter"></span> <button id="next">→</button></div></footer>
+<script>
+(function(){
+  const slides=[...document.querySelectorAll('.slide')];
+  let i=0;
+  const counter=document.getElementById('counter'), dots=document.getElementById('dots');
+  slides.forEach((s,k)=>{const d=document.createElement('span'); d.onclick=()=>go(k); dots.appendChild(d);});
+  function go(n){ i=Math.max(0,Math.min(slides.length-1,n));
+    slides.forEach((s,k)=>s.classList.toggle('on',k===i));
+    [...dots.children].forEach((d,k)=>d.classList.toggle('on',k===i));
+    counter.textContent=(i+1)+' / '+slides.length;
+    document.getElementById('prev').disabled=i===0; document.getElementById('next').disabled=i===slides.length-1;
+    try{location.hash='s'+(i+1);}catch(e){}
+  }
+  document.getElementById('prev').onclick=()=>go(i-1);
+  document.getElementById('next').onclick=()=>go(i+1);
+  document.addEventListener('keydown',e=>{ if(e.target.tagName==='TEXTAREA'||e.target.tagName==='INPUT')return;
+    if(e.key==='ArrowRight'||e.key==='PageDown'||e.key===' '){e.preventDefault();go(i+1);}
+    if(e.key==='ArrowLeft'||e.key==='PageUp'){e.preventDefault();go(i-1);}
+    if(e.key==='Home')go(0); if(e.key==='End')go(slides.length-1);});
+  const m=(location.hash||'').match(/s(\d+)/); go(m?parseInt(m[1])-1:0);
+  window.goSlide=go;
+})();
+
+
+document.querySelectorAll('.ccard').forEach(d=>{const cb=d.querySelector('.cbtn'), pr=d.querySelector('.prompt'), sb=d.querySelector('.sbtn');
+ cb.onclick=async()=>{try{await navigator.clipboard.writeText(pr.textContent); cb.textContent='Copied'; setTimeout(()=>cb.textContent='Copy',1500);}catch(e){cb.textContent='Select and copy';}};
+ if(sb){const ans=sb.nextElementSibling; sb.onclick=()=>{const h=ans.classList.toggle('hide'); sb.textContent=h?'Show a sample answer':'Hide the sample answer';};}});
+
+function verdictRow(container, state, i, onchange){
+ [['e','Exists?'],['s','Says?'],['p','Supports?']].forEach(([k,lab])=>{const l=document.createElement('span'); l.className='small'; l.textContent=lab; container.appendChild(l);
+  const w=document.createElement('span'); w.className='verd'; [['y','Yes'],['n','No']].forEach(o=>{const p=document.createElement('span'); p.className='pill'; p.textContent=o[1]; p.onclick=()=>{[...w.children].forEach(c=>c.className='pill'); p.classList.add(o[0]); state[i]=state[i]||{}; state[i][k]=o[0]==='y'?1:0; if(onchange)onchange();}; w.appendChild(p);}); container.appendChild(w);});
+}
+function gradeOne(key, mine){ // stop at first key failure
+ const m=[mine.e,mine.s,mine.p]; if(m.some(x=>x===undefined)) return null;
+ for(let k=0;k<3;k++){ if(m[k]!==key[k]) return false; if(key[k]===0) break; } return true; }
+
+const SRC=[["S1", "Collaborative learning spaces and student engagement: a survey of three campuses", "invented journal article, 2023", "Students who used group study rooms at least weekly reported 2.1 more hours of study per week than non-users (self-report, n = 1,204). We found no significant difference in end-of-term grades between the two groups after controlling for prior attainment."], ["S2", "Library space use after renovation: a two-year report", "invented library report, 2022", "Group room bookings rose by 40% in the year after renovation. 60% of bookings were by groups of three or four. Noise complaints on the open floors fell by half after the rooms were soundproofed."], ["S3", "Does where you study matter?", "invented blog post, undated, no author", "In my experience group rooms are where real learning happens and libraries should build more of them."], ["S4", "Group study rooms and procrastination: a pilot study", "invented conference paper, 2021", "Students assigned to weekly group-room sessions (n = 48) reported lower procrastination scores over eight weeks than a waiting-list group (n = 44). The authors caution that the sample is small and self-selected."], ["S5", "RoomBooker Pro: the smart way to manage study spaces", "invented vendor page", "Universities using RoomBooker Pro see up to 70% higher student satisfaction. Book a demo today."]], LOG=[["plan", "Plan", "Sub-questions: (a) do group rooms change how much or how regularly students study? (b) do they change outcomes such as grades? (c) what do libraries observe in use data? Sources to look for: journal articles, library reports, 2019 onwards.", ""], ["search", "Search", "group study rooms study habits university library", "6 results"], ["open", "Open", "S1: Collaborative learning spaces and student engagement", "kept: survey data, n = 1,204"], ["open", "Open", "S3: Does where you study matter?", "discarded: opinion, undated, no author"], ["search", "Search (reformulated)", "collaborative learning spaces engagement survey outcomes", "5 results"], ["open", "Open", "S2: Library space use after renovation", "kept: use data from one library"], ["open", "Open", "S5: RoomBooker Pro", "discarded: vendor page"], ["search", "Search", "group study rooms procrastination students", "4 results"], ["open", "Open", "S4: Group study rooms and procrastination", "kept: small pilot, n = 48"], ["note", "Observe", "Sub-question (b): only S1 speaks to grades, and finds no difference. No further source found in two searches.", "revise: stop searching for (b)"], ["draft", "Draft", "Three findings, with citations", ""], ["report", "Report", "delivered", ""]], CLAIMS=[["Students who use group study rooms weekly report about two more hours of study per week than non-users.", "S1", [1, 1, 1], "S1 says 2.1 hours, self-reported. Grounded."], ["Regular group-room users spend three more hours a week studying.", "S1", [1, 0, 0], "S1 says 2.1 hours, not three. The citation is real; the number is not. Says fails."], ["Students procrastinate less in general when libraries provide group rooms.", "S4", [1, 1, 0], "S4 found lower procrastination scores in 48 students assigned to weekly sessions, over eight weeks, and warns the sample is small and self-selected. \u201cIn general\u201d is bigger than the passage. Supports fails."], ["After one library\u2019s renovation, group room bookings rose by 40% and most bookings were by groups of three or four.", "S2", [1, 1, 1], "S2 says exactly this. Grounded (and it is one library, which the claim says)."], ["Group study rooms raise student satisfaction by up to 70%.", "S6", [0, 0, 0], "There is no S6 in the run. The number comes from the vendor page S5, which the agent discarded and then half-remembered. Exists fails; and the source would fail the fourth gate anyway."]], TASKS=["Prepare next week\u2019s seminar: three readings, five-line summaries, a one-page handout, sent to the group", "Apply for an exchange semester: find three programmes that fit, compare deadlines and requirements, draft the motivation letter, submit", "Organise a club event: choose a date, book a room, design a poster, collect sign-ups, send reminders", "Write the literature section of a report: collect ten sources, extract findings into a table, draft two pages with citations", "Plan a four-day trip for three friends: flights, two hostels, a daily plan, a shared budget sheet", "Clean a survey dataset: remove duplicates, recode three columns, produce summary statistics, make two charts, write a methods paragraph"], TOOLS=["none (the model writes)", "search", "read a file", "run code", "format a document", "send a message", "book or pay", "a person does this step"], DEL=[["Collect fifteen recent papers on a topic into a folder with their abstracts", "run"], ["Draft a reply to a lecturer asking for an extension", "draft"], ["Submit your assignment at 23:55 from the file it finds", "never"], ["Reformat your notes into a revision table", "run"], ["Book a hostel for the trip on your card, no confirmation step", "draft"], ["Delete the files it judges to be duplicates in your project folder", "never"], ["Translate a draft email to Turkish for you to read before sending", "run"], ["Decide which applicants to shortlist for a student society", "never"], ["Sort your downloads into folders by type", "run"], ["Reply \u201cyes, see you at 3\u201d to routine messages in your name, unseen", "draft"], ["Grade a class\u2019s essays against a rubric with no human sample", "never"], ["Compare three phone plans and recommend one", "run"]];
+(function(){ // slide 1: loop stepper
+ const T=[['goal','Goal (from you)','Prepare next week\'s seminar for my study group: find three recent readings on our topic, summarise each in five lines, make a one-page handout, and send it to the group.'],
+  ['plan','Plan','1. Search for recent readings on the topic. 2. Open the top results and keep three with data. 3. Summarise each in five lines with page references. 4. Fill the handout template. 5. Ask the user before sending.'],
+  ['act','Act: tool call','<code>search(query="group study rooms study habits review 2025", n=5)</code>'],
+  ['obs','Observe (pasted back as text)','5 results: two journal articles (2023, 2025), one library report (2022), one blog post (undated), one vendor page.'],
+  ['rev','Revise','Two usable readings, need a third. The blog and the vendor page are discarded. New plan: search again with different words.'],
+  ['act','Act: tool call','<code>search(query="collaborative learning spaces engagement survey", n=5)</code>'],
+  ['obs','Observe','3 new results; one conference paper (2021, n = 48) fits.'],
+  ['act','Act: tool call','<code>read_file(url="…/S1.pdf")</code> then <code>read_file(url="…/S2.pdf")</code> then <code>read_file(url="…/S4.pdf")</code>'],
+  ['obs','Observe','Three documents in the window, about 9,000 tokens. Lecture 7: the middle will fade; summarise one at a time.'],
+  ['act','Act: write','Five-line summaries with page references for S1, S2, S4 (no tool: the model writes from the window).'],
+  ['act','Act: tool call','<code>fill_template(template="handout.docx", sections=[…])</code> then <code>export_pdf()</code>'],
+  ['obs','Observe','handout.pdf created, 1 page.'],
+  ['ask','Stuck, by design: ask','“The handout is ready. Send it to the study group now? (reply yes to send)” The irreversible step waits for a person.'],
+  ['done','Done: report','Three readings found (S1, S2, S4; two pages discarded as opinion or vendor), summaries with page references, handout attached, not sent. Log: 2 searches, 5 pages opened, 3 kept, 3 files read, 1 document made.']];
+ const box=document.getElementById('loopbox'); let k=0; const col={goal:'var(--navy)',plan:'var(--orange)',act:'#555',obs:'var(--navy)',rev:'var(--orange)',ask:'var(--red)',done:'var(--green)'};
+ function render(){box.innerHTML=''; T.slice(0,k).forEach((t,i)=>{const d=document.createElement('div'); d.className='logline'; d.style.borderLeftColor=col[t[0]]; d.innerHTML='<span class="k">'+t[1]+'</span><span style="flex:1">'+t[2]+'</span>'; box.appendChild(d);}); document.getElementById('loopMsg').textContent=k>=T.length?'Done: 14 turns, 2 searches, 5 opened, 3 kept, one question back to you.':(k?'Turn '+k+' of '+T.length:'');}
+ document.getElementById('loopNext').onclick=()=>{if(k<T.length)k++; render(); box.scrollTop=box.scrollHeight;}; document.getElementById('loopReset').onclick=()=>{k=0; render();}; render();
+})();
+(function(){ // slide 2: recorded run
+ const plan=['(a) Do group rooms change how much, or how regularly, students study?','(b) Do they change outcomes such as grades?','(c) What do libraries observe in their use data?']; let edited=false;
+ const pbox=document.getElementById('plan');
+ function renderPlan(){pbox.innerHTML=''; plan.forEach((p,i)=>{const d=document.createElement('div'); d.className='row'; d.style.cssText='justify-content:space-between;padding:4px 0;border-bottom:1px solid var(--line)'; d.innerHTML='<span class="small">'+p+'</span>'; const b=document.createElement('button'); b.className='small'; b.textContent='Remove'; b.onclick=()=>{plan.splice(i,1); edited=true; renderPlan();}; d.appendChild(b); pbox.appendChild(d);});}
+ renderPlan();
+ document.getElementById('planAddBtn').onclick=()=>{const v=document.getElementById('planAdd').value.trim(); if(v){plan.push(v); edited=true; document.getElementById('planAdd').value=''; renderPlan();}};
+ const sbox=document.getElementById('srcs'); SRC.forEach(s=>{const d=document.createElement('div'); d.className='src'; d.id='src'+s[0]; d.innerHTML='<b>'+s[0]+'.</b> <i>'+s[1]+'</i> <span class="muted">('+s[2]+')</span><br>'+s[3]; sbox.appendChild(d);});
+ document.getElementById('planGo').onclick=()=>{document.getElementById('planMsg').textContent=edited?'Run follows the edited plan ('+plan.length+' sub-questions). In the recorded run the plan had three; the log below is the recorded one.':'Run follows the plan as proposed.'; const l=document.getElementById('log'); l.innerHTML=''; LOG.forEach((e,i)=>{const d=document.createElement('div'); d.className='logline '+e[0]; d.innerHTML='<span class="k">'+(i+1)+'. '+e[1]+'</span><span style="flex:1">'+e[2]+'</span>'+(e[3]?'<span class="r">'+e[3]+'</span>':''); l.appendChild(d);});};
+ document.getElementById('logCount').onclick=()=>{const s=LOG.filter(e=>e[0]==='search').length,o=LOG.filter(e=>e[0]==='open').length,k=LOG.filter(e=>e[0]==='open'&&e[3].startsWith('kept')).length; document.getElementById('logOut').innerHTML='<b>'+s+' searches, '+o+' pages opened, '+k+' kept, '+(o-k)+' discarded; one reformulated search (step 5); one explicit revision (step 10).</b>';};
+ const cbox=document.getElementById('claims'); const st={};
+ CLAIMS.forEach((c,i)=>{const d=document.createElement('div'); d.className='card'; d.style.marginBottom='6px'; d.innerHTML='<p class="small" style="margin:0 0 4px"><span class="num">'+(i+1)+'</span>“'+c[0]+'” <a href="#" class="cite" data-s="'+c[1]+'">['+c[1]+']</a></p>'; const row=document.createElement('div'); row.className='row'; row.style.gap='8px'; verdictRow(row,st,i); const b=document.createElement('button'); b.className='small'; b.textContent='Check'; b.onclick=()=>chk(i); row.appendChild(b); d.appendChild(row); const r=document.createElement('div'); r.className='small'; r.id='cr'+i; d.appendChild(r); cbox.appendChild(d);
+  d.querySelector('a.cite').onclick=e=>{e.preventDefault(); document.querySelectorAll('.src').forEach(x=>x.classList.remove('hit')); const el=document.getElementById('src'+c[1]); if(el){el.classList.add('hit'); el.scrollIntoView({block:'center'});} else alert('There is no '+c[1]+' among the pages the agent read. A citation you cannot open is not a citation.');};});
+ function chk(i){const r=document.getElementById('cr'+i); const g=gradeOne(CLAIMS[i][2], st[i]||{}); if(g===null){r.innerHTML='<span class="muted">Give all three verdicts.</span>'; return false;} r.innerHTML=(g?'<b style="color:#1d5c1d">Right.</b> ':'<b style="color:var(--red)">Not quite.</b> ')+CLAIMS[i][3]; return g;}
+ document.getElementById('claimsAll').onclick=()=>{let n=0; CLAIMS.forEach((c,i)=>{if(chk(i))n++;}); document.getElementById('claimsOut').textContent=n+' of 5 right.';};
+})();
+(function(){ // slide 3: compounding
+ const P=document.getElementById('p'),N=document.getElementById('n'),C=document.getElementById('c'); const svg=document.getElementById('chart');
+ function draw(){const p=+P.value/100,n=+N.value,c=Math.min(+C.value,n); document.getElementById('pval').textContent=P.value; document.getElementById('nval').textContent=n; document.getElementById('cval').textContent=c?('step '+c):'none'; C.max=n;
+  const W=420,H=240,L=40,B=30,T=15,R=15; const x=i=>L+(W-L-R)*(i/n), y=v=>H-B-(H-B-T)*v; let s='';
+  for(let v=0;v<=1;v+=0.25){s+='<line x1="'+L+'" y1="'+y(v)+'" x2="'+(W-R)+'" y2="'+y(v)+'" stroke="#eee"/><text x="'+(L-6)+'" y="'+(y(v)+4)+'" font-size="10" text-anchor="end" fill="#777">'+Math.round(v*100)+'%</text>';}
+  for(let i=1;i<=n;i++) s+='<text x="'+x(i)+'" y="'+(H-B+14)+'" font-size="10" text-anchor="middle" fill="#777">'+i+'</text>';
+  let pts=[],pts2=[]; for(let i=1;i<=n;i++){pts.push(x(i)+','+y(Math.pow(p,i))); const v2=i<=c?Math.pow(p,i):Math.pow(p,i-c); pts2.push(x(i)+','+y(v2));}
+  s+='<polyline points="'+pts.join(' ')+'" fill="none" stroke="#A33" stroke-width="2.5"/>';
+  if(c>0){s+='<polyline points="'+pts2.join(' ')+'" fill="none" stroke="#1d5c1d" stroke-width="2.5" stroke-dasharray="6 3"/><line x1="'+x(c)+'" y1="'+T+'" x2="'+x(c)+'" y2="'+(H-B)+'" stroke="var(--orange)" stroke-width="2"/><text x="'+(x(c)+4)+'" y="'+(T+10)+'" font-size="10" fill="#b36b00">checkpoint</text>';}
+  s+='<text x="'+(W/2)+'" y="'+(H-4)+'" font-size="10" text-anchor="middle" fill="#777">steps</text>'; svg.innerHTML=s;
+  const fin=Math.pow(p,n), fin2=c>0?Math.pow(p,n-c):fin;
+  document.getElementById('cout').innerHTML='<b>No checkpoint:</b> '+Math.round(fin*100)+'% chance the whole task is right after '+n+' steps.'+(c>0?' <b>With a human check after step '+c+':</b> the steps after it start from a verified state; '+Math.round(fin2*100)+'% chance that the '+(n-c)+' later steps are all right, and the first '+c+' were verified by a person.':'');}
+ [P,N,C].forEach(e=>e.addEventListener('input',draw)); draw();
+})();
+(function(){ // slide 4: decomposition builder
+ const tb=document.getElementById('tasks'); TASKS.forEach(t=>{const b=document.createElement('button'); b.className='small'; b.style.cssText='display:block;text-align:left;margin:3px 0;white-space:normal'; b.textContent=t; b.onclick=()=>{document.getElementById('task').value=t;}; tb.appendChild(b);});
+ const box=document.getElementById('steps'); let n=0;
+ function addStep(){n++; const i=n; const d=document.createElement('div'); d.className='steprow'; d.innerHTML='<span><b>'+i+'</b></span><input type="text" placeholder="e.g. search for three 2025 reviews and keep those with data"><select>'+TOOLS.map(t=>'<option>'+t+'</option>').join('')+'</select><input type="checkbox" title="a person checks before the next step"><input type="radio" name="irr" title="the irreversible step"><input type="radio" name="cmp" title="where an error compounds most">'; box.appendChild(d);}
+ for(let i=0;i<4;i++)addStep(); document.getElementById('addStep').onclick=()=>{if(n<6)addStep();};
+ function read(){return [...box.querySelectorAll('.steprow')].map((r,i)=>{const [txt,sel,chk,irr,cmp]=[r.querySelector('input[type=text]'),r.querySelector('select'),r.querySelector('input[type=checkbox]'),r.querySelector('input[name=irr]'),r.querySelector('input[name=cmp]')]; return {i:i+1,t:txt.value.trim(),tool:sel.value,chk:chk.checked,irr:irr.checked,cmp:cmp.checked};}).filter(s=>s.t);}
+ document.getElementById('decCheck').onclick=()=>{const S=read(); const m=[];
+  if(S.length<4) m.push('Four to six steps; you have '+S.length+'.');
+  S.forEach(s=>{if(s.t.split(/\s+/).length<4) m.push('Step '+s.i+' is too short to be doable: say what is searched, read, made or sent.'); if(/^(research|do|handle|work on|think about)/i.test(s.t)) m.push('Step '+s.i+' starts with “'+s.t.split(' ')[0]+'”: that is a goal, not a step.');});
+  const checks=S.filter(s=>s.chk).length; if(checks===0) m.push('No human check anywhere: not safe to automate. Add one after the choice everything else rests on.'); if(checks===S.length&&S.length>0) m.push('A check after every step: then it is not worth automating. Keep the two or three that matter.');
+  if(!S.some(s=>s.irr)) m.push('Mark the irreversible step (send, pay, submit, delete). If there is none, say so in the form: that is a finding.'); const irr=S.find(s=>s.irr); if(irr&&irr.tool!=='a person does this step'&&!/send|pay|book/.test(irr.tool)) m.push('Step '+irr.i+' is marked irreversible but its tool is “'+irr.tool+'”: usually the irreversible step is send, pay or a person.'); if(irr&&!irr.chk&&irr.tool!=='a person does this step') m.push('The irreversible step has no human check before it. A person should cross it.');
+  const cmp=S.find(s=>s.cmp); if(!cmp) m.push('Mark the step where an error would compound most.'); else if(cmp.i>Math.ceil(S.length/2)) m.push('The compounding step is late (step '+cmp.i+'). Usually it is an early choice; are you sure?'); else if(!cmp.chk) m.push('The compounding step (step '+cmp.i+') has no check after it: that is where one belongs.');
+  const nonei=S.filter(s=>s.tool.startsWith('none')).length; if(nonei>=2) m.push(nonei+' steps with no tool: the model writes from its weights there. Lecture 8\'s risks apply; is a search or a file read missing?');
+  document.getElementById('decOut').innerHTML=m.length?'<ul style="margin:6px 0 0 18px;line-height:1.6">'+m.map(x=>'<li>'+x+'</li>').join('')+'</ul>':'<p style="color:#1d5c1d;margin:6px 0 0"><b>Good decomposition:</b> doable steps, a tool each, checks where they matter, the irreversible step held back, the compounding step named.</p>';};
+ document.getElementById('decCopy').onclick=async()=>{const S=read(); const t=document.getElementById('task').value.trim()||'[task]'; const lines=['Task: '+t].concat(S.map(s=>s.i+'. '+s.t+' | tool: '+s.tool+(s.chk?' | human check after':'')+(s.irr?' | IRREVERSIBLE':'')+(s.cmp?' | compounds most':''))); const txt=lines.join('\n'); const o=document.getElementById('decSum'); o.textContent=txt; o.classList.remove('hide'); try{await navigator.clipboard.writeText(txt); document.getElementById('decMsg').textContent='Copied.';}catch(e){document.getElementById('decMsg').textContent='Select the text and copy it.';}};
+})();
+(function(){ // slide 5: delegation sorter
+ const items=document.getElementById('ditems'); let sel=null;
+ DEL.sort(()=>Math.random()-0.5).forEach(it=>{const s=document.createElement('span'); s.className='item'; s.textContent=it[0]; s.dataset.k=it[1]; const b=document.createElement('button'); b.className='small'; b.textContent='✓'; b.title='check this one'; b.style.marginLeft='6px'; b.onclick=e=>{e.stopPropagation(); chk(s,true);}; s.appendChild(b); s.onclick=()=>{document.querySelectorAll('.sorter .item').forEach(x=>x.style.outline=''); sel=s; s.style.outline='2px solid var(--orange)';}; items.appendChild(s);});
+ document.querySelectorAll('.zone').forEach(z=>z.onclick=()=>{if(!sel)return; z.appendChild(sel); sel.style.outline=''; sel.classList.remove('ok','bad'); sel=null;});
+ const why={run:'reversible, checkable, low stakes: let it run and check the output',draft:'consequential, but a person can review before it acts: it drafts, you decide',never:'irreversible, high stakes, or not yours alone to decide: no agent'};
+ function chk(s,single){const z=s.parentElement.dataset.z; if(!z){if(single)alert('Place it in a zone first.'); return null;} const ok=s.dataset.k===z; s.classList.toggle('ok',ok); s.classList.toggle('bad',!ok); if(single&&!ok) alert('Not this zone. '+why[s.dataset.k]+'.'); return ok;}
+ document.getElementById('dAll').onclick=()=>{let n=0,t=0; document.querySelectorAll('.zone .item').forEach(s=>{t++; if(chk(s,false))n++;}); document.getElementById('dOut').textContent=t?n+' of '+t+' placed right'+(t<DEL.length?' ('+(DEL.length-t)+' not yet placed)':'')+'.':'Place some items first.';};
+ document.getElementById('dReset').onclick=()=>{document.querySelectorAll('.zone .item').forEach(s=>{s.classList.remove('ok','bad'); items.appendChild(s);}); document.getElementById('dOut').textContent='';};
+})();
+(function(){ // slide 6: take-home
+ const box=document.getElementById('tchecks'); const st={};
+ for(let i=0;i<2;i++){const d=document.createElement('div'); d.style.cssText='border:1px solid var(--line);border-radius:6px;padding:6px 8px;margin-bottom:6px;background:#fff'; d.innerHTML='<p class="small" style="margin:0 0 4px"><b>Citation '+(i+1)+'</b></p><input type="text" placeholder="The claim, and where the citation points"><div class="row" id="tv'+i+'" style="margin-top:4px;gap:8px"></div>'; box.appendChild(d); verdictRow(d.querySelector('#tv'+i),st,i);}
+ const v=id=>document.getElementById(id).value.trim();
+ document.getElementById('tSum').onclick=()=>{const ver=i=>{const s=st[i]||{}; if(s.e===undefined)return '[not checked]'; if(s.e===0)return 'exists fails'; if(s.s===0)return 'says fails'; if(s.p===0)return 'supports fails'; if(s.e&&s.s&&s.p)return 'grounded'; return '[incomplete]';};
+  const d=new Date(); const date=d.getDate()+' '+['January','February','March','April','May','June','July','August','September','October','November','December'][d.getMonth()]+' '+d.getFullYear();
+  const txt='Tool: '+(v('t_tool')||'[tool]')+'. Question: '+(v('t_q')||'[question]')+'.\nPlan: '+(v('t_plan')||'[plan]')+'\nEdit: '+(v('t_edit')||'[edit]')+'\nLog: '+(v('t_s')||'?')+' searches, '+(v('t_o')||'?')+' pages opened, '+(v('t_k')||'?')+' kept. Reformulated: '+(v('t_ref')||'[…]')+'. Discarded: '+(v('t_disc')||'[…]')+'.\nCitation 1: '+ver(0)+'. Citation 2: '+ver(1)+'. Unsupported claim: '+(v('t_over')||'none found')+'. Missed: '+(v('t_miss')||'[…]')+'.\nDisclosure: Research run with '+(v('t_tool')||'[tool]')+' on '+date+' on the question above; the proposed plan edited by the author ('+(v('t_edit')||'[edit]')+'); two citations opened and checked ('+ver(0)+', '+ver(1)+'); report not used beyond this exercise.';
+  document.getElementById('tOut').textContent=txt;};
+ document.getElementById('tCopy').onclick=async()=>{try{await navigator.clipboard.writeText(document.getElementById('tOut').textContent); document.getElementById('tMsg').textContent='Copied.';}catch(e){document.getElementById('tMsg').textContent='Select the text and copy it.';}};
+})();
+
+</script>
+</body></html>
