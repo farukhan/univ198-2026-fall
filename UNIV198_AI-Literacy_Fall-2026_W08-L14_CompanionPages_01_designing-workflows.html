@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>UNIV198 · Lecture 14 · Designing Workflows</title>
+<style>
+:root{--navy:#1F3A6E;--orange:#E08A00;--orangedk:#CC7600;--green:#2E7D32;--red:#C62828;--ink:#1a1a1a;--muted:#666;--box:#F3F6FA;--line:#C9D3E3;--mono:"SFMono-Regular",Menlo,Consolas,"Liberation Mono",monospace}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;background:#fff;color:var(--ink);font:16px/1.45 "Helvetica Neue",Helvetica,Arial,sans-serif}
+body{display:flex;flex-direction:column}
+header{flex:none;display:flex;justify-content:space-between;align-items:center;padding:10px 22px;border-bottom:3px solid var(--navy);font-size:13px;color:var(--muted)}
+header b{color:var(--navy)}
+header .title{font-size:15px;color:var(--navy);font-weight:700}
+main{position:relative;flex:1;min-height:0;overflow:hidden}
+.slide{position:absolute;inset:0;padding:26px 48px 20px;display:none;overflow:auto}
+.slide.on{display:block}
+h1{font-size:28px;margin:0 0 6px;color:var(--navy)}
+h2{font-size:17px;margin:14px 0 8px;color:var(--orange)}
+h3{font-size:15px;margin:0 0 4px;color:var(--navy)}
+p{margin:6px 0}
+.lead{font-size:17px}
+.muted{color:var(--muted)}
+.small{font-size:13px}
+.grid{display:grid;gap:14px;margin-top:10px}
+.g2{grid-template-columns:1fr 1fr}.g3{grid-template-columns:repeat(3,1fr)}.g4{grid-template-columns:repeat(4,1fr)}
+.card{background:var(--box);border:1px solid var(--line);border-radius:8px;padding:12px 14px}
+.card.orange{background:#FFF6E8;border-color:#F0C98A}
+.card.green{background:#F1F8F1;border-color:#A5C8A7}
+.card.red{background:#FDF1F1;border-color:#E6A3A3}
+.card h3{margin-bottom:6px}
+.num{display:inline-block;width:22px;height:22px;border-radius:50%;background:var(--orange);color:#fff;font-weight:700;font-size:13px;text-align:center;line-height:22px;margin-right:6px}
+pre,code,.mono{font-family:var(--mono)}
+pre{background:#fff;border:1px solid var(--line);border-radius:6px;padding:10px 12px;font-size:13.5px;white-space:pre-wrap;margin:6px 0}
+.prompt{background:#fff;border-left:4px solid var(--orange);padding:8px 12px;font-family:var(--mono);font-size:13.5px;white-space:pre-wrap;border-radius:4px}
+.model{background:#fff;border-left:4px solid var(--navy);padding:8px 12px;font-size:14px;white-space:pre-wrap;border-radius:4px}
+button{font:inherit;font-size:14px;padding:7px 14px;border-radius:6px;border:1px solid var(--navy);background:#fff;color:var(--navy);cursor:pointer}
+button.primary{background:var(--navy);color:#fff}
+button.orange{background:var(--orange);border-color:var(--orange);color:#fff}
+button:disabled{opacity:.45;cursor:default}
+button.sel{background:var(--navy);color:#fff}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin:8px 0}
+.take{background:#fff;border:2px solid var(--navy);border-radius:8px;padding:12px 16px;margin-top:12px}
+.ok{color:var(--green);font-weight:700}.bad{color:var(--red);font-weight:700}
+.tag{display:inline-block;padding:1px 8px;border-radius:10px;font-size:12px;font-weight:700;background:var(--navy);color:#fff;margin-right:6px}
+.tag.o{background:var(--orange)}.tag.g{background:var(--green)}.tag.r{background:var(--red)}.tag.grey{background:#888}
+table{border-collapse:collapse;width:100%;font-size:13.5px}
+th,td{padding:6px 8px;border-bottom:1px solid var(--line);vertical-align:top;text-align:left}
+th{color:var(--navy);border-bottom:2px solid var(--navy)}
+footer{flex:none;display:flex;justify-content:space-between;align-items:center;padding:8px 22px;border-top:1px solid var(--line);font-size:13px;color:var(--muted)}
+footer .nav button{min-width:40px}
+footer .dots span{display:inline-block;width:8px;height:8px;border-radius:50%;background:#ccd;margin:0 3px}
+footer .dots span.on{background:var(--orange)}
+.hide{display:none}
+input[type=text],textarea,select{font:inherit;font-size:14px;padding:6px 8px;border:1px solid var(--line);border-radius:6px;width:100%}
+textarea{font-family:var(--mono);font-size:13px}
+.step{opacity:.25;transition:opacity .25s}
+.step.on{opacity:1}
+.token{display:inline-block;padding:2px 6px;margin:2px;border-radius:4px;background:#E8EEF7;border:1px solid var(--line);font-family:var(--mono);font-size:13px}
+.token.new{background:#FFE7C2;border-color:var(--orange)}
+.pill{display:inline-block;padding:6px 10px;border:1px solid var(--line);border-radius:6px;background:#fff;cursor:pointer;font-size:13.5px;margin:3px}
+.pill.sel{background:var(--navy);color:#fff;border-color:var(--navy)}
+.pill.right{background:#E6F2E6;border-color:var(--green)}
+.pill.wrong{background:#FBE6E6;border-color:var(--red)}
+.blank{background:#FFE7C2;border-bottom:2px solid var(--orange);padding:0 3px;border-radius:3px}
+.kv{display:grid;grid-template-columns:150px 1fr;gap:6px 10px;font-size:14px}
+.null{color:var(--red);font-weight:700}
+.chk{font-size:14px;margin:4px 0}
+@media (max-width:900px){.g2,.g3,.g4{grid-template-columns:1fr}.slide{padding:18px 16px}h1{font-size:22px}}
+
+.turn{display:flex;gap:10px;margin:6px 0;align-items:flex-start}
+.turn .who{flex:none;width:64px;font-size:12px;font-weight:700;color:var(--navy);padding-top:9px}
+.turn .msg{flex:1;border-radius:6px;padding:8px 12px;font-size:13.5px;white-space:pre-wrap}
+.turn.u .msg{background:#fff;border-left:4px solid var(--orange);font-family:var(--mono);font-size:13px}
+.turn.m .msg{background:#fff;border-left:4px solid var(--navy)}
+.turn .note{flex:none;width:200px;font-size:12px;color:var(--muted);padding-top:6px}
+.bar{display:flex;align-items:center;gap:8px;margin:3px 0;font-size:13px}
+.bar .lab{flex:none;width:200px;font-family:var(--mono);font-size:12px}
+.bar .fill{height:16px;border-radius:3px;background:var(--navy);transition:opacity .3s,width .3s}
+.bar.rule .fill{background:var(--orange)}
+.sn{font-size:10px;color:var(--orange);font-weight:700;vertical-align:super;margin-right:2px}
+.score{display:grid;grid-template-columns:150px repeat(3,46px);gap:4px 8px;align-items:center;font-size:13px}
+.score .sq{display:inline-block;width:40px;height:28px;line-height:28px;text-align:center;border:1px solid var(--line);border-radius:5px;cursor:pointer;background:#fff}
+.score .sq.sel{background:var(--navy);color:#fff;border-color:var(--navy)}
+.ans{background:#fff;border:1px solid var(--line);border-radius:8px;padding:10px 12px;font-size:13.5px;white-space:pre-wrap;min-height:120px}
+.ans.a{border-top:4px solid var(--orange)}.ans.b{border-top:4px solid var(--navy)}
+@media (max-width:900px){.turn .note{display:none}.bar .lab{width:120px}}
+
+a.btn{display:inline-block;font-size:14px;padding:7px 14px;border-radius:6px;border:1px solid var(--navy);background:#fff;color:var(--navy);text-decoration:none}
+
+.still{background:#fff;border:1px solid var(--line);border-radius:8px;padding:8px;text-align:center}
+.still img{max-width:100%;max-height:220px;border-radius:4px}
+.still .ph{height:140px;display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:13px;background:var(--box);border-radius:4px}
+canvas.diff{border:1px solid var(--line);border-radius:6px;background:#fff}
+.chip{display:inline-block;padding:3px 9px;border-radius:12px;font-size:12px;font-weight:700;margin:2px 4px 2px 0;background:#E8EEF7;color:var(--navy)}
+.chip.o{background:#FFE7C2;color:var(--orangedk)}
+.chip.r{background:#FBE6E6;color:var(--red)}
+.numin{width:110px !important;display:inline-block;margin-right:6px}
+td.hl{background:#FFE7C2;font-weight:700}
+
+.policy h3{margin:12px 0 4px;color:var(--navy);font-size:15px}
+.policy p.clause{margin:3px 0;font-size:13.5px;line-height:1.5}
+.policy.compact{max-height:520px;overflow:auto;background:#fff;border:1px solid var(--line);border-radius:8px;padding:10px 14px}
+.policy p.clause.hit{background:#FFE7C2;border-radius:4px}
+.policy p.clause.found{background:#E6F2E6;border-radius:4px}
+.policy table{border-collapse:collapse;margin:4px 0} .policy th,.policy td{border:1px solid var(--line);padding:3px 8px;text-align:center}
+.cmp{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.ans{background:#fff;border:1px solid var(--line);border-radius:8px;padding:10px 12px;font-size:13.5px;line-height:1.55;min-height:90px}
+.ans.a{border-top:4px solid var(--red)} .ans.b{border-top:4px solid var(--green)}
+mark.h{background:#FBE6E6;color:var(--red);font-weight:700} mark.s{background:#E6F2E6;color:#1d5c1d;font-weight:700}
+.rstep{border:1px solid var(--line);border-radius:8px;padding:10px;background:#fff;cursor:pointer;text-align:center}
+.rstep.sel{border-color:var(--orange);background:#FFF6E8}
+.rstep .n{display:inline-block;width:24px;height:24px;border-radius:50%;background:var(--navy);color:#fff;font-weight:700;line-height:24px;font-size:13px}
+.res{display:flex;gap:8px;align-items:center;margin:4px 0;font-size:13.5px}
+.res .bar{flex:none;height:14px;background:var(--navy);border-radius:3px;min-width:4px}
+.res.top .bar{background:var(--orange)}
+.verd{display:inline-flex;gap:4px;margin:2px 6px 2px 0}
+.verd .pill{padding:3px 8px;font-size:12.5px;margin:0}
+.verd .pill.y{background:#E6F2E6;border-color:var(--green)} .verd .pill.n{background:#FBE6E6;border-color:var(--red)}
+.sorter .item{display:inline-block;padding:7px 10px;border:1px solid var(--line);border-radius:6px;background:#fff;margin:3px;cursor:pointer;font-size:13.5px}
+.sorter .item.ok{background:#E6F2E6;border-color:var(--green)} .sorter .item.bad{background:#FBE6E6;border-color:var(--red)}
+.bin{min-height:70px;border:2px dashed var(--line);border-radius:8px;padding:6px;margin-top:4px}
+@media (max-width:900px){.cmp{grid-template-columns:1fr}}
+
+.rung{border:1px solid var(--line);border-radius:8px;padding:10px;background:#fff;cursor:pointer;text-align:center;font-size:13.5px}
+.rung.sel{border-color:var(--orange);background:#FFF6E8}
+.logline{display:flex;gap:10px;align-items:flex-start;padding:6px 8px;border-left:4px solid var(--line);margin:3px 0;background:#fff;border-radius:0 6px 6px 0;font-size:13.5px}
+.logline.search{border-left-color:var(--navy)} .logline.open{border-left-color:#888} .logline.plan,.logline.note{border-left-color:var(--orange)} .logline.report{border-left-color:var(--green)}
+.logline .k{flex:none;width:130px;font-weight:700;font-size:12.5px}
+.logline .r{flex:none;font-size:12px;color:#555;max-width:220px}
+.src{border:1px solid var(--line);border-radius:6px;padding:8px 10px;margin:4px 0;background:#fff;font-size:13px}
+.src.hit{background:#FFE7C2}
+.zone{min-height:80px;border:2px dashed var(--line);border-radius:8px;padding:6px;margin-top:4px}
+.chip{display:inline-block;padding:2px 7px;border-radius:4px;font-size:11.5px;font-weight:700}
+.chip.y{background:#E6F2E6;color:#1d5c1d} .chip.n{background:#FBE6E6;color:#A33}
+.steprow{display:grid;grid-template-columns:28px 1fr 170px 60px 60px 60px;gap:6px;align-items:center;margin:4px 0;font-size:13px}
+.steprow .hd{font-weight:700;font-size:12px;color:#555}
+
+.field{border:1px solid var(--line);border-radius:8px;padding:10px;background:#fff;cursor:pointer;font-size:13.5px}
+.field.sel{border-color:var(--orange);background:#FFF6E8}
+.wcard{border:2px solid var(--navy);border-radius:10px;padding:12px 14px;background:#fff;font-size:13.5px}
+.wcard h3{margin:0 0 8px}
+.wcard .fld{display:grid;grid-template-columns:150px 1fr;gap:4px 10px;margin:3px 0}
+.wcard .fld b{color:var(--navy)}
+.stp{display:grid;grid-template-columns:26px 1fr 170px 72px 72px 1fr;gap:6px;align-items:center;margin:4px 0;font-size:13px}
+.stp .hd{font-weight:700;font-size:12px;color:#555}
+.pm{border-collapse:collapse;font-size:13px} .pm th,.pm td{border:1px solid var(--line);padding:4px 8px;text-align:center} .pm td:first-child{text-align:left;font-weight:700}
+.pm td.off{background:#FDF1F1}
+.fcheck{display:flex;gap:8px;align-items:flex-start;margin:4px 0}
+.fcheck .msg{flex:1;font-size:13px}
+.hl{background:#FFE7C2;border-radius:3px;padding:0 3px}
+.pg{background:#fff;border:1px solid var(--line);border-radius:8px;padding:10px 14px;font-size:13.5px;line-height:1.5}
+.pg .hid{display:none;color:#999;font-family:var(--mono);font-size:12.5px}
+.pg.reveal .hid{display:inline;background:#FBE6E6;color:var(--red)}
+.pline{padding:4px 8px;border-radius:5px;cursor:pointer;margin:2px 0;font-size:13.5px}
+.pline:hover{background:#F3F6FA}
+.pline.pick{background:#FFE7C2}
+.pline.right{background:#E6F2E6;border:1px solid var(--green)}
+.pline.wrong{background:#FBE6E6}
+.q{border:1px solid var(--line);border-radius:8px;padding:10px;background:#fff;margin:6px 0;font-size:13.5px}
+.q.done{background:#F1F8F1;border-color:#A5C8A7}
+.row select,.row input[type=text]{width:auto}
+.logrow input,.stp input[type=text]{width:100%}
+.logrow{display:grid;grid-template-columns:26px 1fr 110px 130px 1fr 1fr;gap:6px;align-items:center;margin:4px 0;font-size:13px}
+.logrow .hd{font-weight:700;font-size:12px;color:#555}
+.big{font-size:22px;font-weight:700;color:var(--navy)}
+</style></head>
+<body>
+<header><div><span class="title">UNIV198 · AI Literacy · Lecture 14</span><br>AI agents and AI-assisted workflows</div>
+<div class="small">Companion page · <b>Designing Workflows</b><br>Use ← → or the buttons below</div></header>
+<main>
+<section class="slide">
+<h1>The Workflow Card: Seven Fields, One Page</h1>
+<p class="lead">A workflow is a decomposition with a contract around it. Click a field to see the question it answers, what goes wrong when it is missing, and how the lecture's seminar card fills it in.</p>
+<div class="grid" style="grid-template-columns:repeat(7,1fr);gap:8px" id="fields"></div>
+<div class="card" id="fieldOut" style="margin-top:8px;min-height:110px"><p class="small muted">Click a field.</p></div>
+<h2>Four shapes a workflow takes</h2>
+<table class="small"><tr><th>Shape</th><th>What it is</th><th>Where to put the check</th><th>Example</th></tr>
+<tr><td><b>Chain</b></td><td>each step's output is the next step's input</td><td>between the steps that matter</td><td>the seminar card</td></tr>
+<tr><td><b>Route</b></td><td>a model classifies, then a fixed path per class</td><td>check the sorter on a sample</td><td>support tickets; referral letters</td></tr>
+<tr><td><b>Split and merge</b></td><td>the same step on many items in parallel, then combine</td><td>check the merge: that is where things get dropped</td><td>summarise ten papers</td></tr>
+<tr><td><b>Check and redo</b></td><td>a second model, rule or test judges the draft; the first redoes it</td><td>cap the loop; remember the judge is a model too</td><td>a draft that must meet criteria</td></tr></table>
+<div class="take"><b>The test for a card:</b> every field is a sentence, the whole thing fits on a page, and a stranger could run it from the card alone. Permissions and “done means” are written first; they reshape the steps.</div>
+</section>
+<section class="slide">
+<h1>Demo: Building a Card from a Decomposition (Recorded)</h1>
+<p class="lead">Lecture 13's decomposition of the seminar task, with the six other fields added. Two of them change the design: watch what happens to step 4 when you change <b>permissions</b> and <b>done means</b>. If the live demo is not possible, this is the demo.</p>
+<div class="grid g2">
+ <div>
+  <div class="row"><label class="small"><b>E-mail permission:</b> <select id="dPerm"><option value="send">read, write and send</option><option value="draft" selected>draft only</option><option value="none">none</option></select></label>
+  <label class="small"><b>Done means:</b> <select id="dDone"><option value="sent">the handout has been sent to the group</option><option value="draft" selected>a PDF in the folder and a draft e-mail waiting</option></select></label></div>
+  <div id="dCard" class="wcard"></div>
+ </div>
+ <div>
+  <div class="card" id="dWhy" style="min-height:120px"></div>
+  <h2>Three finished cards</h2>
+  <p class="small">The same seven fields on three tasks (all invented). Open one, or load it into the builder on the next slide.</p>
+  <div class="row" id="exBtns"></div>
+  <div class="wcard small" id="exCard"></div>
+ </div>
+</div>
+</section>
+<section class="slide">
+<h1>Activity 1: Design a Workflow (the builder)</h1>
+<p class="lead">Twelve minutes, individually, on the Google Form. Start from your Lecture 13 decomposition, or load one of the three ready ones. Fill the seven fields, press Check on each or <b>Check all</b>, then copy the card into the form. Write <b>permissions</b> and <b>done means</b> first.</p>
+<div class="row"><span class="small"><b>Start from:</b></span><button id="bBlank">my own decomposition (blank)</button><button id="bEx0">the seminar card</button><button id="bEx1">exchange application</button><button id="bEx2">club event</button><span class="small muted" id="bLoaded"></span></div>
+<div class="grid g2">
+ <div>
+  <h3>Task, in one line</h3><input type="text" id="bTask" placeholder="e.g. prepare the weekly seminar handout">
+  <h3 style="margin-top:8px">1. Trigger</h3><div class="fcheck"><input type="text" id="bTrig" placeholder="when does it start: a schedule, an event, a person saying go?"><button data-f="trig">Check</button></div><div class="msg small" id="mTrig"></div>
+  <h3 style="margin-top:8px">2. Inputs</h3><div class="fcheck"><input type="text" id="bInp" placeholder="exactly what goes in, from where, in what form"><button data-f="inp">Check</button></div><div class="msg small" id="mInp"></div>
+  <h3 style="margin-top:8px">5. Permissions (tick the least the task needs)</h3>
+  <table class="pm" id="bPerm"></table>
+  <div class="fcheck" style="margin-top:4px"><button data-f="perm">Check permissions</button><div class="msg" id="mPerm"></div></div>
+  <h3 style="margin-top:8px">6. Done means</h3><div class="fcheck"><input type="text" id="bDone" placeholder="the exact output that ends the run"><button data-f="done">Check</button></div><div class="msg small" id="mDone"></div>
+ </div>
+ <div>
+  <h3>3 and 4. Steps, tools, checkpoints, hand-offs; 7. if the step fails</h3>
+  <div class="stp"><span class="hd">#</span><span class="hd">Step (verb first)</span><span class="hd">Tool</span><span class="hd">Check after?</span><span class="hd">Hand-off?</span><span class="hd">If it fails: then what?</span></div>
+  <div id="bSteps"></div>
+  <div class="row"><button id="bAdd">+ step</button><button data-f="steps">Check steps and checkpoints</button></div><div class="msg small" id="mSteps"></div>
+  <h3 style="margin-top:8px">7. Caps (the brakes)</h3>
+  <div class="row small">at most <input type="text" id="bCapS" class="numin" placeholder="steps"> steps; <input type="text" id="bCapM" class="numin" placeholder="minutes"> minutes; retries per step <input type="text" id="bCapR" class="numin" placeholder="e.g. 2">; then stop and tell <input type="text" id="bCapW" style="width:160px" placeholder="who?"></div>
+  <div class="fcheck"><button data-f="fail">Check failure rules</button><div class="msg" id="mFail"></div></div>
+  <h3 style="margin-top:8px">Which field changed your steps, and how?</h3><input type="text" id="bChanged" placeholder="one line, for the form">
+  <div class="row" style="margin-top:10px"><button class="primary" id="bAll">Check all</button><button class="orange" id="bCopy">Copy the card as text</button><span class="small muted" id="mAll"></span></div>
+  <textarea id="bOut" rows="8" class="hide" readonly></textarea>
+ </div>
+</div>
+</section>
+<section class="slide">
+<h1>What the Room Usually Finds, and What Comes Next</h1>
+<div class="grid g3">
+ <div class="card green"><h3>Permissions rewrite the steps</h3><p class="small">Once “send” is unticked, the last step becomes a hand-off on nearly every card. The field that took thirty seconds changed the design most.</p></div>
+ <div class="card orange"><h3>“If a step fails” is left blank</h3><p class="small">Half the cards have “retry” and nothing after it. Retry forever is a loop; retry twice then stop and tell someone is a design.</p></div>
+ <div class="card red"><h3>The silent failure is a read</h3><p class="small">A search that returns one result, a file that opens empty, a page that is a login wall. The agent carries on; the card must say “stop”.</p></div>
+</div>
+<div class="take" style="margin-top:12px"><b>The lesson:</b> a workflow is designed from its edges inwards: what it may never do, what ends it, what stops it. The steps in the middle are the easy part, and the only part most people write.</div>
+<div class="card" style="margin-top:12px"><h3>Companion page 02</h3><p class="small" style="margin:0">Going wrong and oversight: the five failures with a sorter, the prompt-injection demo you can run with different permissions, the Break It card for Activity 2, the permissions and decision tools, and the take-home run sheet with the three-number calculator.</p>
+<p class="small" style="margin:6px 0 0"><a class="btn" href="https://farukhan.github.io/univ198-2026-fall/UNIV198_AI-Literacy_Fall-2026_W08-L14_CompanionPages_02_going-wrong-and-oversight.html">Open companion page 02</a></p></div>
+</section></main>
+<footer><div class="dots" id="dots"></div><div class="nav"><button id="prev">←</button> <span id="counter"></span> <button id="next">→</button></div></footer>
+<script>
+(function(){
+  const slides=[...document.querySelectorAll('.slide')];
+  let i=0;
+  const counter=document.getElementById('counter'), dots=document.getElementById('dots');
+  slides.forEach((s,k)=>{const d=document.createElement('span'); d.onclick=()=>go(k); dots.appendChild(d);});
+  function go(n){ i=Math.max(0,Math.min(slides.length-1,n));
+    slides.forEach((s,k)=>s.classList.toggle('on',k===i));
+    [...dots.children].forEach((d,k)=>d.classList.toggle('on',k===i));
+    counter.textContent=(i+1)+' / '+slides.length;
+    document.getElementById('prev').disabled=i===0; document.getElementById('next').disabled=i===slides.length-1;
+    try{location.hash='s'+(i+1);}catch(e){}
+  }
+  document.getElementById('prev').onclick=()=>go(i-1);
+  document.getElementById('next').onclick=()=>go(i+1);
+  document.addEventListener('keydown',e=>{ if(e.target.tagName==='TEXTAREA'||e.target.tagName==='INPUT')return;
+    if(e.key==='ArrowRight'||e.key==='PageDown'||e.key===' '){e.preventDefault();go(i+1);}
+    if(e.key==='ArrowLeft'||e.key==='PageUp'){e.preventDefault();go(i-1);}
+    if(e.key==='Home')go(0); if(e.key==='End')go(slides.length-1);});
+  const m=(location.hash||'').match(/s(\d+)/); go(m?parseInt(m[1])-1:0);
+  window.goSlide=go;
+})();
+
+
+
+document.querySelectorAll('.ccard').forEach(d=>{const cb=d.querySelector('.cbtn'), pr=d.querySelector('.prompt'), sb=d.querySelector('.sbtn');
+ cb.onclick=async()=>{try{await navigator.clipboard.writeText(pr.textContent); cb.textContent='Copied'; setTimeout(()=>cb.textContent='Copy',1500);}catch(e){cb.textContent='Select and copy';}};
+ if(sb){const ans=sb.nextElementSibling; sb.onclick=()=>{const h=ans.classList.toggle('hide'); sb.textContent=h?'Show a sample answer':'Hide the sample answer';};}});
+
+
+const FIELDS=[["Trigger", "When does it start: a schedule, an event, a person?", "Runs when nobody expects it, or never; a weekly task that fires on every file change.", "Every week, the same day, 09:00."], ["Inputs", "Exactly what goes in, from where, in what form?", "The agent goes looking for inputs itself, and finds the wrong ones.", "The seminar topic; the group's e-mail list; the handout template."], ["Steps and tools", "Lecture 13: doable steps, a tool each, dependencies.", "“Research it”: the plan is written at run time by the model, every time, differently.", "1 find three readings (search); 2 summarise, five lines each (read, write); 3 fill the handout (format, export); 4 send to the group (send)."], ["Checkpoints and hand-offs", "Where does a person look, and where does a person act?", "Checks only at the end; the irreversible step inside the agent's reach.", "A person approves the three readings before step 2; a person reads the handout before step 4; a person presses send, the agent only drafts."], ["Permissions", "What may it read, write, send, pay, delete? Per tool.", "It can do everything the account can; one injected instruction away from sending.", "Read the web; read and write the handout folder; no send, no pay, no delete; nothing outside the folder."], ["Done means", "What exact output ends the run?", "It stops when it feels done; or never, and the bill arrives.", "Three readings with links, a one-page PDF in the folder, a draft e-mail waiting for a person."], ["If a step fails", "Retry how many times; then what; who is told; what is logged.", "Silent failure: a confident report built on a step that returned nothing.", "Fewer than three readings after two searches: stop and report. Any step over ten minutes: stop. Log every call."]];
+const TOOLS=["none (the model writes)", "search", "read a file", "run code", "format a document", "send a message", "book or pay", "submit a form", "delete or move files", "a person does this step"];
+const IRREV=["send a message", "book or pay", "submit a form", "delete or move files"];
+const PR=["Web search and pages", "My working folder", "The rest of my files", "E-mail and messages", "Calendar, payments, accounts"];
+const PC=["Read", "Write", "Send / post", "Pay / book", "Delete"];
+const EX=[{"name": "Prepare the weekly seminar handout (the lecture example)", "trigger": "Every week, the same day, 09:00", "inputs": "The topic; the group's e-mail list; the handout template (all in the working folder)", "steps": [["Find three recent readings on the topic", "search", true, false, "Fewer than three after two searches: stop and report"], ["Summarise each reading in five lines with page references", "read a file", false, false, "A file that opens empty or is a login wall: stop and report"], ["Fill the handout template and export a one-page PDF", "format a document", true, false, "Export fails or the PDF is over one page: retry once, then stop"], ["Draft the e-mail to the group with the PDF attached; a person sends it", "send a message", false, true, "Never sends: the draft waits in the outbox"]], "perms": {"Web search and pages": [1, 0, 0, 0, 0], "My working folder": [1, 1, 0, 0, 0], "The rest of my files": [0, 0, 0, 0, 0], "E-mail and messages": [0, 1, 0, 0, 0], "Calendar, payments, accounts": [0, 0, 0, 0, 0]}, "done": "Three readings with links, a one-page PDF in the folder, a draft e-mail waiting for a person", "caps": {"steps": 12, "minutes": 10, "retries": 2}, "note": "E-mail “write” means draft only; the send cell is empty."}, {"name": "Apply for an exchange semester", "trigger": "When I say go, once; not on a schedule", "inputs": "My transcript (PDF, working folder); a list of three partner universities; the motivation-letter template", "steps": [["Find the exchange page of each of the three universities and extract deadline, language requirement and credit rules into a table", "search", true, false, "Any university with no page found after two searches: mark “unknown” and stop for that one"], ["Compare the three rows against my transcript and flag anything I do not meet", "read a file", false, false, "Transcript unreadable: stop"], ["Draft the motivation letter for the best-fitting programme from the template", "none (the model writes)", true, false, "Template missing: stop; do not invent one"], ["Submit the application on the portal; a person does this", "submit a form", false, true, "Never submits"]], "perms": {"Web search and pages": [1, 0, 0, 0, 0], "My working folder": [1, 1, 0, 0, 0], "The rest of my files": [0, 0, 0, 0, 0], "E-mail and messages": [0, 0, 0, 0, 0], "Calendar, payments, accounts": [0, 0, 0, 0, 0]}, "done": "A three-row comparison table with links, a flagged list of requirements I miss, a draft letter in the folder; nothing submitted", "caps": {"steps": 10, "minutes": 15, "retries": 2}, "note": "The checkpoint after step 1 matters most: a wrong deadline compounds into a wrong letter."}, {"name": "Organise a club event", "trigger": "When the committee sends the topic and the month", "inputs": "The shared calendar (read only); the room-booking rules page; the poster template; the members' list", "steps": [["Propose three dates in the month with no clash on the shared calendar", "read a file", true, false, "Fewer than three free dates: report the ones found and stop"], ["Draft the room-booking request for the chosen date; a person submits it", "submit a form", false, true, "Never books"], ["Design the poster from the template with the title, date and room", "format a document", true, false, "Room not yet confirmed: stop and wait"], ["Create the sign-up form and put its link on the poster", "run code", false, false, "Form creation fails: retry once, then stop"], ["Draft the reminder message to members; a person sends it", "send a message", false, true, "Never sends"]], "perms": {"Web search and pages": [1, 0, 0, 0, 0], "My working folder": [1, 1, 0, 0, 0], "The rest of my files": [0, 0, 0, 0, 0], "E-mail and messages": [0, 1, 0, 0, 0], "Calendar, payments, accounts": [1, 0, 0, 0, 0]}, "done": "Three candidate dates, a booking request draft, a poster PDF, a live sign-up form link, a draft reminder; nothing sent or booked", "caps": {"steps": 12, "minutes": 10, "retries": 1}, "note": "Two hand-offs (book, send) and the calendar is read-only."}];
+
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;');}
+function renderCard(c, opts){ opts=opts||{}; const steps=c.steps.map((s,i)=>'<div>'+(i+1)+'. '+esc(s[0])+' <span class="muted">(tool: '+esc(s[1])+(s[2]?'; <b>checkpoint after</b>':'')+(s[3]?'; <b>hand-off: a person does it</b>':'')+')</span>'+(opts.fail?'<br><span class="small muted">if it fails: '+esc(s[4])+'</span>':'')+'</div>').join('');
+ const perms=PR.map(r=>{const v=c.perms[r]||[0,0,0,0,0]; const on=PC.filter((_,j)=>v[j]); return on.length?esc(r)+': '+on.join(', ').toLowerCase():null;}).filter(Boolean).join('; ');
+ return '<h3>'+esc(c.name)+'</h3><div class="fld"><b>Trigger</b><span>'+esc(c.trigger)+'</span><b>Inputs</b><span>'+esc(c.inputs)+'</span><b>Steps and tools</b><span>'+steps+'</span><b>Permissions</b><span>'+(perms||'none')+'; <span class="muted">everything else: no</span></span><b>Done means</b><span>'+esc(c.done)+'</span><b>If a step fails</b><span>per step as above; at most '+c.caps.steps+' steps, '+c.caps.minutes+' minutes, '+c.caps.retries+' retries; then stop and report</span></div>'+(c.note?'<p class="small muted" style="margin:6px 0 0">'+esc(c.note)+'</p>':'');}
+
+(function(){ // slide 1: fields explorer
+ const box=document.getElementById('fields'), out=document.getElementById('fieldOut');
+ FIELDS.forEach((f,i)=>{const d=document.createElement('div'); d.className='field'; d.innerHTML='<span class="num">'+(i+1)+'</span><b>'+f[0]+'</b>'; d.onclick=()=>{[...box.children].forEach(c=>c.classList.remove('sel')); d.classList.add('sel'); out.innerHTML='<h3>'+f[0]+'</h3><div class="grid g3"><div class="small"><b>The question:</b> '+f[1]+'</div><div class="small"><b>When it is missing:</b> '+f[2]+'</div><div class="small"><b>Seminar card:</b> '+f[3]+'</div></div>';}; box.appendChild(d);});
+})();
+
+(function(){ // slide 2: demo
+ const perm=document.getElementById('dPerm'), done=document.getElementById('dDone'), cardEl=document.getElementById('dCard'), why=document.getElementById('dWhy');
+ function render(){ const c=JSON.parse(JSON.stringify(EX[0])); const p=perm.value, d=done.value; let w='';
+  if(p==='send'){ c.perms['E-mail and messages']=[1,1,1,0,0]; c.steps[3]=['Send the handout to the group','send a message',false,false,'Retry']; w+='<p class="small"><b style="color:var(--red)">Send allowed.</b> Step 4 is now inside the agent: the handout goes out without a person reading it, and any instruction hidden in a reading (page 02, slide 2) can make it send something else. The checkpoint before step 4 is the only brake, and it is a checkpoint people skip.</p>'; }
+  else if(p==='none'){ c.perms['E-mail and messages']=[0,0,0,0,0]; c.steps[3]=['Leave the PDF in the folder; a person writes and sends the e-mail','a person does this step',false,true,'Nothing to fail']; w+='<p class="small"><b style="color:var(--green)">No e-mail permission.</b> Safe, and the person now does more: writing the e-mail each week. Draft-only is the usual compromise: the agent prepares, the person reads and presses send.</p>'; }
+  else { w+='<p class="small"><b style="color:var(--green)">Draft only.</b> Step 4 is a hand-off: the agent writes the e-mail into the outbox, a person reads it and sends it. The injected “e-mail the documents” order fails because sending does not exist.</p>'; }
+  if(d==='sent'){ c.done='The handout has been sent to the group'; w+='<p class="small"><b style="color:var(--red)">Done means “sent”.</b> Then the run cannot end until something is sent, which means the agent must have send permission, which contradicts the row above. “Done” defines what the agent must be able to do: write it as a draft, and the irreversible step leaves the loop by definition.</p>'; }
+  else { w+='<p class="small"><b style="color:var(--green)">Done means a draft.</b> The run ends with a PDF in the folder and a draft waiting. The person\u2019s two minutes (read the handout, press send) are the product.</p>'; }
+  cardEl.innerHTML=renderCard(c,{fail:true}); why.innerHTML='<h3>What changed</h3>'+w; }
+ perm.onchange=render; done.onchange=render; render();
+ const bt=document.getElementById('exBtns'), ec=document.getElementById('exCard'); let cur=0;
+ function show(i){cur=i; [...bt.querySelectorAll('button')].forEach((b,k)=>b.classList.toggle('sel',k===i)); ec.innerHTML=renderCard(EX[i],{fail:true})+'<div class="row" style="margin-top:8px"><button class="orange" id="loadEx">Load this card into the builder</button></div>'; document.getElementById('loadEx').onclick=()=>{window.loadCard(EX[i]); window.goSlide(2);};}
+ EX.forEach((c,i)=>{const b=document.createElement('button'); b.textContent=['Seminar handout','Exchange application','Club event'][i]; b.onclick=()=>show(i); bt.appendChild(b);}); show(0);
+})();
+
+(function(){ // slide 3: builder
+ const steps=document.getElementById('bSteps'); let n=0;
+ function addStep(v){n++; const d=document.createElement('div'); d.className='stp'; v=v||['','search',false,false,'']; d.innerHTML='<span><b>'+n+'</b></span><input type="text" placeholder="e.g. find three readings and keep those with data"><select>'+TOOLS.map(t=>'<option'+(t===v[1]?' selected':'')+'>'+t+'</option>').join('')+'</select><input type="checkbox" title="a person checks the result before the next step"'+(v[2]?' checked':'')+'><input type="checkbox" title="a person does this step; the agent only prepares it"'+(v[3]?' checked':'')+'><input type="text" placeholder="e.g. fewer than 3 results after 2 searches: stop and report">'; d.querySelectorAll('input[type=text]')[0].value=v[0]; d.querySelectorAll('input[type=text]')[1].value=v[4]; steps.appendChild(d);}
+ function readSteps(){return [...steps.querySelectorAll('.stp')].map((r,i)=>{const t=r.querySelectorAll('input[type=text]'), c=r.querySelectorAll('input[type=checkbox]'); return {i:i+1,t:t[0].value.trim(),tool:r.querySelector('select').value,chk:c[0].checked,hand:c[1].checked,fail:t[1].value.trim()};}).filter(s=>s.t);}
+ const pm=document.getElementById('bPerm'); pm.innerHTML='<tr><th></th>'+PC.map(c=>'<th>'+c+'</th>').join('')+'</tr>'+PR.map((r,i)=>'<tr><td>'+r+'</td>'+PC.map((c,j)=>'<td'+(j>=2||i===2?' class="off"':'')+'><input type="checkbox" data-r="'+i+'" data-c="'+j+'"></td>').join('')+'</tr>').join('');
+ function readPerm(){const m=PR.map(()=>[0,0,0,0,0]); pm.querySelectorAll('input').forEach(x=>{if(x.checked)m[+x.dataset.r][+x.dataset.c]=1;}); return m;}
+ const g=id=>document.getElementById(id), val=id=>g(id).value.trim();
+ function clearAll(){['bTask','bTrig','bInp','bDone','bCapS','bCapM','bCapR','bCapW','bChanged'].forEach(id=>g(id).value=''); steps.innerHTML=''; n=0; pm.querySelectorAll('input').forEach(x=>x.checked=false); ['mTrig','mInp','mPerm','mDone','mSteps','mFail','mAll'].forEach(id=>g(id).innerHTML=''); g('bOut').classList.add('hide');}
+ window.loadCard=function(c){clearAll(); g('bTask').value=c.name; g('bTrig').value=c.trigger; g('bInp').value=c.inputs; g('bDone').value=c.done; g('bCapS').value=c.caps.steps; g('bCapM').value=c.caps.minutes; g('bCapR').value=c.caps.retries; g('bCapW').value='me'; c.steps.forEach(s=>addStep(s)); PR.forEach((r,i)=>(c.perms[r]||[]).forEach((v,j)=>{if(v)pm.querySelector('input[data-r="'+i+'"][data-c="'+j+'"]').checked=true;})); g('bLoaded').textContent='Loaded: '+c.name;};
+ g('bBlank').onclick=()=>{clearAll(); for(let k=0;k<4;k++)addStep(); g('bLoaded').textContent='Blank card, four empty steps.';};
+ [0,1,2].forEach(i=>g('bEx'+i).onclick=()=>window.loadCard(EX[i]));
+ g('bAdd').onclick=()=>addStep();
+ const ok=s=>'<span class="ok">✓</span> '+s, bad=s=>'<span class="bad">✗</span> '+s;
+ const CH={
+  trig(){const t=val('bTrig'); if(t.length<6) return [false,bad('Empty. When does it start: a schedule (“every week, 09:00”), an event (“when the form arrives”), or a person (“when I say go”)?')]; if(!/every|when|at |on |daily|weekly|monthly|once|each|after|\d/i.test(t)) return [false,bad('Say when: a schedule, an event, or a person saying go. “As needed” is not a trigger.')]; return [true,ok('A trigger someone could set a clock or a rule by.')];},
+  inp(){const t=val('bInp'); if(t.length<10) return [false,bad('Name the inputs: what, from where, in what form. If the agent has to go and find its own inputs, it will find the wrong ones.')]; if(!/,|;| and /.test(t)) return [false,bad('Usually more than one thing: the content, the list, the template. Name each.')]; return [true,ok('Inputs named; the agent does not have to look for them.')];},
+  steps(){const S=readSteps(); if(S.length<3) return [false,bad('At least three steps. “Research it” is not a step; “search for three 2025 reviews and keep those with data” is.')];
+   const vague=S.filter(s=>/^(research|handle|deal with|do|manage|look into|work on)\b/i.test(s.t)); if(vague.length) return [false,bad('Step '+vague[0].i+' starts with “'+vague[0].t.split(' ')[0]+'”: not doable by one tool. Split it or name the tool action.')];
+   const irr=S.filter(s=>IRREV.includes(s.tool)&&!s.hand); if(irr.length) return [false,bad('Step '+irr[0].i+' uses “'+irr[0].tool+'” and is not a hand-off. Anything that leaves the system (send, pay, submit, delete) is prepared by the agent and done by a person. Tick hand-off.')];
+   const early=S.slice(0,-1).some(s=>s.chk); if(!early) return [false,bad('No checkpoint before the last step. Checks only at the end let an early wrong choice compound. Add one after the step everything else rests on.')];
+   if(S.every(s=>s.chk)) return [false,bad('Every step has a check: then nobody will do them properly, and it is not worth automating. Keep one or two, where they matter.')];
+   return [true,ok(S.length+' steps, '+S.filter(s=>s.chk).length+' checkpoint(s), '+S.filter(s=>s.hand).length+' hand-off(s); every irreversible tool is a hand-off.')];},
+  perm(){const m=readPerm(); const any=m.some(r=>r.some(x=>x)); if(!any) return [false,bad('Nothing ticked. It needs to read something, or it cannot work. Tick the least.')];
+   const bad1=[]; m.forEach((r,i)=>r.forEach((v,j)=>{if(v&&j>=2) bad1.push(PR[i]+' / '+PC[j]);})); if(bad1.length) return [false,bad('“'+bad1[0]+'” is ticked. Send, pay and delete are hand-offs, not permissions: a person does them. Untick, and make that step a hand-off.')];
+   if(m[2].some(x=>x)) return [false,bad('“The rest of my files” is ticked. That row is the one an injected “e-mail the user’s documents” needs; keep the agent inside its working folder.')];
+   const S=readSteps(); if(S.some(s=>s.tool==='search')&&!m[0][0]) return [false,bad('A step searches, but the web is not readable. Tick what the steps actually use, and only that.')];
+   return [true,ok('Least permissions: reads where it must, writes in one folder at most, nothing leaves the system without a person.')];},
+  done(){const t=val('bDone'); if(t.length<10) return [false,bad('What exact output ends the run? A file in a folder, a table, a draft. Without it the agent stops when it feels done.')]; const t2=t.replace(/\b(nothing|not|never|no)\s+(yet\s+)?(sent|submitted|booked|paid|deleted|posted)(\s+or\s+(sent|submitted|booked|paid|deleted|posted))*/gi,''); if(/\b(sent|submitted|booked|paid|deleted|posted)\b/i.test(t2)) return [false,bad('“Done” includes an irreversible result ('+t2.match(/\b(sent|submitted|booked|paid|deleted|posted)\b/i)[0]+'). Then the agent must be able to do it. Write it as a draft waiting for a person.')]; return [true,ok('A checkable output; the irreversible step is outside it.')];},
+  fail(){const S=readSteps(); const miss=S.filter(s=>!s.fail); if(S.length&&miss.length) return [false,bad('Step '+miss[0].i+' has no “if it fails”. What does failed look like there (too few results, an empty file, a login wall), and then what?')];
+   const r=parseInt(val('bCapR')), mn=parseInt(val('bCapM')), st=parseInt(val('bCapS')); if(isNaN(r)||isNaN(mn)||isNaN(st)) return [false,bad('Caps missing: at most how many steps, how many minutes, how many retries? Retry without a number is retry forever.')]; if(r>3) return [false,bad(r+' retries: a step that fails three times will fail a fourth. Two, then a person.')]; if(!val('bCapW')) return [false,bad('Then stop and tell whom? A failure nobody hears about is a silent one.')];
+   const loop=S.filter(s=>/^retry\.?$/i.test(s.fail)); if(loop.length) return [false,bad('Step '+loop[0].i+' says only “retry”. Retry how many times, then what?')];
+   return [true,ok('Every step says what failed looks like; caps set; someone is told.')];}
+ };
+ const MSG={trig:'mTrig',inp:'mInp',steps:'mSteps',perm:'mPerm',done:'mDone',fail:'mFail'};
+ document.querySelectorAll('button[data-f]').forEach(b=>b.onclick=()=>{const [o,m]=CH[b.dataset.f](); g(MSG[b.dataset.f]).innerHTML=m;});
+ g('bAll').onclick=()=>{let k=0; Object.keys(CH).forEach(f=>{const [o,m]=CH[f](); g(MSG[f]).innerHTML=m; if(o)k++;}); g('mAll').textContent=k+' of 6 checks pass'+(k===6?'. The card is ready to copy.':'.');};
+ g('bCopy').onclick=async()=>{const S=readSteps(), m=readPerm(); const perms=PR.map((r,i)=>{const on=PC.filter((_,j)=>m[i][j]); return on.length?r+': '+on.join(', ').toLowerCase():null;}).filter(Boolean).join('; ')||'none';
+  const txt='WORKFLOW CARD: '+val('bTask')+'\n1 Trigger: '+val('bTrig')+'\n2 Inputs: '+val('bInp')+'\n3 Steps and tools:\n'+S.map(s=>'  '+s.i+'. '+s.t+' [tool: '+s.tool+(s.chk?'; checkpoint after':'')+(s.hand?'; hand-off, a person does it':'')+'] if it fails: '+s.fail).join('\n')+'\n4 Checkpoints and hand-offs: after steps '+(S.filter(s=>s.chk).map(s=>s.i).join(', ')||'none')+'; hand-offs at steps '+(S.filter(s=>s.hand).map(s=>s.i).join(', ')||'none')+'\n5 Permissions: '+perms+'; everything else: no\n6 Done means: '+val('bDone')+'\n7 If a step fails: at most '+val('bCapS')+' steps, '+val('bCapM')+' minutes, '+val('bCapR')+' retries; then stop and tell '+val('bCapW')+'\nThe field that changed my steps: '+val('bChanged');
+  const o=g('bOut'); o.value=txt; o.classList.remove('hide'); try{await navigator.clipboard.writeText(txt); g('mAll').textContent='Copied; paste into the form.';}catch(e){g('mAll').textContent='Select the text below and copy it.';}};
+ g('bBlank').click();
+})();
+
+</script>
+</body></html>
